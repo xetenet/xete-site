@@ -104,6 +104,10 @@
   #info{ position:fixed; left:26px; bottom:24px; width:300px; z-index:6;
     background:var(--panel); border:1px solid var(--line); border-radius:14px;
     padding:16px 18px; backdrop-filter:blur(9px); box-shadow:0 8px 40px rgba(0,0,0,.55); display:none; }
+  #info.pulse{ animation:infoPulse .42s ease; }
+  @keyframes infoPulse{ 0%{ transform:scale(1); box-shadow:0 8px 40px rgba(0,0,0,.55); }
+    45%{ transform:scale(1.035); box-shadow:0 8px 46px rgba(96,165,250,.45); }
+    100%{ transform:scale(1); box-shadow:0 8px 40px rgba(0,0,0,.55); } }
   #info .chip{ display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
     padding:3px 9px; border-radius:999px; margin-bottom:8px; }
   #info .role{ font-size:11px; font-style:italic; color:#7fe9da; margin:0 0 6px; }
@@ -735,13 +739,14 @@ function showInfo(id){
   const o=(out[id]||[]).map(([t,l,g])=>`<div class="rel"><b>${labelOf[t]}</b> <span class="verb">· ${l}</span>${g?`<div class="gl">${g}</div>`:''}</div>`).join('');
   const i=(inc[id]||[]).map(([f,l,g])=>`<div class="rel"><b>${labelOf[f]}</b> <span class="verb">· ${l}</span>${g?`<div class="gl">${g}</div>`:''}</div>`).join('');
   const hasFeat=NODES.some(x=>x.feature&&x.parent===id);
-  const hint=hasFeat?(expanded===id?`<p class="hintline">▾ click again to collapse</p>`:`<p class="hintline">▸ click again to open its parts</p>`):'';
+  const hint=hasFeat?(expanded===id?`<p class="hintline">▾ click again to collapse</p>`:`<p class="hintline">▸ click again to open its parts</p>`):(selected===id?`<p class="hintline">◦ this is its full card · click empty space to deselect</p>`:`<p class="hintline">▸ click again for its full card</p>`);
   document.getElementById('info-body').innerHTML=
     `<span class="chip" style="background:${cc}22;color:${cc};border:1px solid ${cc}55">${areaName}</span>
      <div class="role">◦ ${n.role}</div><h3>${n.label}</h3><p class="desc">${n.sub}</p>${n.note?`<p class="note">${n.note}</p>`:''}${n.addr?`<a class="onchain" href="https://solscan.io/account/${n.addr}" target="_blank" rel="noopener">View on-chain (Solscan) · <span class="ad">${n.addr.slice(0,4)}…${n.addr.slice(-4)}</span></a>`:''}${hint}
      ${o?`<div class="grp">this → others</div>${o}`:''}${i?`<div class="grp">others → this</div>${i}`:''}`;
   document.getElementById('info').style.display='block';
 }
+function pulseInfo(){ const el=document.getElementById('info'); el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }   // restart the brief glow so the 2nd click gives feedback
 let downXY=[0,0];
 renderer.domElement.addEventListener('pointerdown',e=>{ bumpTimer(); if(e.button===0) downXY=[e.clientX,e.clientY]; });
 renderer.domElement.addEventListener('wheel',bumpTimer,{passive:true});
@@ -754,9 +759,10 @@ renderer.domElement.addEventListener('pointerup',e=>{
   const hit=ray.intersectObjects(meshes.filter(m=>m.visible))[0];
   const id=hit?hit.object.userData.id:null;
   const nd=id?NODES.find(n=>n.id===id):null;
-  if(nd && nd.feature){ showInfo(id); return; }   // feature node: show its card, leave the layout put
+  if(nd && nd.feature){ showInfo(id); pulseInfo(); return; }   // feature node: show its card, leave the layout put
   if(id && id===selected){
     if(NODES.some(n=>n.feature&&n.parent===id)){ expanded=(expanded===id?null:id); showInfo(id); computeTargets(); animating=true; applyVisibility(); }
+    else { showInfo(id); pulseInfo(); }   // no parts: second click re-affirms its info card so every node's 2nd click does something
     return;
   }
   setSelection(id);

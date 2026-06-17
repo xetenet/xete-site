@@ -1,7 +1,7 @@
 {
   "generated_note": "sha256 of each LIVE page; manual check + GitHub verifier compare against these",
   "pages": {
-    "/": "0379e6e5a47e4d9b4d02fabe5a5a18dbe9534f1af0b18d0ee7227384354f01f8",
+    "/": "4e695c67847403a8396987a12ecdbb55f9cb9606165e78ecd2323181e9586e96",
     "/home": "776bfcbf654466bdaee990f9ac48434c44f9cd0fc1cc9683d5d6fcc45037af93",
     "/people": "41dcc48fd7520bc1f1d3b49be64f755bd8dbd0de01e0aaa12bb732b4e78fb81b",
     "/how-it-works": "ccc1ffd68c3a292a9559d8336ddaf4eada3e0a88015db9aaf7a867e7d11405c6",
