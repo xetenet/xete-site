@@ -1,7 +1,7 @@
 {
   "generated_note": "sha256 of each LIVE page; manual check + GitHub verifier compare against these",
   "pages": {
-    "/": "4e695c67847403a8396987a12ecdbb55f9cb9606165e78ecd2323181e9586e96",
+    "/": "6bd2cebe612494c7581b94fa1d95edaf22c2c839abf6aa80855bb80160f66397",
     "/home": "776bfcbf654466bdaee990f9ac48434c44f9cd0fc1cc9683d5d6fcc45037af93",
     "/people": "41dcc48fd7520bc1f1d3b49be64f755bd8dbd0de01e0aaa12bb732b4e78fb81b",
     "/how-it-works": "ccc1ffd68c3a292a9559d8336ddaf4eada3e0a88015db9aaf7a867e7d11405c6",
@@ -14,7 +14,7 @@
     "/enterprise": "6e2ced5c843491bf23592fb8d04281d28ea0428c27939ad7ea2b4026f3558168",
     "/trust": "b503a0d58982955faea6730d71ffb837f767e3ed170ea00e0c0495cbd9f9e64d",
     "/contact": "ae4e317ac086a395e2a9bbade66a5986bafc331e1430782621ac0a0ae1fc9792",
-    "/login": "dcee182fe56efd898b38e5c6b29c7cb345d099ad9ec304851d680ef54456c7e0",
+    "/login": "9b296d0c5e1e2d80f4dcd476cfd36a78ea8d19c23c0e6c9f51e8adde4add9e66",
     "/tour": "f850b347de6be875237827f32db224c45c138956eed559d5ecb3c8821bc883f8"
   }
 }

@@ -59,6 +59,9 @@
   .mlabel.mlink{ cursor:pointer; transition:color .15s; }
   .mlabel.mlink:hover{ color:#a6f5e8; }
   .mlabel.mlink:hover small{ color:#cdd9df; text-decoration:underline; }
+  /* viz labels must never be text-selectable or browser-draggable, or a drag that starts on a
+     label (esp. the membrane caption near the equator) does native select/drag instead of orbit */
+  .label, .mlabel{ -webkit-user-select:none; user-select:none; -webkit-user-drag:none; }
 
   #title{ position:fixed; top:22px; left:26px; max-width:350px; z-index:5; }
   #title h1{ font-size:38px; margin:0 0 6px; letter-spacing:2px; font-weight:700; }
@@ -539,7 +542,7 @@ shells.add(medium);
 // membrane caption
 const mcap = document.createElement('div'); mcap.className='mlabel mlink';
 mcap.innerHTML='Encrypted boundary<small>only ciphertext crosses · how it\'s proven</small>';
-mcap.style.pointerEvents='auto'; mcap.setAttribute('role','link'); mcap.tabIndex=0;
+mcap.style.pointerEvents='none'; mcap.setAttribute('role','link'); mcap.tabIndex=0;   // pointer-events:none so a drag over the caption ORBITS through it; its click is re-routed via the canvas handler below
 mcap.title='Trust & verification — how xete proves this';
 mcap.addEventListener('click',()=>{ location.href='/trust'; });
 mcap.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); location.href='/trust'; } });
@@ -754,6 +757,9 @@ renderer.domElement.addEventListener('pointerup',e=>{
   if(Math.hypot(e.clientX-downXY[0],e.clientY-downXY[1])>=5) return;
   if(phase==='landing'){ if(!gateRevealed) revealGate(); else if(gateFree) enterSite(); return; }   // click reveals the gate; session/gate-off can click the system to enter
   if(phase!=='home') return;                       // ignore clicks mid-flight
+  // membrane caption: it's pointer-events:none (so drags orbit through it), so detect a real CLICK on
+  // it here, in the canvas handler, and send it to /trust like the old direct link did.
+  { const mr=mcap.getBoundingClientRect(); if(mr.width && e.clientX>=mr.left && e.clientX<=mr.right && e.clientY>=mr.top && e.clientY<=mr.bottom){ location.href='/trust'; return; } }
   mouse.x=(e.clientX/innerWidth)*2-1; mouse.y=-(e.clientY/innerHeight)*2+1;
   ray.setFromCamera(mouse,camera);
   const hit=ray.intersectObjects(meshes.filter(m=>m.visible))[0];
