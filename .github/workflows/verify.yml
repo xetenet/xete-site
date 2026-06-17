@@ -1,0 +1,47 @@
+name: verify-site-integrity
+
+# Continuously confirms the LIVE xete.net site still matches this canonical repo. On ANY mismatch it
+# POSTs to https://xete.net/integrity/report (-> a red alarm on our admin dashboard) and fails the
+# run loudly. This is the GLOBAL tamper/drift monitor. It checks from one vantage point (GitHub's
+# runners), so it catches a wholesale swap of the live site; per-visitor / targeted injection is
+# caught separately by the browser-side CSP tripwire (also reports to /integrity/report).
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # every 15 minutes
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify live site == canonical repo
+        run: |
+          set -u
+          MISMATCH=0
+          while read route name; do
+            [ -z "${route:-}" ] && continue
+            curl -sL --compressed "https://xete.net$route" -o /tmp/live.html
+            live=$(sha256sum /tmp/live.html | cut -d' ' -f1)
+            repo=$(sha256sum "pages/$name" | cut -d' ' -f1)
+            if [ "$live" != "$repo" ]; then
+              echo "::error::MISMATCH  $route  (live=$live  repo=$repo)"
+              MISMATCH=1
+              curl -s -X POST "https://xete.net/integrity/report" \
+                -H "Content-Type: application/json" \
+                -d "{\"source\":\"github-verify\",\"route\":\"$route\",\"live\":\"$live\",\"repo\":\"$repo\",\"run\":\"${GITHUB_RUN_ID:-}\"}" || true
+            else
+              echo "ok  $route"
+            fi
+          done < routes.txt
+          if [ "$MISMATCH" != "0" ]; then
+            echo "Live site does NOT match the canonical repo."
+            exit 1
+          fi
+          echo "Live site matches the repo - virtuous."

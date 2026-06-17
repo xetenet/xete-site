@@ -1,0 +1,15 @@
+/ index.html
+/home home.html
+/people people.html
+/how-it-works how-it-works.html
+/aliases aliases.html
+/about about.html
+/help help.html
+/get-started get-started.html
+/developers developers.html
+/for-agents for-agents.html
+/enterprise enterprise.html
+/trust trust.html
+/contact contact.html
+/login login.html
+/tour tour.html

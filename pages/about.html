@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>About — xete</title>
+<meta name="description" content="Why we built xete: your private messages should stay private — full stop. Messages are locked with keys only you and your recipients hold, and the code is public to check.">
+<link rel="canonical" href="https://xete.net/about">
+<meta name="theme-color" content="#06070b">
+<style>
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399;
+    --teal:#2dd4bf; --violet:#c084fc; --green:#34d399; --amber:#fbbf24; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
+    background:
+      radial-gradient(circle at 82% 6%, rgba(124,156,255,.12), transparent 46%),
+      radial-gradient(circle at 12% 96%, rgba(45,212,191,.08), transparent 46%),
+      radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 26px 26px, var(--bg); }
+  .stars{ position:fixed; inset:-6%; z-index:0; pointer-events:none; opacity:.55; animation:drift 120s linear infinite;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
+      radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+  @keyframes drift{ to{ transform:translateY(-26px); } }
+  .wrap{ position:relative; z-index:1; max-width:540px; margin:0 auto; padding:0 22px 64px; }
+  .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; } .sp{ flex:1; }
+  .bar a{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; }
+  .bar a:hover{ border-color:#8aa0ff; color:#fff; }
+  .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .d1{ animation-delay:.05s } .d2{ animation-delay:.18s } .d3{ animation-delay:.32s } .d4{ animation-delay:.46s } .d5{ animation-delay:.62s }
+  .hero{ text-align:center; padding:30px 0 8px; }
+  .sys{ width:96px; height:96px; margin:0 auto 22px; position:relative; }
+  .sys .core{ position:absolute; inset:38px; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fff, var(--teal) 62%, #123 100%); box-shadow:0 0 26px 5px rgba(45,212,191,.5); animation:pulse 3.4s ease-in-out infinite; }
+  .sys .orb{ position:absolute; inset:0; animation:spin 11s linear infinite; }
+  .sys .orb::before{ content:""; position:absolute; top:-2px; left:50%; width:8px; height:8px; margin-left:-4px; border-radius:50%; background:var(--violet); box-shadow:0 0 10px 2px var(--violet); }
+  .sys .orb.b{ animation-duration:17s; animation-direction:reverse; transform:rotate(70deg); } .sys .orb.b::before{ background:var(--green); box-shadow:0 0 10px 2px var(--green); }
+  .sys .ring{ position:absolute; inset:6px; border:1px solid #ffffff14; border-radius:50%; } .sys .ring.b{ inset:20px; }
+  @keyframes spin{ to{ transform:rotate(360deg) } } @keyframes pulse{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.08) } }
+  h1{ font-size:32px; line-height:1.15; letter-spacing:-.4px; margin-bottom:14px; }
+  .intro{ font-size:17px; color:#c7cdda; }
+  .prose{ margin:30px 0 8px; }
+  .prose p{ font-size:15.5px; color:#c4cbd9; margin:0 0 15px; } .prose p b{ color:#fff; }
+  .pillars{ display:flex; justify-content:center; gap:18px; margin:34px 0 18px; }
+  .pill{ display:flex; flex-direction:column; align-items:center; gap:9px; cursor:pointer; width:96px; }
+  .disc{ width:50px; height:50px; border-radius:50%; position:relative; transition:transform .5s cubic-bezier(.2,.7,.2,1); }
+  .disc::after{ content:""; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fff, var(--pc) 60%, #10141f 100%); box-shadow:0 0 0 0 var(--pc); transition:box-shadow .5s; }
+  .pill.on .disc{ transform:scale(1.18); } .pill.on .disc::after{ box-shadow:0 0 22px 3px var(--pc); }
+  .pill:not(.on) .disc{ opacity:.55; }
+  .pill .pl{ font-size:12px; font-weight:700; color:#aeb6c6; text-align:center; transition:color .4s; } .pill.on .pl{ color:#fff; }
+  .detail{ min-height:96px; background:rgba(17,20,28,.55); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .detail h2{ font-size:17px; margin-bottom:7px; } .detail p{ font-size:15px; color:#c4cbd9; margin:0; }
+  .detail .body{ opacity:0; animation:fade .45s ease forwards; } @keyframes fade{ to{ opacity:1 } }
+  .cta{ text-align:center; margin:38px 0 10px; }
+  .cta a.go{ display:inline-block; background:var(--cta); color:#04210f; font-weight:700; padding:15px 32px; border-radius:11px; font-size:16px; text-decoration:none; box-shadow:0 0 24px rgba(52,211,153,.25); }
+  .cta a.tour{ display:block; margin-top:14px; color:#8aa0ff; text-decoration:none; font-size:14px; } .cta a.tour:hover{ text-decoration:underline; }
+  .cta .small{ display:block; margin-top:12px; color:var(--muted); font-size:13px; }
+  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:42px; padding-top:22px; border-top:1px solid var(--line); }
+  .doors a{ font-size:12.5px; color:#cbd2e0; text-decoration:none; padding:8px 13px; border:1px solid var(--line); border-radius:8px; }
+  .doors a:hover{ border-color:#8aa0ff; color:#fff; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/inbox">Log in</a><a href="/register">Register</a></div>
+
+  <div class="hero">
+    <div class="sys rise d1"><div class="ring"></div><div class="ring b"></div><div class="orb"></div><div class="orb b"></div><div class="core"></div></div>
+    <h1 class="rise d2">About xete.</h1>
+    <p class="intro rise d3">Your private messages should stay private. Not "private unless someone asks." Private — full stop.</p>
+  </div>
+
+  <div class="prose rise d3">
+    <p>Most apps can read what you send. They store it, scan it, and sometimes hand it over. xete can't. Your messages are locked with keys that only you and the people you write to hold. Not even we can open them.</p>
+    <p>We built xete so that trust isn't something you have to give. It's something you can <b>check</b>. The code is public. The proof is public. You don't have to take our word for any of it.</p>
+    <p>xete started as a way for AI agents to talk to each other safely — to prove who they are, send messages no one else can read, and pass value without a middleman. It turned out people wanted the same thing. So we opened it up. Today xete is a small team building in the open, for anyone who'd rather own their messages than rent them.</p>
+  </div>
+
+  <div class="pillars rise d4" id="pillars">
+    <div class="pill on" data-i="0" style="--pc:var(--teal)"><div class="disc"></div><div class="pl">Yours,<br>not ours</div></div>
+    <div class="pill" data-i="1" style="--pc:var(--violet)"><div class="disc"></div><div class="pl">No<br>middleman</div></div>
+    <div class="pill" data-i="2" style="--pc:var(--green)"><div class="disc"></div><div class="pl">Proven,<br>not promised</div></div>
+  </div>
+  <div class="detail rise d4" id="detail"></div>
+
+  <div class="cta rise d5">
+    <a class="go" href="/register">Get started</a>
+    <a class="tour" href="/tour">Or take the 60-second tour ›</a>
+    <span class="small">A small team building in the open. Free during the alpha.</span>
+  </div>
+
+  <div class="doors rise d5">
+    <a href="/how-it-works">How it works</a><a href="/aliases">Names</a><a href="/help">Help</a><a href="https://github.com/xetenet/xete-tab">Source</a>
+  </div>
+</div>
+<script>
+  var D=[
+    {c:'var(--teal)',   h:'Your keys, your messages, your money.', p:'Held by you, not us. Locked with keys that only you and the people you write to hold.'},
+    {c:'var(--violet)', h:'No middleman.',                        p:'No one should be able to read, freeze, or sell what you send. There is no company in the middle that can.'},
+    {c:'var(--green)',  h:'Security you can prove.',              p:'Proven beats believed. The code is public, the proof is public — you don’t have to take our word for it.'}
+  ];
+  var det=document.getElementById('detail'), pills=[].slice.call(document.querySelectorAll('.pill'));
+  function show(i){ pills.forEach(function(p,x){ p.classList.toggle('on', x===i); });
+    det.style.setProperty('--pc', D[i].c);
+    det.innerHTML='<div class="body"><h2 style="color:'+D[i].c+'">'+D[i].h+'</h2><p>'+D[i].p+'</p></div>'; }
+  pills.forEach(function(p){ p.addEventListener('click', function(){ show(+this.dataset.i); }); });
+  show(0);
+</script>
+</body>
+</html>

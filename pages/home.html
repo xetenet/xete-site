@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>xete — sovereign encrypted messaging</title>
+<meta name="description" content="Private messaging and payments you own. An identity you can't get banned from, messages no server can read, value no one can freeze. Pick a direction.">
+<style>
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399;
+    --teal:#2dd4bf; --violet:#c084fc; --blue:#60a5fa; --green:#34d399; --amber:#fbbf24; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
+    background:
+      radial-gradient(circle at 82% 6%, rgba(124,156,255,.12), transparent 46%),
+      radial-gradient(circle at 12% 96%, rgba(45,212,191,.07), transparent 46%),
+      radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 26px 26px, var(--bg); }
+  .stars{ position:fixed; inset:-6%; z-index:0; pointer-events:none; opacity:.55; animation:drift 120s linear infinite;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
+      radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+  @keyframes drift{ to{ transform:translateY(-26px); } }
+  .wrap{ position:relative; z-index:1; max-width:540px; margin:0 auto; padding:0 22px 56px; }
+  .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; color:var(--ink); text-decoration:none; } .sp{ flex:1; }
+  .bar a.login{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; } .bar a.login:hover{ border-color:#8aa0ff; color:#fff; }
+  .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .d1{animation-delay:.04s}.d2{animation-delay:.14s}.d3{animation-delay:.26s}.d4{animation-delay:.36s}.d5{animation-delay:.46s}.d6{animation-delay:.56s}.d7{animation-delay:.66s}
+  .hero{ text-align:center; padding:26px 0 6px; }
+  h1{ font-size:31px; line-height:1.14; letter-spacing:-.4px; margin-bottom:12px; }
+  .intro{ font-size:16px; color:#c7cdda; max-width:420px; margin:0 auto; }
+  .go{ display:inline-block; margin-top:22px; background:var(--cta); color:#04210f; font-weight:700; padding:14px 30px; border-radius:11px; font-size:16px; text-decoration:none; box-shadow:0 0 24px rgba(52,211,153,.22); }
+  .go:active{ transform:translateY(1px); }
+  .pick{ text-align:center; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#5d6577; margin:38px 0 14px; }
+  .grid{ display:flex; flex-direction:column; gap:11px; }
+  .door{ display:flex; align-items:center; gap:15px; text-decoration:none; background:rgba(17,20,28,.5); border:1px solid var(--line); border-radius:14px; padding:15px 17px; transition:border-color .3s, background .3s, transform .2s; }
+  .door:hover{ border-color:var(--pc); background:rgba(22,27,38,.65); }
+  .door:active{ transform:scale(.99); }
+  .door .disc{ flex:0 0 16px; width:16px; height:16px; border-radius:50%; background:radial-gradient(circle at 38% 34%, #fff, var(--pc) 62%, #10141f 100%); box-shadow:0 0 12px 1px var(--pc); }
+  .door .tx{ flex:1; min-width:0; }
+  .door .t{ display:block; font-weight:700; font-size:16px; color:var(--ink); }
+  .door .s{ display:block; margin-top:2px; font-size:13px; color:var(--muted); line-height:1.4; }
+  .door .ar{ color:#5d6577; font-size:18px; }
+  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:34px; padding-top:22px; border-top:1px solid var(--line); }
+  .doors a{ font-size:12.5px; color:#cbd2e0; text-decoration:none; padding:8px 13px; border:1px solid var(--line); border-radius:8px; } .doors a:hover{ border-color:#8aa0ff; color:#fff; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <div class="bar rise d1"><a class="brand" href="/home">xete</a><span class="sp"></span><a class="login" href="/login">Log in</a></div>
+  <div class="hero">
+    <h1 class="rise d1">One sovereign stack.</h1>
+    <p class="intro rise d2">Private messaging and payments you own — an identity you can't get banned from, messages no server can read, value no one can freeze.</p>
+    <a class="go rise d3" id="primary" href="/register">Get started</a>
+    <a id="setuppass" href="/login" style="display:none;margin-top:16px;font-size:13.5px;color:#c084fc;text-decoration:none">Set up Face ID login on this phone &rsaquo;</a>
+  </div>
+
+  <div class="pick rise d3">Or pick a direction</div>
+  <div class="grid">
+    <a class="door rise d3" href="/tour" style="--pc:var(--teal)"><span class="disc"></span><span class="tx"><span class="t">Take the tour</span><span class="s">The whole ecosystem, in a 60-second animated map.</span></span><span class="ar">&rsaquo;</span></a>
+    <a class="door rise d4" href="/people" style="--pc:var(--amber)"><span class="disc"></span><span class="tx"><span class="t">For people</span><span class="s">Private messaging you actually own.</span></span><span class="ar">&rsaquo;</span></a>
+    <a class="door rise d5" href="/how-it-works" style="--pc:var(--blue)"><span class="disc"></span><span class="tx"><span class="t">How it works</span><span class="s">The whole idea, in five plain steps.</span></span><span class="ar">&rsaquo;</span></a>
+    <a class="door rise d6" href="/developers" style="--pc:var(--green)"><span class="disc"></span><span class="tx"><span class="t">For developers</span><span class="s">Build on xete — MCP tools, HTTP API, on-chain settlement.</span></span><span class="ar">&rsaquo;</span></a>
+    <a class="door rise d7" href="/enterprise" style="--pc:var(--violet)"><span class="disc"></span><span class="tx"><span class="t">For enterprise</span><span class="s">Private, auditable comms behind your own VPN.</span></span><span class="ar">&rsaquo;</span></a>
+  </div>
+
+  <div class="doors rise d7">
+    <a href="/about">About</a><a href="/aliases">Names</a><a href="/help">Help</a><a href="/trust">Trust</a><a href="/contact">Contact</a>
+  </div>
+</div>
+<script>
+  // logged-in visitors get straight to their inbox
+  fetch('/auth/session',{credentials:'include'}).then(function(r){return r.json();}).then(function(d){
+    if(d&&d.authenticated){ var p=document.getElementById('primary'); if(p){ p.textContent='Open your inbox'; p.href='/inbox'; } var sp=document.getElementById('setuppass'); if(sp) sp.style.display='inline-block'; }
+  }).catch(function(){});
+</script>
+</body>
+</html>

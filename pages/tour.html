@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Take the tour — xete</title>
+<meta name="description" content="The xete ecosystem in a few taps: identity you can't get banned from, messages no server can read, value no one can freeze.">
+<style>
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399; --amber:#fbbf24; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; overflow:hidden; }
+  body{ color:var(--ink); background:var(--bg); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(circle at 80% 8%, rgba(124,156,255,.10), transparent 48%),
+      radial-gradient(circle at 14% 92%, rgba(251,191,36,.06), transparent 48%),
+      radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 26px 26px, var(--bg); }
+  .stars{ position:fixed; inset:-6%; z-index:0; pointer-events:none; opacity:.6; animation:drift 110s linear infinite;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
+      radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+  @keyframes drift{ to{ transform:translateY(-26px); } }
+  .stage{ position:relative; z-index:1; height:100%; display:flex; flex-direction:column; max-width:600px; margin:0 auto; }
+  .top{ display:flex; align-items:center; justify-content:space-between; padding:max(16px,env(safe-area-inset-top)) 22px 4px; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; }
+  .skip{ color:var(--muted); font-size:12px; text-decoration:none; } .skip:hover{ color:#fff; }
+  .map{ flex:1 1 auto; position:relative; min-height:0; }
+  svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .edge{ stroke:#5566aa; fill:none; pointer-events:stroke; cursor:pointer; }
+  .node{ cursor:pointer; }
+  .node .rim{ fill:none; stroke:#fff; stroke-opacity:.25; }
+  .node .ball{ transition:r .6s ease; }
+  .node .lbl{ fill:#cdd4e2; text-anchor:middle; font-weight:600; letter-spacing:.2px; }
+  .panel{ flex:0 0 auto; padding:12px 24px max(18px,env(safe-area-inset-bottom)); }
+  .dots{ display:flex; gap:7px; margin:0 0 12px; }
+  .dots i{ width:7px; height:7px; border-radius:50%; background:#2a3142; cursor:pointer; transition:all .3s; }
+  .dots i.on{ background:var(--amber); box-shadow:0 0 8px var(--amber); transform:scale(1.25); }
+  .step{ display:none; } .step.on{ display:block; animation:rise .6s ease both; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:translateY(0);} }
+  .kicker{ font-size:10.5px; letter-spacing:2.4px; text-transform:uppercase; margin-bottom:8px; }
+  h1{ font-size:23px; line-height:1.16; letter-spacing:-.3px; margin-bottom:8px; }
+  p{ font-size:15px; line-height:1.5; color:#c4cbd9; } p b{ color:#fff; }
+  .hint{ margin-top:8px; font-size:11px; color:#5d6577; }
+  .nav{ display:flex; align-items:center; gap:12px; margin-top:14px; }
+  .back{ background:none; border:0; color:var(--muted); font-size:14px; padding:10px 4px; cursor:pointer; } .back:hover{ color:#fff; } .back[hidden]{ visibility:hidden; }
+  .spacer{ flex:1; }
+  .btn{ text-decoration:none; display:inline-block; border:0; cursor:pointer; font-family:inherit; background:var(--cta); color:#04210f; font-weight:700; border-radius:11px; padding:12px 22px; font-size:15px; }
+  .btn:active{ transform:translateY(1px); } .btn.ghost{ background:#11151e; color:var(--ink); border:1px solid var(--line); }
+  .cta{ display:none; gap:10px; margin-top:14px; } .cta.on{ display:flex; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="stage">
+  <div class="top"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><a class="skip" id="tourskip" href="/home">skip ›</a></div>
+  <div class="map"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid meet"><g id="edges"></g><g id="nodes"></g></svg></div>
+  <div class="panel">
+    <div class="dots" id="dots"></div>
+    <div id="steps"></div>
+    <div class="nav" id="nav"><button class="back" id="back" hidden>‹ Back</button><div class="spacer"></div><button class="btn" id="next">Next ›</button></div>
+    <div class="cta" id="endcta"><a class="btn" href="/register">Get started</a><a class="btn ghost" href="/people">For people</a></div>
+  </div>
+</div>
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  var ID='#c084fc', APP='#60a5fa', SVC='#2dd4bf', LIVE='#34d399', BUILT='#f472b6', GUARD='#f87171';
+  // every node lives in the map; FOCAL ones (in ORDER) get a tour stop, the rest are labeled references.
+  var N=[
+    {id:'wallet',  hx:100,hy:30, r:8.5,c:ID,   k:'start here · your identity', t:'Your keypair is you.', b:'No account, no email — <b>nothing to ban</b>. One Solana keypair is your login <b>and</b> your encryption identity. Make as many as you like; xete never links them together.'},
+    {id:'House Elf',hx:30,hy:60, r:8,  c:APP,  k:'the app',                   t:'Your private home.', b:'House Elf is the sovereign desktop app — an encrypted <b>inbox</b>, an on-device <b>vault</b> for notes and files, and on-chain <b>transactions</b>. Prefer the browser? Webmail does messaging too.'},
+    {id:'relay',   hx:106,hy:74, r:8,  c:SVC,  k:'the whole point',           t:'No one can read it.', b:'Your messages are encrypted to the recipient <b>before they leave your device</b>. The relay that carries them only ever sees ciphertext — not us, not anyone.'},
+    {id:'%alias',  hx:58, hy:20, r:5.5,c:ID,   k:'your name',                 t:'Claim a %name.', b:'A short human handle others reach you by — like <b>%you</b>. Already have a <b>.sol</b> name? Bring it.'},
+    {id:'settle',  hx:118,hy:138,r:8.5,c:LIVE, k:'when you’re ready · value',  t:'Settle, don’t trust.', b:'Negotiate privately, then <b>settle on-chain</b> — non-custodial, live on Solana. A payment detector greenlights paid delivery.'},
+    {id:'xete-mcp',hx:46, hy:66, r:7,  c:APP,  k:'for builders & agents',     t:'It goes deeper.', b:'Your AI agents get their own identity and the same primitives — message, settle, and trade on-chain. <b>Token swaps</b>, <b>agent guard</b>, <b>on-chain name ownership</b>: the power tools are here when you want them.'},
+    // ---- labeled references (not focal stops; tap to peek) ----
+    {id:'Webmail', hx:58, hy:104,r:5,  c:APP,  k:'apps',            t:'Webmail.', b:'Your encrypted inbox, right in the browser.'},
+    {id:'.sol',    hx:142,hy:22, r:4.5,c:ID,   k:'identity',        t:'.sol names.', b:'Bring an existing .sol name — free match during the grace window.'},
+    {id:'website', hx:24, hy:40, r:5,  c:APP,  k:'apps',            t:'The website.', b:'Three doors — for people, developers, and enterprise.'},
+    {id:'permit',  hx:146,hy:98, r:5,  c:SVC,  k:'services',        t:'Permit server.', b:'Co-signs %name claims to the on-chain registry.'},
+    {id:'guard',   hx:178,hy:60, r:6,  c:GUARD,k:'agent guard',     t:'Agent guard.', b:'Protects an autonomous agent on the network so it can act on its own.'},
+    {id:'pay',     hx:80, hy:132,r:6.5,c:LIVE, k:'on-chain · live', t:'Payment Detector.', b:'Live on Solana — greenlights paid, encrypted delivery.'},
+    {id:'registry',hx:158,hy:126,r:6,  c:BUILT,k:'on-chain · built',t:'Alias Registry.', b:'On-chain name ownership: claim, transfer, release.'},
+    {id:'swap',    hx:40, hy:126,r:6,  c:BUILT,k:'on-chain · built',t:'Token Swap.', b:'Atomic token ↔ token, no middleman.'}
+  ];
+  var IX={}; N.forEach(function(n,i){ IX[n.id]=i; });
+  var E=[ ['wallet','%alias'],['wallet','.sol'],['wallet','House Elf'],['wallet','xete-mcp'],['wallet','settle'],['wallet','pay'],
+          ['website','xete-mcp'],['xete-mcp','relay'],['House Elf','relay'],['Webmail','relay'],['House Elf','swap'],
+          ['relay','pay'],['relay','permit'],['permit','registry'],['%alias','registry'],
+          ['guard','relay'],['guard','settle'],['settle','pay'],['xete-mcp','swap'],['relay','settle'] ].map(function(e){return [IX[e[0]],IX[e[1]]];});
+  var adj=N.map(function(){return {};}); E.forEach(function(e){ adj[e[0]][e[1]]=1; adj[e[1]][e[0]]=1; });
+  var ORDER=['wallet','House Elf','relay','%alias','settle','xete-mcp'].map(function(k){return IX[k];});   // the focal tour path
+  var CX=100, CY=68, RING=46, FAR=122, DUR=1500;   // slower so you can enjoy the reorganize
+
+  var gN=document.getElementById('nodes'), gE=document.getElementById('edges'),
+      stepsBox=document.getElementById('steps'), dotsBox=document.getElementById('dots'),
+      back=document.getElementById('back'), next=document.getElementById('next'), nav=document.getElementById('nav'), endcta=document.getElementById('endcta');
+  var step=0, cur=ORDER[0];
+  var P=N.map(function(n){ return {x:n.hx,y:n.hy,o:1,tx:n.hx,ty:n.hy,to:1,sx:n.hx,sy:n.hy,so:1}; });
+  var EO=E.map(function(){ return {o:.5,t:.5,s:.5}; });
+
+  var defs=document.createElementNS(NS,'defs');
+  defs.innerHTML=N.map(function(n,i){ return '<radialGradient id="g'+i+'"><stop offset="0%" stop-color="'+n.c+'" stop-opacity=".8"/><stop offset="45%" stop-color="'+n.c+'" stop-opacity=".28"/><stop offset="100%" stop-color="'+n.c+'" stop-opacity="0"/></radialGradient>'; }).join('');
+  gN.appendChild(defs);
+  var edgeEls=E.map(function(e){ var ln=document.createElementNS(NS,'line'); ln.setAttribute('class','edge'); ln.setAttribute('stroke-width','.5');
+    ln.addEventListener('click', function(){ tap(cur===e[0]?e[1]:e[0]); }); gE.appendChild(ln); return ln; });
+  var nodeEls=N.map(function(n,i){ var g=document.createElementNS(NS,'g'); g.setAttribute('class','node');
+    var glow=document.createElementNS(NS,'circle'); glow.setAttribute('r',n.r*2.2); glow.setAttribute('fill','url(#g'+i+')');
+    var ball=document.createElementNS(NS,'circle'); ball.setAttribute('r',n.r); ball.setAttribute('fill',n.c); ball.setAttribute('class','ball');
+    var rim=document.createElementNS(NS,'circle'); rim.setAttribute('r',n.r); rim.setAttribute('class','rim'); rim.setAttribute('stroke-width','.35');
+    var lbl=document.createElementNS(NS,'text'); lbl.setAttribute('class','lbl'); lbl.setAttribute('font-size','2.5'); lbl.textContent=n.id;
+    g.appendChild(glow); g.appendChild(ball); g.appendChild(rim); g.appendChild(lbl);
+    g.addEventListener('click', function(){ tap(i); }); gN.appendChild(g);
+    return {g:g,glow:glow,ball:ball,rim:rim,lbl:lbl}; });
+
+  N.forEach(function(n,i){ var s=document.createElement('div'); s.className='step';
+    s.innerHTML='<div class="kicker" style="color:'+n.c+'">'+n.k+'</div><h1>'+n.t+'</h1><p>'+n.b+'</p>'+(i===ORDER[0]?'<div class="hint">Tap any node or line — the map reorganizes around it. Or hit Next.</div>':'');
+    stepsBox.appendChild(s); });
+  var steps=[].slice.call(stepsBox.children);
+  var dots=ORDER.map(function(_,k){ var d=document.createElement('i'); d.addEventListener('click',function(){ step=k; go(ORDER[k]); }); dotsBox.appendChild(d); return d; });
+
+  function layout(f){
+    var nbrs=[]; for(var j=0;j<N.length;j++) if(adj[f][j]) nbrs.push(j);
+    nbrs.sort(function(a,b){ return Math.atan2(N[a].hy-CY,N[a].hx-CX) - Math.atan2(N[b].hy-CY,N[b].hx-CX); });
+    P[f].tx=CX; P[f].ty=CY; P[f].to=1;
+    nbrs.forEach(function(j,k){ var ang=-Math.PI/2 + k*(2*Math.PI/nbrs.length);
+      P[j].tx=CX+RING*Math.cos(ang); P[j].ty=CY+RING*Math.sin(ang)*0.78; P[j].to=1; });
+    for(var j=0;j<N.length;j++){ if(j===f||adj[f][j]) continue;
+      var a=Math.atan2(N[j].hy-CY,N[j].hx-CX); P[j].tx=CX+FAR*Math.cos(a); P[j].ty=CY+FAR*Math.sin(a)*0.78; P[j].to=.1; }
+    EO.forEach(function(eo,ei){ eo.t=(E[ei][0]===f||E[ei][1]===f)?1:.04; });
+  }
+  function render(){
+    nodeEls.forEach(function(el,i){ var p=P[i], R=N[i].r*(i===cur?1.18:1);
+      el.g.setAttribute('opacity',p.o.toFixed(3));
+      el.glow.setAttribute('cx',p.x); el.glow.setAttribute('cy',p.y);
+      el.ball.setAttribute('cx',p.x); el.ball.setAttribute('cy',p.y); el.ball.setAttribute('r',R);
+      el.rim.setAttribute('cx',p.x); el.rim.setAttribute('cy',p.y); el.rim.setAttribute('r',R);
+      el.lbl.setAttribute('x',p.x); el.lbl.setAttribute('font-size', i===cur?7:5.6); el.lbl.setAttribute('y',p.y+R+(i===cur?6:4.8)); });
+    edgeEls.forEach(function(ln,ei){ var a=P[E[ei][0]], b=P[E[ei][1]];
+      ln.setAttribute('x1',a.x); ln.setAttribute('y1',a.y); ln.setAttribute('x2',b.x); ln.setAttribute('y2',b.y);
+      ln.setAttribute('opacity',EO[ei].o.toFixed(3)); ln.setAttribute('stroke',(EO[ei].t>.5)?N[cur].c:'#5566aa'); ln.setAttribute('stroke-width',(EO[ei].t>.5)?'.7':'.45'); });
+  }
+  var raf=null;
+  function ease(k){ return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2; }
+  function animate(){
+    P.forEach(function(p){ p.sx=p.x; p.sy=p.y; p.so=p.o; }); EO.forEach(function(e){ e.s=e.o; });
+    var t0=null; if(raf) cancelAnimationFrame(raf);
+    function frame(now){ if(t0===null)t0=now; var k=Math.min(1,(now-t0)/DUR), e=ease(k);
+      P.forEach(function(p){ p.x=p.sx+(p.tx-p.sx)*e; p.y=p.sy+(p.ty-p.sy)*e; p.o=p.so+(p.to-p.so)*e; });
+      EO.forEach(function(o){ o.o=o.s+(o.t-o.s)*e; }); render(); if(k<1) raf=requestAnimationFrame(frame);
+    } raf=requestAnimationFrame(frame);
+  }
+  function go(i){ cur=i; layout(i); animate();
+    steps.forEach(function(s,x){ s.classList.toggle('on',x===i); });
+    var op=ORDER.indexOf(i); if(op>=0) step=op;
+    dots.forEach(function(d,k){ d.classList.toggle('on',k===step); });
+    var last=step===ORDER.length-1;
+    back.hidden=step<=0; next.style.display=last?'none':'inline-block'; nav.style.display=last?'none':'flex'; endcta.classList.toggle('on',last);
+  }
+  function tap(i){ go(i); }   // tapping any node/line focuses it; narrative position (step) only moves on focal nodes
+  next.onclick=function(){ if(step<ORDER.length-1){ step++; go(ORDER[step]); } };
+  back.onclick=function(){ if(step>0){ step--; go(ORDER[step]); } };
+  var x0=null;
+  document.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',function(e){ if(x0==null)return; var dx=e.changedTouches[0].clientX-x0;
+    if(dx<-45&&step<ORDER.length-1){ step++; go(ORDER[step]); } else if(dx>45&&step>0){ step--; go(ORDER[step]); } x0=null; },{passive:true});
+  document.addEventListener('keydown',function(e){ if(e.key==='ArrowRight'&&step<ORDER.length-1){ step++; go(ORDER[step]); } if(e.key==='ArrowLeft'&&step>0){ step--; go(ORDER[step]); } });
+  render(); go(ORDER[0]);
+  // skip dumps into the home hub (newbs choose there); logged-in users go straight to their inbox.
+  var sk=document.getElementById('tourskip');
+  if(sk) sk.addEventListener('click', function(e){ e.preventDefault();
+    fetch('/auth/session',{credentials:'include'}).then(function(r){return r.json();}).then(function(d){
+      location.href = (d&&d.authenticated) ? '/inbox' : '/home';
+    }).catch(function(){ location.href='/home'; });
+  });
+})();
+</script>
+</body>
+</html>

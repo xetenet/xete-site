@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Get started — xete</title>
+<meta name="description" content="Get started with xete in about a minute: connect or create a wallet, claim a short name, and send a test message to the echo bot to watch it work end to end.">
+<style>
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399;
+    --teal:#2dd4bf; --violet:#c084fc; --green:#34d399; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
+    background:
+      radial-gradient(circle at 82% 6%, rgba(124,156,255,.12), transparent 46%),
+      radial-gradient(circle at 12% 96%, rgba(52,211,153,.08), transparent 46%),
+      radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 26px 26px, var(--bg); }
+  .stars{ position:fixed; inset:-6%; z-index:0; pointer-events:none; opacity:.55; animation:drift 120s linear infinite;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
+      radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+  @keyframes drift{ to{ transform:translateY(-26px); } }
+  .wrap{ position:relative; z-index:1; max-width:540px; margin:0 auto; padding:0 22px 64px; }
+  .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; } .sp{ flex:1; }
+  .bar a{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; }
+  .bar a:hover{ border-color:#8aa0ff; color:#fff; }
+  .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .d1{ animation-delay:.05s } .d2{ animation-delay:.18s } .d3{ animation-delay:.32s } .d4{ animation-delay:.46s } .d5{ animation-delay:.62s }
+  .hero{ text-align:center; padding:30px 0 6px; }
+  h1{ font-size:32px; line-height:1.15; letter-spacing:-.4px; margin-bottom:12px; }
+  .intro{ font-size:17px; color:#c7cdda; }
+  .clock{ display:inline-block; margin-top:14px; font-size:12.5px; color:var(--green); border:1px solid rgba(52,211,153,.3); background:rgba(52,211,153,.07); padding:6px 13px; border-radius:20px; }
+
+  /* interactive step rail — numbered glowing discs on a track; tap to reveal */
+  .steps{ display:flex; justify-content:center; align-items:flex-start; gap:0; margin:36px 0 18px; position:relative; }
+  .track{ position:absolute; top:25px; left:18%; right:18%; height:2px; background:linear-gradient(90deg,var(--teal),var(--violet),var(--green)); opacity:.35; }
+  .stp{ display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; width:96px; position:relative; z-index:1; }
+  .disc{ width:50px; height:50px; border-radius:50%; position:relative; display:grid; place-items:center; transition:transform .5s cubic-bezier(.2,.7,.2,1); }
+  .disc::after{ content:""; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fff, var(--pc) 62%, #10141f 100%); box-shadow:0 0 0 0 var(--pc); transition:box-shadow .5s; }
+  .disc span{ position:relative; z-index:1; font-weight:800; color:#06121a; font-size:18px; }
+  .stp.on .disc{ transform:scale(1.16); } .stp.on .disc::after{ box-shadow:0 0 22px 3px var(--pc); }
+  .stp:not(.on) .disc{ opacity:.5; }
+  .stp .pl{ font-size:12px; font-weight:700; color:#aeb6c6; text-align:center; transition:color .4s; } .stp.on .pl{ color:#fff; }
+  .detail{ min-height:104px; background:rgba(17,20,28,.55); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .detail h2{ font-size:18px; margin-bottom:7px; } .detail p{ font-size:15px; color:#c4cbd9; margin:0; }
+  .detail .body{ opacity:0; animation:fade .45s ease forwards; } @keyframes fade{ to{ opacity:1 } }
+  .cta{ text-align:center; margin:38px 0 10px; }
+  .cta a.go{ display:inline-block; background:var(--cta); color:#04210f; font-weight:700; padding:15px 32px; border-radius:11px; font-size:16px; text-decoration:none; box-shadow:0 0 24px rgba(52,211,153,.25); }
+  .cta a.tour{ display:block; margin-top:14px; color:#8aa0ff; text-decoration:none; font-size:14px; } .cta a.tour:hover{ text-decoration:underline; }
+  .cta .small{ display:block; margin-top:12px; color:var(--muted); font-size:13px; }
+  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:42px; padding-top:22px; border-top:1px solid var(--line); }
+  .doors a{ font-size:12.5px; color:#cbd2e0; text-decoration:none; padding:8px 13px; border:1px solid var(--line); border-radius:8px; } .doors a:hover{ border-color:#8aa0ff; color:#fff; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/inbox">Log in</a><a href="/register">Register</a></div>
+  <div class="hero">
+    <h1 class="rise d2">Get started.</h1>
+    <p class="intro rise d3">Up and running in about a minute. Here's all it takes.</p>
+    <div class="clock rise d3">~1 minute · free during the alpha</div>
+  </div>
+
+  <div class="steps rise d4">
+    <div class="track"></div>
+    <div class="stp on" data-i="0" style="--pc:var(--teal)"><div class="disc"><span>1</span></div><div class="pl">Connect<br>a wallet</div></div>
+    <div class="stp" data-i="1" style="--pc:var(--violet)"><div class="disc"><span>2</span></div><div class="pl">Claim<br>your name</div></div>
+    <div class="stp" data-i="2" style="--pc:var(--green)"><div class="disc"><span>3</span></div><div class="pl">Send<br>a hello</div></div>
+  </div>
+  <div class="detail rise d4" id="detail"></div>
+
+  <div class="cta rise d5">
+    <a class="go" href="/register">Connect wallet & start</a>
+    <a class="tour" href="/tour">New here? Take the 60-second tour ›</a>
+    <span class="small">No account, no email — just your wallet.</span>
+  </div>
+  <div class="doors rise d5">
+    <a href="/how-it-works">How it works</a><a href="/aliases">Names</a><a href="/help">Help</a><a href="/people">For people</a>
+  </div>
+</div>
+<script>
+  var D=[
+    {c:'var(--teal)',   h:'Connect or create a wallet.', p:'Use a wallet you already have, or make a new one in seconds. It’s your ID and it holds your keys — no email, no phone number.'},
+    {c:'var(--violet)', h:'Claim your name.',            p:'Pick a short handle like <b style="color:#fff">%alex</b> so people can find you. Most names are free.'},
+    {c:'var(--green)',  h:'Send a hello.',               p:'Message our echo bot and it replies instantly — so you can watch xete work end to end, encrypted both ways.'}
+  ];
+  var det=document.getElementById('detail'), stps=[].slice.call(document.querySelectorAll('.stp'));
+  function show(i){ stps.forEach(function(s,x){ s.classList.toggle('on', x===i); });
+    det.innerHTML='<div class="body"><h2 style="color:'+D[i].c+'">'+D[i].h+'</h2><p>'+D[i].p+'</p></div>'; }
+  stps.forEach(function(s){ s.addEventListener('click', function(){ show(+this.dataset.i); }); });
+  show(0);
+</script>
+</body>
+</html>

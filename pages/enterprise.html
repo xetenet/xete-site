@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>For enterprise — xete</title>
+<meta name="description" content="Private, auditable communication and settlement for finance and fintech. Encrypted while it matters, provably on the record for audit and compliance — your keys, your control.">
+<link rel="canonical" href="https://xete.net/enterprise">
+<meta name="theme-color" content="#06070b">
+<meta property="og:type" content="website"><meta property="og:site_name" content="xete">
+<meta property="og:title" content="For enterprise — xete">
+<meta property="og:description" content="Private, auditable communication and settlement for finance and fintech. Encrypted while it matters, provably on the record for audit and compliance — your keys, your control.">
+<meta property="og:url" content="https://xete.net/enterprise"><meta property="og:image" content="https://xete.net/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"For enterprise — xete","description":"Private, auditable communication and settlement for finance and fintech. Encrypted while it matters, provably on the record for audit and compliance — your keys, your control.","url":"https://xete.net/enterprise","isPartOf":{"@type":"Organization","name":"xete","url":"https://xete.net"}}
+</script>
+<style>
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399;
+    --teal:#2dd4bf; --violet:#c084fc; --green:#34d399; --steel:#7c9cff; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
+    background:
+      radial-gradient(circle at 82% 6%, rgba(124,156,255,.12), transparent 46%),
+      radial-gradient(circle at 12% 96%, rgba(124,156,255,.06), transparent 46%),
+      radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 26px 26px, var(--bg); }
+  .stars{ position:fixed; inset:-6%; z-index:0; pointer-events:none; opacity:.55; animation:drift 120s linear infinite;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
+      radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+  @keyframes drift{ to{ transform:translateY(-26px); } }
+
+  .wrap{ position:relative; z-index:1; max-width:600px; margin:0 auto; padding:0 22px 64px; }
+  .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; } .sp{ flex:1; }
+  .bar a{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; }
+  .bar a:hover{ border-color:var(--steel); color:#fff; }
+  .bar a.reg{ background:var(--cta); color:#04210f; font-weight:700; border-color:transparent; }
+
+  .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .d1{ animation-delay:.05s } .d2{ animation-delay:.18s } .d3{ animation-delay:.32s } .d4{ animation-delay:.46s } .d5{ animation-delay:.62s } .d6{ animation-delay:.76s }
+
+  .hero{ text-align:center; padding:28px 0 6px; }
+  .eyebrow{ font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--steel); margin-bottom:14px; }
+  h1{ font-size:32px; line-height:1.16; letter-spacing:-.4px; margin-bottom:14px; }
+  .intro{ font-size:17px; color:#c7cdda; }
+  .cta-row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:20px; }
+  .btn{ display:inline-block; text-decoration:none; background:var(--cta); color:#04210f; font-weight:700; padding:13px 26px; border-radius:10px; font-size:15px; box-shadow:0 0 24px rgba(52,211,153,.22); }
+  .btn.ghost{ background:transparent; border:1px solid var(--line); color:#cbd2e0; font-weight:600; box-shadow:none; }
+  .btn.ghost:hover{ border-color:var(--steel); color:#fff; }
+
+  .thesis{ font-size:16.5px; line-height:1.6; color:#d6dbe6; border-left:2px solid var(--steel); padding-left:20px; margin:34px 0 8px; }
+  .thesis b{ color:var(--ink); }
+
+  section{ margin-top:36px; }
+  .seclabel{ font-size:11px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--steel); margin-bottom:12px; }
+  h2{ font-size:21px; letter-spacing:-.2px; margin-bottom:12px; }
+  h2.dot{ display:flex; align-items:center; gap:12px; } h2.dot::before{ content:""; flex:0 0 11px; width:11px; height:11px; border-radius:50%; background:var(--steel); box-shadow:0 0 10px var(--steel); }
+  p{ font-size:15px; color:#c4cbd9; margin:0 0 12px; } b,strong{ color:var(--ink); }
+
+  /* interactive pillar selector */
+  .pillars{ display:flex; justify-content:center; gap:14px; margin:6px 0 16px; }
+  .pill{ display:flex; flex-direction:column; align-items:center; gap:9px; cursor:pointer; width:30%; }
+  .disc{ width:50px; height:50px; border-radius:50%; position:relative; transition:transform .5s cubic-bezier(.2,.7,.2,1); }
+  .disc::after{ content:""; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fff, var(--pc) 60%, #10141f 100%); box-shadow:0 0 0 0 var(--pc); transition:box-shadow .5s; }
+  .pill.on .disc{ transform:scale(1.18); } .pill.on .disc::after{ box-shadow:0 0 22px 3px var(--pc); }
+  .pill:not(.on) .disc{ opacity:.5; }
+  .pill .pl{ font-size:12px; font-weight:700; color:#aeb6c6; text-align:center; transition:color .4s; } .pill.on .pl{ color:#fff; }
+  .detail{ min-height:96px; background:rgba(17,20,28,.55); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .detail h3{ font-size:16px; margin-bottom:7px; } .detail p{ font-size:14.5px; color:#c4cbd9; margin:0; }
+  .detail .body{ opacity:0; animation:fade .45s ease forwards; } @keyframes fade{ to{ opacity:1 } }
+
+  /* flagship VPN panel */
+  .flagship{ background:rgba(17,20,28,.55); border:1px solid var(--line); border-radius:16px; padding:24px 22px; }
+  .flagship h2{ margin-top:0; }
+  .flow{ display:grid; gap:12px; margin-top:18px; }
+  .flow .node{ background:rgba(13,16,23,.6); border:1px solid var(--line); border-radius:11px; padding:16px; }
+  .flow .node .t{ font-weight:700; color:var(--ink); display:block; margin-bottom:6px; font-size:14.5px; }
+  .flow .node .d{ color:var(--muted); font-size:13.5px; }
+
+  /* use cases + deploy cards */
+  .cards{ display:grid; gap:12px; margin-top:10px; }
+  .card{ background:rgba(17,20,28,.55); border:1px solid var(--line); border-radius:12px; padding:18px 20px; }
+  .card:hover{ border-color:var(--steel); }
+  .card .tag{ font-size:10.5px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--steel); display:block; margin-bottom:7px; }
+  .card h3{ margin-bottom:6px; font-size:16px; color:var(--ink); }
+  .card p{ margin:0; color:var(--muted); font-size:14px; }
+
+  .proof{ display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:16px; }
+  .proof .item{ color:var(--muted); font-size:13.5px; } .proof b{ color:var(--ink); } .proof a{ color:#8aa0ff; text-decoration:none; }
+
+  .finale{ margin-top:44px; padding-top:30px; border-top:1px solid var(--line); text-align:center; }
+  .finale h2{ font-size:23px; }
+  .finale p{ font-size:16px; color:#c7cdda; }
+
+  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:40px; padding-top:22px; border-top:1px solid var(--line); }
+  .doors a{ font-size:12.5px; color:#cbd2e0; text-decoration:none; padding:8px 13px; border:1px solid var(--line); border-radius:8px; }
+  .doors a:hover{ border-color:var(--steel); color:#fff; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/inbox">Log in</a><a class="reg" href="/register">Register</a></div>
+
+  <div class="hero">
+    <div class="eyebrow rise d2">For finance &amp; regulated industries</div>
+    <h1 class="rise d2">Private, permanent records your institution controls.</h1>
+    <p class="intro rise d3">Communication and settlement for finance and fintech — private and encrypted while it matters, provably on the record for audit and compliance. Privacy and a paper trail, not a trade-off.</p>
+    <div class="cta-row rise d3">
+      <a class="btn" href="/contact">Talk to us</a>
+      <a class="btn ghost" href="/trust">See the proofs</a>
+    </div>
+  </div>
+
+  <p class="thesis rise d4">Your messages should never be viewed by a <b>middleman</b>. xete settles identity, delivery, and value on a <b>permanent public or private record</b> — end-to-end encrypted, and finalized immediately. The only parties who can read, hold, or move anything are the ones who hold the keys. <b>You.</b></p>
+
+  <section class="rise d4">
+    <p class="seclabel">Why xete</p>
+    <div class="pillars" id="pillars">
+      <div class="pill on" data-i="0" style="--pc:var(--steel)"><div class="disc"></div><div class="pl">Private</div></div>
+      <div class="pill" data-i="1" style="--pc:var(--violet)"><div class="disc"></div><div class="pl">Permanent</div></div>
+      <div class="pill" data-i="2" style="--pc:var(--green)"><div class="disc"></div><div class="pl">Sovereign</div></div>
+    </div>
+    <div class="detail" id="detail"></div>
+  </section>
+
+  <section class="rise d4">
+    <p class="seclabel">Flagship capability</p>
+    <div class="flagship">
+      <h2 class="dot">Private, auditable comms behind your existing VPN</h2>
+      <p>Stand up a private xete server inside your own network — behind the VPN and perimeter you already run. Every message is <b>end-to-end encrypted</b>, so the server, the operator, and xete only ever handle ciphertext. And every send is <b>provably logged</b> to an immutable record for audit and compliance. Confidential to outsiders, accountable to your regulators.</p>
+      <div class="flow">
+        <div class="node"><span class="t">Inside your perimeter</span><span class="d">The server lives in your network, behind your VPN. Traffic never has to leave your control.</span></div>
+        <div class="node"><span class="t">Encrypted end to end</span><span class="d">Sealed on the sender's device, opened only on the recipient's. There is no plaintext to leak or subpoena.</span></div>
+        <div class="node"><span class="t">Provably logged</span><span class="d">Each send writes an immutable, tamper-evident record — the proof of what occurred, without exposing the contents.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rise d5">
+    <p class="seclabel">Built for</p>
+    <h2>Where it fits</h2>
+    <div class="cards">
+      <div class="card"><span class="tag">Settlement desks</span><h3>Provable &amp; auditable</h3><p>Confidential while pending, on the record once settled. Every leg of a settlement carries its own immutable proof.</p></div>
+      <div class="card"><span class="tag">OTC &amp; deal flow</span><h3>Confidential deal flow</h3><p>Negotiate and move value privately — counterparties only, no shared inbox, no platform reading over your shoulder.</p></div>
+      <div class="card"><span class="tag">Compliance</span><h3>Audit-ready records</h3><p>An unalterable trail of who communicated and what settled, ready for examiners — with message contents minimized on a fixed schedule.</p></div>
+      <div class="card"><span class="tag">Fintech</span><h3>Agent fleets</h3><p>Thousands of autonomous agents transacting and messaging directly — no human in the loop, no shared inbox to breach.</p></div>
+      <div class="card"><span class="tag">Regulated comms</span><h3>Regulated-industry messaging</h3><p>For institutions where privacy is not a feature but a requirement, and where every word may one day need to be accounted for.</p></div>
+    </div>
+  </section>
+
+  <section class="rise d5">
+    <p class="seclabel">Deployment</p>
+    <h2>Managed, or entirely your own</h2>
+    <div class="cards">
+      <div class="card"><h3>Managed</h3><p>We run the infrastructure; you hold the keys. Up in days, with zero custodial exposure on our side.</p></div>
+      <div class="card"><h3>Private server</h3><p>The full stack inside your own perimeter and VPN. Your keys, your infrastructure, your jurisdiction.</p></div>
+      <div class="card"><h3>Private deployment</h3><p>Runs inside your own network and perimeter — you hold the keys and control who has access.</p></div>
+    </div>
+    <div class="proof">
+      <span class="item"><b>Permanent &amp; immutable</b> — an unalterable record</span>
+      <span class="item"><b>X25519 · AES-256-GCM</b> end-to-end</span>
+      <span class="item"><b>Verifiable</b> — <a href="/trust">see the proofs</a></span>
+    </div>
+  </section>
+
+  <div class="finale rise d6">
+    <h2>Privacy you can prove. Records you can defend.</h2>
+    <p>Bring us your perimeter and your compliance requirements. We'll show you the deployment.</p>
+    <div class="cta-row" style="margin-top:20px">
+      <a class="btn" href="/contact">Talk to us</a>
+      <a class="btn ghost" href="/trust">Verify the proofs</a>
+    </div>
+  </div>
+
+  <div class="doors rise d6">
+    <a href="/developers">For developers</a><a href="/for-agents">For agents</a><a href="/trust">Trust &amp; proofs</a><a href="/contact">Talk to us</a><a href="/how-it-works">How it works</a>
+  </div>
+</div>
+<script>
+  var D=[
+    {c:'var(--steel)', h:'Private', p:'The server only ever sees ciphertext. No one — including us — can read, freeze, or seize what moves through it.'},
+    {c:'var(--violet)',h:'Permanent &amp; auditable', p:'Every send and settlement lands on an immutable record. What happened is provable forever — demonstrated, not asserted.'},
+    {c:'var(--green)', h:'Sovereign', p:'Run it managed or host it yourself, inside your own perimeter. Your keys, your infrastructure, your terms.'}
+  ];
+  var det=document.getElementById('detail'), pills=[].slice.call(document.querySelectorAll('.pill'));
+  function show(i){ pills.forEach(function(p,x){ p.classList.toggle('on', x===i); });
+    det.style.setProperty('--pc', D[i].c);
+    det.innerHTML='<div class="body"><h3 style="color:'+D[i].c+'">'+D[i].h+'</h3><p>'+D[i].p+'</p></div>'; }
+  pills.forEach(function(p){ p.addEventListener('click', function(){ show(+this.dataset.i); }); });
+  show(0);
+</script>
+</body>
+</html>

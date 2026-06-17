@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How it works — xete</title>
+<meta name="description" content="How xete works in plain steps: get a wallet that is also your ID, pick a name, send end-to-end encrypted messages that erase after 24 hours, and send money too.">
+<style>
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; overflow:hidden; }
+  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(circle at 82% 6%, rgba(124,156,255,.12), transparent 46%),
+      radial-gradient(circle at 12% 96%, rgba(52,211,153,.08), transparent 46%),
+      radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 26px 26px, var(--bg); }
+  .stars{ position:fixed; inset:-6%; z-index:0; pointer-events:none; opacity:.55; animation:drift 120s linear infinite;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
+      radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+  @keyframes drift{ to{ transform:translateY(-26px); } }
+  .stage{ position:relative; z-index:1; height:100%; display:flex; flex-direction:column; max-width:540px; margin:0 auto; padding:0 24px max(20px,env(safe-area-inset-bottom)); }
+  .top{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; } .sp{ flex:1; }
+  .top a{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; } .top a:hover{ border-color:#8aa0ff; color:#fff; }
+  .dots{ display:flex; gap:7px; justify-content:center; margin:6px 0 4px; }
+  .dots i{ width:7px; height:7px; border-radius:50%; background:#2a3142; cursor:pointer; transition:all .3s; }
+  .dots i.on{ background:var(--c,#34d399); box-shadow:0 0 8px var(--c,#34d399); transform:scale(1.25); }
+  .body-wrap{ flex:1 1 auto; display:flex; flex-direction:column; justify-content:center; }
+  .disc{ width:80px; height:80px; border-radius:50%; margin:0 0 22px; position:relative; display:grid; place-items:center; }
+  .disc::after{ content:""; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fff, var(--c) 62%, #10141f 100%); box-shadow:0 0 28px 4px var(--c); }
+  .disc span{ position:relative; z-index:1; font-weight:800; font-size:30px; color:#06121a; }
+  .step{ display:none; } .step.on{ display:block; animation:rise .6s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(16px) } to{ opacity:1; transform:none } }
+  .kick{ font-size:11px; letter-spacing:2.4px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.15; letter-spacing:-.4px; margin-bottom:12px; }
+  p{ font-size:16px; line-height:1.55; color:#c4cbd9; } p b{ color:#fff; }
+  .short li{ list-style:none; font-size:15px; color:#c4cbd9; margin:8px 0; padding-left:20px; position:relative; }
+  .short li::before{ content:""; position:absolute; left:0; top:8px; width:8px; height:8px; border-radius:50%; background:var(--cta); box-shadow:0 0 8px var(--cta); }
+  .nav{ flex:0 0 auto; display:flex; align-items:center; gap:12px; margin-top:18px; }
+  .back{ background:none; border:0; color:var(--muted); font-size:14px; padding:11px 4px; cursor:pointer; } .back:hover{ color:#fff; } .back[hidden]{ visibility:hidden; }
+  .nsp{ flex:1; }
+  .btn{ text-decoration:none; display:inline-block; border:0; cursor:pointer; font-family:inherit; background:var(--cta); color:#04210f; font-weight:700; border-radius:11px; padding:13px 24px; font-size:15px; } .btn:active{ transform:translateY(1px); }
+  .btn.ghost{ background:#11151e; color:var(--ink); border:1px solid var(--line); }
+  .endcta{ display:none; gap:10px; margin-top:6px; flex-wrap:wrap; } .endcta.on{ display:flex; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="stage">
+  <div class="top"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/people">For people</a><a href="/register">Register</a></div>
+  <div class="dots" id="dots"></div>
+  <div class="body-wrap" id="bw"></div>
+  <div class="nav" id="nav"><button class="back" id="back" hidden>‹ Back</button><div class="nsp"></div><button class="btn" id="next">Next ›</button></div>
+  <div class="endcta" id="endcta"><a class="btn" href="/get-started">Get started</a><a class="btn ghost" href="/tour">Take the tour</a></div>
+</div>
+<script>
+  var S=[
+    {c:'#2dd4bf', n:'1', k:'step one', h:'Get a wallet.', p:'A wallet is a small app that holds your <b>keys</b> — a key is like a password only you have. Use one you own or make a new one in seconds. Your wallet is also your ID, so <b>no email or phone number</b>.'},
+    {c:'#c084fc', n:'2', k:'step two', h:'Pick a name.', p:'Choose a short name like <b>%alex</b> so people can find you — it works like a username, and points to your wallet.'},
+    {c:'#60a5fa', n:'3', k:'step three', h:'Send a message.', p:'Write it and press send. <b>Before it leaves your device</b>, xete locks it with the other person’s key — only their key can open it. That’s end-to-end encryption: no one in the middle can read it.'},
+    {c:'#fbbf24', n:'4', k:'step four', h:'It disappears.', p:'After 24 hours the message is <b>erased</b> — it doesn’t sit on a server forever. A short private record stays on-chain to prove it was sent — but never what it said.'},
+    {c:'#34d399', n:'5', k:'step five', h:'Send money, too.', p:'Send a payment along with a message. The <b>same keys</b> that protect your words protect your money — you stay in control the whole time.'},
+    {c:'#34d399', n:'✓', k:'the short version', h:'That’s it.', short:['Your keys never leave your device.','No email or phone number needed.','No one can read your messages but you and the person you write to.'], end:true}
+  ];
+  var bw=document.getElementById('bw'), dotsBox=document.getElementById('dots'), back=document.getElementById('back'),
+      next=document.getElementById('next'), nav=document.getElementById('nav'), endcta=document.getElementById('endcta'), cur=0;
+  S.forEach(function(s,i){ var d=document.createElement('div'); d.className='step'+(i===0?' on':'');
+    var inner='<div class="kick">'+s.k+'</div><div class="disc" style="--c:'+s.c+'"><span>'+s.n+'</span></div><h1>'+s.h+'</h1>';
+    if(s.short){ inner+='<ul class="short">'+s.short.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>'; } else { inner+='<p>'+s.p+'</p>'; }
+    d.innerHTML=inner; d.style.setProperty('--c',s.c); bw.appendChild(d);
+    var dot=document.createElement('i'); dot.addEventListener('click',(function(k){return function(){ go(k); };})(i)); dotsBox.appendChild(dot);
+  });
+  var steps=[].slice.call(bw.children), dots=[].slice.call(dotsBox.children);
+  function go(i){ cur=i; steps.forEach(function(s,x){ s.classList.toggle('on',x===i); });
+    dots.forEach(function(d,x){ d.classList.toggle('on',x===i); d.style.setProperty('--c',S[i].c); });
+    var last=i===S.length-1; back.hidden=i<=0; next.style.display=last?'none':'inline-block'; nav.style.display=last?'none':'flex'; endcta.classList.toggle('on',last); }
+  next.onclick=function(){ if(cur<S.length-1) go(cur+1); }; back.onclick=function(){ if(cur>0) go(cur-1); };
+  var x0=null; document.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',function(e){ if(x0==null)return; var dx=e.changedTouches[0].clientX-x0;
+    if(dx<-45&&cur<S.length-1) go(cur+1); else if(dx>45&&cur>0) go(cur-1); x0=null; },{passive:true});
+  document.addEventListener('keydown',function(e){ if(e.key==='ArrowRight'&&cur<S.length-1)go(cur+1); if(e.key==='ArrowLeft'&&cur>0)go(cur-1); });
+  go(0);
+</script>
+</body>
+</html>

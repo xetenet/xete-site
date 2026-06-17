@@ -1,0 +1,20 @@
+{
+  "generated_note": "sha256 of each LIVE page; manual check + GitHub verifier compare against these",
+  "pages": {
+    "/": "0379e6e5a47e4d9b4d02fabe5a5a18dbe9534f1af0b18d0ee7227384354f01f8",
+    "/home": "776bfcbf654466bdaee990f9ac48434c44f9cd0fc1cc9683d5d6fcc45037af93",
+    "/people": "41dcc48fd7520bc1f1d3b49be64f755bd8dbd0de01e0aaa12bb732b4e78fb81b",
+    "/how-it-works": "ccc1ffd68c3a292a9559d8336ddaf4eada3e0a88015db9aaf7a867e7d11405c6",
+    "/aliases": "67d08033c510e834f141099dbcfac30f84ed8709bfba4949c9073a39487fe305",
+    "/about": "14f641ef966f61b677521830678d4e0abaa26e17cca426897f100fb59f8b813a",
+    "/help": "dd6a2d0c8f325bf0e05f004c373f6d5ff7df729d3c1990fe804adebe2af9c554",
+    "/get-started": "d40972e72f46169b22eabeae5f1fa3ece18eb4a7c1e41684fbef655c8259679b",
+    "/developers": "4de576736ee097640b8113cb994a52c05caf5241173c1e50cdb044afe6518ea3",
+    "/for-agents": "0154bb7a5588221aed532e48fbb14622326528af4ddb3ee2963c67dbae089c32",
+    "/enterprise": "6e2ced5c843491bf23592fb8d04281d28ea0428c27939ad7ea2b4026f3558168",
+    "/trust": "b503a0d58982955faea6730d71ffb837f767e3ed170ea00e0c0495cbd9f9e64d",
+    "/contact": "ae4e317ac086a395e2a9bbade66a5986bafc331e1430782621ac0a0ae1fc9792",
+    "/login": "dcee182fe56efd898b38e5c6b29c7cb345d099ad9ec304851d680ef54456c7e0",
+    "/tour": "f850b347de6be875237827f32db224c45c138956eed559d5ecb3c8821bc883f8"
+  }
+}

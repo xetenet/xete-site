@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact — xete</title>
+<meta name="description" content="Get in touch with xete. One inbox for everyone — a question, a bug, or a deployment for your firm. No account needed to reach us, and we never share your details.">
+<link rel="canonical" href="https://xete.net/contact">
+<meta name="theme-color" content="#06070b">
+<style>
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399;
+    --teal:#2dd4bf; --violet:#c084fc; --green:#34d399; --panel:#11141c; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
+    background:
+      radial-gradient(circle at 82% 6%, rgba(124,156,255,.12), transparent 46%),
+      radial-gradient(circle at 12% 96%, rgba(45,212,191,.08), transparent 46%),
+      radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 26px 26px, var(--bg); }
+  .stars{ position:fixed; inset:-6%; z-index:0; pointer-events:none; opacity:.55; animation:drift 120s linear infinite;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
+      radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+  @keyframes drift{ to{ transform:translateY(-26px); } }
+  .wrap{ position:relative; z-index:1; max-width:540px; margin:0 auto; padding:0 22px 64px; }
+  .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; } .sp{ flex:1; }
+  .bar a{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; }
+  .bar a:hover{ border-color:#8aa0ff; color:#fff; }
+  .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .d1{ animation-delay:.05s } .d2{ animation-delay:.18s } .d3{ animation-delay:.32s } .d4{ animation-delay:.46s } .d5{ animation-delay:.62s }
+  .hero{ text-align:center; padding:30px 0 8px; }
+  h1{ font-size:32px; line-height:1.15; letter-spacing:-.4px; margin-bottom:12px; }
+  .intro{ font-size:17px; color:#c7cdda; }
+  form{ margin-top:30px; }
+  label{ display:block; font-size:13px; color:var(--muted); margin:18px 0 6px; letter-spacing:.3px; }
+  input, select, textarea{ width:100%; background:var(--panel); border:1px solid var(--line); border-radius:11px;
+    color:var(--ink); font:inherit; padding:12px 14px; }
+  input:focus, select:focus, textarea:focus{ outline:none; border-color:#8aa0ff; }
+  textarea{ min-height:120px; resize:vertical; }
+  .send{ margin-top:24px; width:100%; background:var(--cta); color:#04210f; font-weight:700; border:0; border-radius:11px;
+    padding:15px 28px; font-size:16px; cursor:pointer; box-shadow:0 0 24px rgba(52,211,153,.25); font-family:inherit; }
+  .send:active{ transform:translateY(1px); }
+  .note{ font-size:12.5px; color:var(--muted); margin-top:14px; text-align:center; }
+  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:42px; padding-top:22px; border-top:1px solid var(--line); }
+  .doors a{ font-size:12.5px; color:#cbd2e0; text-decoration:none; padding:8px 13px; border:1px solid var(--line); border-radius:8px; }
+  .doors a:hover{ border-color:#8aa0ff; color:#fff; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/inbox">Log in</a><a href="/register">Register</a></div>
+
+  <div class="hero">
+    <h1 class="rise d2">Talk to us.</h1>
+    <p class="intro rise d3">One inbox for everyone — a question, a bug, or a deployment for your firm. Tell us a little and we'll get back to you.</p>
+  </div>
+
+  <form class="rise d4" onsubmit="return sendContact(event);">
+    <label for="name">Your name</label>
+    <input id="name" type="text" autocomplete="name">
+
+    <label for="email">Email or %alias to reach you</label>
+    <input id="email" type="text">
+
+    <label for="who">You're reaching out as</label>
+    <select id="who">
+      <option>A person trying it out</option>
+      <option>A developer building on xete</option>
+      <option>Enterprise — finance / fintech</option>
+      <option>Enterprise — other regulated industry</option>
+    </select>
+
+    <label for="msg">What's on your mind?</label>
+    <textarea id="msg" placeholder="A question, a bug, or what you'd like to deploy…"></textarea>
+
+    <button class="send" type="submit">Send</button>
+    <p class="note">No account needed to reach us. We never share your details.</p>
+  </form>
+
+  <div class="doors rise d5">
+    <a href="/about">About</a><a href="/help">Help</a><a href="/how-it-works">How it works</a><a href="/trust">Trust</a>
+  </div>
+</div>
+<script>
+  function sendContact(e){
+    e.preventDefault();
+    var name = document.getElementById('name').value.trim();
+    var reach = document.getElementById('email').value.trim();
+    var who = document.getElementById('who').value;
+    var msg = document.getElementById('msg').value.trim();
+    var subject = 'xete — ' + who;
+    var body =
+      'Name: ' + name + '\n' +
+      'Email or %alias: ' + reach + '\n\n' +
+      'Message:\n' + msg + '\n';
+    window.location.href = 'mailto:contact@xete.net'
+      + '?subject=' + encodeURIComponent(subject)
+      + '&body=' + encodeURIComponent(body);
+    return false;
+  }
+</script>
+</body>
+</html>
