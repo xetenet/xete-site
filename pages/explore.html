@@ -431,14 +431,15 @@ controls.minDistance=12; controls.maxDistance=300;
 const HOME_CAM=new THREE.Vector3(40,16,56), LAND_CAM=new THREE.Vector3(140,56,196);   // ~2x farther → ~half apparent size
 const YAXIS=new THREE.Vector3(0,1,0);   // pull-out spin axis (dynamism on the reveal)
 let flyLook=null;   // pull-out look-target: starts ON the mcp node, eases to centre as the map reveals
-let flyN=0;         // fly-out frame counter -> hard completion cap so the reveal can never hang short of interactive
+let flyStart=null, flyT0=0;   // captured start pose + start time -> deterministic, fixed-duration reveal that lands on the SAME end frame every launch
+const FLY_MS=2600, FLY_SWIRL=0.8;   // reveal duration (wall-clock) + total pull-out swirl that decays to EXACTLY 0 at the end (so the arrival framing is identical every time)
 let phase = location.hash==='#home' ? 'home' : 'landing';   // bare URL lands; #home skips straight in (used by in-site nav)
 let landRemain = 30;   // (vestigial — entry is gated; no auto fly-in)
 let isSignedIn=false, gateOff=false, gateRemembered=false, gateFree=false, gateRevealed=false, freeShown=false;
 try{ gateRemembered = !!localStorage.getItem('xete_invite_code'); }catch(e){}   // code entered, not yet registered -> remember. wallet-auth clears it on register, so a logged-out user re-gates (no logout-survival)
 gateFree = gateRemembered;   // known synchronously (no re-gate flash on reload)
 const forceGate = /[?&]gate(=|&|$)/.test(location.search);   // ?gate forces the not-signed-in code form (preview/test)
-function enterSite(){ if(phase!=='landing') return; phase='flying'; flyN=0;
+function enterSite(){ if(phase!=='landing') return; phase='flying'; flyT0=performance.now(); flyStart=camera.position.clone();
   document.body.classList.remove('gateopen'); document.body.classList.remove('landing');   // reset offsets so the fly-in centers on home
   controls.enabled=false; document.getElementById('landing').classList.add('gone'); }
 function bumpTimer(){ if(phase==='landing' && landRemain<5) landRemain=5; }
@@ -833,12 +834,13 @@ let clock=0, _fpsN=0, _fpsT=0, _fpsStage=0;   // adaptive quality: measure FPS, 
 function tick(){
   requestAnimationFrame(tick); clock+=0.016;
   if(phase==='flying'){
-    flyN++;
-    var rem=camera.position.distanceTo(HOME_CAM);
-    if(rem>3) camera.position.applyAxisAngle(YAXIS, 0.030*Math.min(1,rem/35));   // spin the MAP only while still far; STOP it near the end so pure lerp converges (the spin used to hold rem just above the 1.2 threshold forever -> the reveal froze short of interactive)
-    camera.position.lerp(HOME_CAM,0.035);                                  // match home's proven approach speed so it reliably arrives
-    if(flyLook){ flyLook.lerp(ORIGIN,0.02); camera.lookAt(flyLook); } else { camera.lookAt(ORIGIN); }   // gaze tracks the mcp node, eases to centre
-    if(camera.position.distanceTo(HOME_CAM)<1.2 || flyN>360){ camera.position.copy(HOME_CAM); controls.target.copy(ORIGIN); controls.enabled=true; controls.enableZoom=true; controls.enablePan=true; userRotate=true; controls.autoRotate=true; controls.autoRotateSpeed=0.9; updateRotate(); phase='home'; flyLook=null; document.body.classList.add('entered'); labelRenderer.domElement.style.display='block'; }   // hard cap (flyN>360 ~6s) guarantees it always reaches interactive; userRotate+updateRotate ensure the map auto-rotates on arrival
+    if(!flyStart) flyStart=camera.position.clone();                        // guard: never fly from an undefined start
+    var t=Math.min(1,(performance.now()-flyT0)/FLY_MS);                    // time-based progress -> identical wall-clock duration on every device, no frame-rate hang
+    var e=t*t*(3-2*t);                                                     // smoothstep ease in/out
+    camera.position.copy(flyStart).lerp(HOME_CAM,e);                       // recomputed FRESH each frame from the fixed start -> deterministic straight path
+    if(e<1) camera.position.applyAxisAngle(YAXIS, FLY_SWIRL*(1-e));        // pull-out swirl that decays to EXACTLY 0 at e=1 -> always lands on the identical framing
+    camera.lookAt(flyLook ? flyLook.clone().lerp(ORIGIN,e) : ORIGIN);      // gaze eases from the node to centre by the same progress
+    if(t>=1){ camera.position.copy(HOME_CAM); controls.target.copy(ORIGIN); controls.enabled=true; controls.enableZoom=true; controls.enablePan=true; userRotate=true; controls.autoRotate=true; controls.autoRotateSpeed=0.9; updateRotate(); phase='home'; flyLook=null; document.body.classList.add('entered'); labelRenderer.domElement.style.display='block'; }   // at t>=1 the camera is EXACTLY HOME_CAM looking at ORIGIN -> the canonical end frame, every launch
   } else {
     controls.update();
     // landing holds until a valid invite code unlocks it (the gate calls enterSite); no auto fly-in
