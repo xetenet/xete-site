@@ -46,19 +46,25 @@
   .spacer{ flex:1; }
   .btn{ text-decoration:none; display:inline-block; border:0; cursor:pointer; font-family:inherit; background:var(--cta); color:#04210f; font-weight:700; border-radius:11px; padding:12px 22px; font-size:15px; }
   .btn:active{ transform:translateY(1px); } .btn.ghost{ background:#11151e; color:var(--ink); border:1px solid var(--line); }
-  .cta{ display:none; gap:10px; margin-top:14px; } .cta.on{ display:flex; }
+  .cta{ display:none; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center; } .cta.on{ display:flex; }
+  .cta .endkick{ width:100%; font-size:12px; color:#aeb6c6; margin-bottom:2px; }
+  .btn.explore{ background:rgba(251,191,36,.15); color:#fbbf24; border:1px solid rgba(251,191,36,.55); }
+  .tarrow{ position:absolute; top:50%; transform:translateY(-50%); width:40px; height:40px; border-radius:50%; background:rgba(20,24,33,.82); border:1px solid #2a3142; color:#cbd2e0; font-size:21px; line-height:1; cursor:pointer; display:grid; place-items:center; z-index:3; transition:opacity .3s, border-color .2s; }
+  .tarrow:hover{ border-color:#8aa0ff; color:#fff; } .tarrow.l{ left:8px; } .tarrow.r{ right:8px; }
+  .tarrow[hidden]{ display:none; }
 </style>
 </head>
 <body>
+<div id="xfade" style="position:fixed;inset:0;background:#06070b;opacity:1;pointer-events:none;z-index:60;transition:opacity .42s ease;"></div>
 <div class="stars"></div>
 <div class="stage">
   <div class="top"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><a class="skip" id="tourskip" href="/home">skip ›</a></div>
-  <div class="map"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid meet"><g id="edges"></g><g id="nodes"></g></svg></div>
+  <div class="map"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid meet"><g id="edges"></g><g id="nodes"></g></svg><button class="tarrow l" id="tarL" aria-label="Previous">&lsaquo;</button><button class="tarrow r" id="tarR" aria-label="Next">&rsaquo;</button></div>
   <div class="panel">
     <div class="dots" id="dots"></div>
     <div id="steps"></div>
     <div class="nav" id="nav"><button class="back" id="back" hidden>‹ Back</button><div class="spacer"></div><button class="btn" id="next">Next ›</button></div>
-    <div class="cta" id="endcta"><a class="btn" href="/register">Get started</a><a class="btn ghost" href="/people">For people</a></div>
+    <div class="cta" id="endcta"><span class="endkick">That's the whole stack.</span><a class="btn" id="endcta-go" href="/register">Get started</a><a class="btn explore" href="/explore">Explore the full map ›</a></div>
   </div>
 </div>
 <script>
@@ -129,25 +135,27 @@
       var a=Math.atan2(N[j].hy-CY,N[j].hx-CX); P[j].tx=CX+FAR*Math.cos(a); P[j].ty=CY+FAR*Math.sin(a)*0.78; P[j].to=.1; }
     EO.forEach(function(eo,ei){ eo.t=(E[ei][0]===f||E[ei][1]===f)?1:.04; });
   }
+  var Z=1;   // entrance zoom: starts >1 (Wallet fills the screen), eases to 1 as the links organise into the hexagon
+  function zx(x){ return CX+(x-CX)*Z; } function zy(y){ return CY+(y-CY)*Z; }
   function render(){
-    nodeEls.forEach(function(el,i){ var p=P[i], R=N[i].r*(i===cur?1.18:1);
+    nodeEls.forEach(function(el,i){ var p=P[i], R=N[i].r*(i===cur?1.18:1)*Z, X=zx(p.x), Y=zy(p.y);
       el.g.setAttribute('opacity',p.o.toFixed(3));
-      el.glow.setAttribute('cx',p.x); el.glow.setAttribute('cy',p.y);
-      el.ball.setAttribute('cx',p.x); el.ball.setAttribute('cy',p.y); el.ball.setAttribute('r',R);
-      el.rim.setAttribute('cx',p.x); el.rim.setAttribute('cy',p.y); el.rim.setAttribute('r',R);
-      el.lbl.setAttribute('x',p.x); el.lbl.setAttribute('font-size', i===cur?7:5.6); el.lbl.setAttribute('y',p.y+R+(i===cur?6:4.8)); });
+      el.glow.setAttribute('cx',X); el.glow.setAttribute('cy',Y);
+      el.ball.setAttribute('cx',X); el.ball.setAttribute('cy',Y); el.ball.setAttribute('r',R);
+      el.rim.setAttribute('cx',X); el.rim.setAttribute('cy',Y); el.rim.setAttribute('r',R);
+      el.lbl.setAttribute('x',X); el.lbl.setAttribute('font-size', i===cur?7:5.6); el.lbl.setAttribute('y',Y+R+(i===cur?6:4.8)); });
     edgeEls.forEach(function(ln,ei){ var a=P[E[ei][0]], b=P[E[ei][1]];
-      ln.setAttribute('x1',a.x); ln.setAttribute('y1',a.y); ln.setAttribute('x2',b.x); ln.setAttribute('y2',b.y);
+      ln.setAttribute('x1',zx(a.x)); ln.setAttribute('y1',zy(a.y)); ln.setAttribute('x2',zx(b.x)); ln.setAttribute('y2',zy(b.y));
       ln.setAttribute('opacity',EO[ei].o.toFixed(3)); ln.setAttribute('stroke',(EO[ei].t>.5)?N[cur].c:'#5566aa'); ln.setAttribute('stroke-width',(EO[ei].t>.5)?'.7':'.45'); });
   }
   var raf=null;
   function ease(k){ return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2; }
   function animate(){
-    P.forEach(function(p){ p.sx=p.x; p.sy=p.y; p.so=p.o; }); EO.forEach(function(e){ e.s=e.o; });
+    P.forEach(function(p){ p.sx=p.x; p.sy=p.y; p.so=p.o; }); EO.forEach(function(e){ e.s=e.o; }); var Zs=Z;
     var t0=null; if(raf) cancelAnimationFrame(raf);
     function frame(now){ if(t0===null)t0=now; var k=Math.min(1,(now-t0)/DUR), e=ease(k);
       P.forEach(function(p){ p.x=p.sx+(p.tx-p.sx)*e; p.y=p.sy+(p.ty-p.sy)*e; p.o=p.so+(p.to-p.so)*e; });
-      EO.forEach(function(o){ o.o=o.s+(o.t-o.s)*e; }); render(); if(k<1) raf=requestAnimationFrame(frame);
+      EO.forEach(function(o){ o.o=o.s+(o.t-o.s)*e; }); Z=Zs+(1-Zs)*e; render(); if(k<1) raf=requestAnimationFrame(frame);
     } raf=requestAnimationFrame(frame);
   }
   function go(i){ cur=i; layout(i); animate();
@@ -156,16 +164,25 @@
     dots.forEach(function(d,k){ d.classList.toggle('on',k===step); });
     var last=step===ORDER.length-1;
     back.hidden=step<=0; next.style.display=last?'none':'inline-block'; nav.style.display=last?'none':'flex'; endcta.classList.toggle('on',last);
+    var aL=document.getElementById('tarL'), aR=document.getElementById('tarR'); if(aL) aL.hidden=step<=0; if(aR) aR.hidden=last;
   }
   function tap(i){ go(i); }   // tapping any node/line focuses it; narrative position (step) only moves on focal nodes
   next.onclick=function(){ if(step<ORDER.length-1){ step++; go(ORDER[step]); } };
   back.onclick=function(){ if(step>0){ step--; go(ORDER[step]); } };
+  var tarL=document.getElementById('tarL'), tarR=document.getElementById('tarR');
+  if(tarL) tarL.addEventListener('click', function(){ if(step>0){ step--; go(ORDER[step]); } });
+  if(tarR) tarR.addEventListener('click', function(){ if(step<ORDER.length-1){ step++; go(ORDER[step]); } });
   var x0=null;
   document.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
   document.addEventListener('touchend',function(e){ if(x0==null)return; var dx=e.changedTouches[0].clientX-x0;
     if(dx<-45&&step<ORDER.length-1){ step++; go(ORDER[step]); } else if(dx>45&&step>0){ step--; go(ORDER[step]); } x0=null; },{passive:true});
   document.addEventListener('keydown',function(e){ if(e.key==='ArrowRight'&&step<ORDER.length-1){ step++; go(ORDER[step]); } if(e.key==='ArrowLeft'&&step>0){ step--; go(ORDER[step]); } });
-  render(); go(ORDER[0]);
+  // entrance: snap every node to its ARRANGED position up front (wallet centred, the six links already
+  // sitting at the ends of their edges), paint the matched "wallet fills" first frame, fade in from the
+  // dip, then pull OUT with a ZOOM-ONLY reveal — the ring doesn't assemble, it's revealed already in place.
+  Z=6; cur=ORDER[0]; step=0; layout(ORDER[0]); P.forEach(function(p){ p.x=p.tx; p.y=p.ty; p.o=p.to; }); render();
+  setTimeout(function(){ var f=document.getElementById('xfade'); if(f) f.style.opacity='0'; }, 40);
+  setTimeout(function(){ go(ORDER[0]); }, 470);
   // skip dumps into the home hub (newbs choose there); logged-in users go straight to their inbox.
   var sk=document.getElementById('tourskip');
   if(sk) sk.addEventListener('click', function(e){ e.preventDefault();
@@ -173,6 +190,10 @@
       location.href = (d&&d.authenticated) ? '/inbox' : '/home';
     }).catch(function(){ location.href='/home'; });
   });
+  // logged-in visitors: the end-of-tour reward button opens their inbox instead of registering.
+  fetch('/auth/session',{credentials:'include'}).then(function(r){return r.json();}).then(function(d){
+    if(d&&d.authenticated){ var g=document.getElementById('endcta-go'); if(g){ g.textContent='Open your inbox'; g.href='/inbox'; } }
+  }).catch(function(){});
 })();
 </script>
 </body>

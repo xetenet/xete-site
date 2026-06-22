@@ -41,6 +41,14 @@
   .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
   @keyframes rise{ to{ opacity:1; transform:none; } }
   .d1{ animation-delay:.05s } .d2{ animation-delay:.18s } .d3{ animation-delay:.32s } .d4{ animation-delay:.46s } .d5{ animation-delay:.62s }
+  /* animated "helium" atom header (shared with About / How-it-works) */
+  .sys{ width:84px; height:84px; margin:0 auto 18px; position:relative; }
+  .sys .core{ position:absolute; inset:33px; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fff, var(--teal) 62%, #123 100%); box-shadow:0 0 24px 5px rgba(45,212,191,.5); animation:pulse 3.4s ease-in-out infinite; }
+  .sys .orb{ position:absolute; inset:0; animation:spin 11s linear infinite; }
+  .sys .orb::before{ content:""; position:absolute; top:-2px; left:50%; width:8px; height:8px; margin-left:-4px; border-radius:50%; background:var(--violet); box-shadow:0 0 10px 2px var(--violet); }
+  .sys .orb.b{ animation-duration:17s; animation-direction:reverse; transform:rotate(70deg); } .sys .orb.b::before{ background:var(--green); box-shadow:0 0 10px 2px var(--green); }
+  .sys .ring{ position:absolute; inset:5px; border:1px solid #ffffff14; border-radius:50%; } .sys .ring.b{ inset:18px; }
+  @keyframes spin{ to{ transform:rotate(360deg) } } @keyframes pulse{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.08) } }
   .hero{ text-align:center; padding:30px 0 8px; }
   h1{ font-size:32px; line-height:1.15; letter-spacing:-.4px; margin-bottom:12px; }
   .intro{ font-size:17px; color:#c7cdda; }
@@ -67,9 +75,10 @@
 <body>
 <div class="stars"></div>
 <div class="wrap">
-  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/inbox">Log in</a><a href="/register">Register</a></div>
+  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/login">Log in</a><a href="/register">Register</a></div>
 
   <div class="hero">
+    <div class="sys rise d1"><div class="ring"></div><div class="ring b"></div><div class="orb"></div><div class="orb b"></div><div class="core"></div></div>
     <h1 class="rise d2">Help.</h1>
     <p class="intro rise d3">Short answers to the questions people ask most. Still stuck? Reach out — a real person will help.</p>
   </div>
@@ -86,12 +95,12 @@
 
   <div class="cta rise d5">
     <a class="go" href="/contact">Contact us</a>
-    <a class="tour" href="/get-started">New here? Get started in about a minute ›</a>
+    <a class="tour" href="/register">New here? Get started in about a minute ›</a>
     <span class="small">A real person will get back to you.</span>
   </div>
 
   <div class="doors rise d5">
-    <a href="/how-it-works">How it works</a><a href="/aliases">Names</a><a href="/about">About</a><a href="/contact">Contact</a>
+    <a href="/how-it-works">How it works</a><a href="/aliases">Names</a><a href="/about">About</a><a href="/help">Help</a><a href="/trust">Trust</a><a href="/contact">Contact</a>
   </div>
 </div>
 <script>

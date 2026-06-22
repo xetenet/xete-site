@@ -5,11 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>How it works — xete</title>
 <meta name="description" content="How xete works in plain steps: get a wallet that is also your ID, pick a name, send end-to-end encrypted messages that erase after 24 hours, and send money too.">
+<link rel="canonical" href="https://xete.net/how-it-works">
+<meta name="theme-color" content="#06070b">
 <style>
-  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399; }
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399;
+    --teal:#2dd4bf; --violet:#c084fc; --blue:#60a5fa; --amber:#fbbf24; --green:#34d399; }
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  html,body{ height:100%; overflow:hidden; }
-  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; -webkit-font-smoothing:antialiased;
+  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
     background:
       radial-gradient(circle at 82% 6%, rgba(124,156,255,.12), transparent 46%),
       radial-gradient(circle at 12% 96%, rgba(52,211,153,.08), transparent 46%),
@@ -20,68 +22,144 @@
       radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
       radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
   @keyframes drift{ to{ transform:translateY(-26px); } }
-  .stage{ position:relative; z-index:1; height:100%; display:flex; flex-direction:column; max-width:540px; margin:0 auto; padding:0 24px max(20px,env(safe-area-inset-bottom)); }
-  .top{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
-  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; } .sp{ flex:1; }
-  .top a{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; } .top a:hover{ border-color:#8aa0ff; color:#fff; }
-  .dots{ display:flex; gap:7px; justify-content:center; margin:6px 0 4px; }
-  .dots i{ width:7px; height:7px; border-radius:50%; background:#2a3142; cursor:pointer; transition:all .3s; }
-  .dots i.on{ background:var(--c,#34d399); box-shadow:0 0 8px var(--c,#34d399); transform:scale(1.25); }
-  .body-wrap{ flex:1 1 auto; display:flex; flex-direction:column; justify-content:center; }
-  .disc{ width:80px; height:80px; border-radius:50%; margin:0 0 22px; position:relative; display:grid; place-items:center; }
-  .disc::after{ content:""; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fff, var(--c) 62%, #10141f 100%); box-shadow:0 0 28px 4px var(--c); }
-  .disc span{ position:relative; z-index:1; font-weight:800; font-size:30px; color:#06121a; }
-  .step{ display:none; } .step.on{ display:block; animation:rise .6s cubic-bezier(.2,.7,.2,1) both; }
-  @keyframes rise{ from{ opacity:0; transform:translateY(16px) } to{ opacity:1; transform:none } }
-  .kick{ font-size:11px; letter-spacing:2.4px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
-  h1{ font-size:30px; line-height:1.15; letter-spacing:-.4px; margin-bottom:12px; }
-  p{ font-size:16px; line-height:1.55; color:#c4cbd9; } p b{ color:#fff; }
-  .short li{ list-style:none; font-size:15px; color:#c4cbd9; margin:8px 0; padding-left:20px; position:relative; }
-  .short li::before{ content:""; position:absolute; left:0; top:8px; width:8px; height:8px; border-radius:50%; background:var(--cta); box-shadow:0 0 8px var(--cta); }
-  .nav{ flex:0 0 auto; display:flex; align-items:center; gap:12px; margin-top:18px; }
-  .back{ background:none; border:0; color:var(--muted); font-size:14px; padding:11px 4px; cursor:pointer; } .back:hover{ color:#fff; } .back[hidden]{ visibility:hidden; }
-  .nsp{ flex:1; }
-  .btn{ text-decoration:none; display:inline-block; border:0; cursor:pointer; font-family:inherit; background:var(--cta); color:#04210f; font-weight:700; border-radius:11px; padding:13px 24px; font-size:15px; } .btn:active{ transform:translateY(1px); }
+  .wrap{ position:relative; z-index:1; max-width:960px; margin:0 auto; padding:0 18px 60px; }
+  .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 4px 6px; max-width:540px; margin:0 auto; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; color:var(--ink); text-decoration:none; } .sp{ flex:1; }
+  .bar a.nav{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; } .bar a.nav:hover{ border-color:#8aa0ff; color:#fff; }
+  .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .d1{animation-delay:.05s}.d2{animation-delay:.18s}.d3{animation-delay:.32s}.d4{animation-delay:.46s}
+
+  /* ── animated "helium" atom header (shared with About) ── */
+  .sys{ width:84px; height:84px; margin:0 auto 18px; position:relative; }
+  .sys .core{ position:absolute; inset:33px; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fff, var(--teal) 62%, #123 100%); box-shadow:0 0 24px 5px rgba(45,212,191,.5); animation:pulse 3.4s ease-in-out infinite; }
+  .sys .orb{ position:absolute; inset:0; animation:spin 11s linear infinite; }
+  .sys .orb::before{ content:""; position:absolute; top:-2px; left:50%; width:8px; height:8px; margin-left:-4px; border-radius:50%; background:var(--violet); box-shadow:0 0 10px 2px var(--violet); }
+  .sys .orb.b{ animation-duration:17s; animation-direction:reverse; transform:rotate(70deg); } .sys .orb.b::before{ background:var(--green); box-shadow:0 0 10px 2px var(--green); }
+  .sys .ring{ position:absolute; inset:5px; border:1px solid #ffffff14; border-radius:50%; } .sys .ring.b{ inset:18px; }
+  @keyframes spin{ to{ transform:rotate(360deg) } } @keyframes pulse{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.08) } }
+
+  .hero{ text-align:center; padding:26px 0 4px; }
+  h1{ font-size:31px; line-height:1.15; letter-spacing:-.4px; margin-bottom:10px; }
+  .intro{ font-size:16px; color:#c7cdda; max-width:480px; margin:0 auto; }
+  .swipehint{ display:inline-flex; align-items:center; gap:7px; margin-top:14px; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:#6b7587; }
+  .swipehint .ln{ width:26px; height:1px; background:linear-gradient(90deg,transparent,#6b7587); }
+
+  /* ── horizontal step rail (scroll / swipe left → right) ── */
+  .rail-wrap{ position:relative; margin:22px 0 4px; }
+  .rail{ display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth;
+    padding:8px max(18px,calc((100% - 460px)/2)) 20px; scrollbar-width:none; -ms-overflow-style:none; }
+  .rail::-webkit-scrollbar{ display:none; }
+  .card{ scroll-snap-align:center; flex:0 0 auto; width:min(460px,84vw); min-height:330px;
+    background:linear-gradient(180deg, rgba(20,24,33,.72), rgba(14,17,24,.72)); border:1px solid var(--line);
+    border-radius:20px; padding:30px 28px; display:flex; flex-direction:column;
+    transition:border-color .4s, transform .4s, box-shadow .4s; }
+  .card.on{ border-color:color-mix(in srgb, var(--c) 55%, var(--line)); box-shadow:0 24px 60px -28px var(--c); }
+  .card:not(.on){ cursor:pointer; }
+  .ic{ width:60px; height:60px; color:var(--c); margin-bottom:20px; }
+  .ic svg{ width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .num{ font-size:11px; letter-spacing:2.4px; text-transform:uppercase; color:var(--c); margin-bottom:9px; font-weight:700; }
+  .card h2{ font-size:23px; line-height:1.2; margin-bottom:11px; letter-spacing:-.3px; }
+  .card p{ font-size:15.5px; line-height:1.55; color:#c4cbd9; } .card p b{ color:#fff; }
+  .card .short{ list-style:none; margin-top:2px; }
+  .card .short li{ font-size:15px; color:#c4cbd9; margin:11px 0; padding-left:22px; position:relative; }
+  .card .short li::before{ content:""; position:absolute; left:0; top:8px; width:9px; height:9px; border-radius:50%; background:var(--c); box-shadow:0 0 9px var(--c); }
+
+  .arrow{ position:absolute; top:50%; transform:translateY(-50%); width:42px; height:42px; border-radius:50%;
+    background:rgba(20,24,33,.85); border:1px solid var(--line); color:#cbd2e0; font-size:20px; cursor:pointer;
+    display:grid; place-items:center; z-index:2; transition:opacity .3s, border-color .2s; }
+  .arrow:hover{ border-color:#8aa0ff; color:#fff; } .arrow.l{ left:2px; } .arrow.r{ right:2px; }
+  .arrow[disabled]{ opacity:0; pointer-events:none; }
+  @media (max-width:680px){ .arrow{ display:none; } }
+
+  .dots{ display:flex; gap:8px; justify-content:center; margin:8px 0 0; }
+  .dots i{ width:8px; height:8px; border-radius:50%; background:#2a3142; cursor:pointer; transition:all .3s; }
+  .dots i.on{ background:var(--cta); box-shadow:0 0 9px var(--cta); transform:scale(1.25); }
+
+  .endcta{ display:flex; gap:11px; flex-wrap:wrap; align-items:center; justify-content:center; margin:34px 0 6px; }
+  .endcta .lead{ width:100%; text-align:center; font-size:13px; color:#aeb6c6; margin-bottom:4px; }
+  .btn{ text-decoration:none; display:inline-block; border:0; cursor:pointer; font-family:inherit; background:var(--cta); color:#04210f; font-weight:700; border-radius:11px; padding:14px 26px; font-size:15px; } .btn:active{ transform:translateY(1px); }
   .btn.ghost{ background:#11151e; color:var(--ink); border:1px solid var(--line); }
-  .endcta{ display:none; gap:10px; margin-top:6px; flex-wrap:wrap; } .endcta.on{ display:flex; }
+  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:40px; padding-top:22px; border-top:1px solid var(--line); }
+  .doors a{ font-size:12.5px; color:#cbd2e0; text-decoration:none; padding:8px 13px; border:1px solid var(--line); border-radius:8px; } .doors a:hover{ border-color:#8aa0ff; color:#fff; }
 </style>
 </head>
 <body>
 <div class="stars"></div>
-<div class="stage">
-  <div class="top"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/people">For people</a><a href="/register">Register</a></div>
+<div class="wrap">
+  <div class="bar rise d1">
+    <a class="brand" href="/home">xete</a><span class="sp"></span>
+    <a class="nav" href="/login">Log in</a><a class="nav" href="/register">Register</a>
+  </div>
+
+  <div class="hero">
+    <div class="sys rise d1"><div class="ring"></div><div class="ring b"></div><div class="orb"></div><div class="orb b"></div><div class="core"></div></div>
+    <h1 class="rise d2">How it works.</h1>
+    <p class="intro rise d3">Five plain steps — get a wallet, pick a name, send something only the right person can open.</p>
+    <div class="swipehint rise d3"><span class="ln"></span> swipe through <span class="ln" style="transform:scaleX(-1)"></span></div>
+  </div>
+
+  <div class="rail-wrap rise d4">
+    <button class="arrow l" id="arL" aria-label="Previous">&lsaquo;</button>
+    <div class="rail" id="rail"></div>
+    <button class="arrow r" id="arR" aria-label="Next">&rsaquo;</button>
+  </div>
   <div class="dots" id="dots"></div>
-  <div class="body-wrap" id="bw"></div>
-  <div class="nav" id="nav"><button class="back" id="back" hidden>‹ Back</button><div class="nsp"></div><button class="btn" id="next">Next ›</button></div>
-  <div class="endcta" id="endcta"><a class="btn" href="/get-started">Get started</a><a class="btn ghost" href="/tour">Take the tour</a></div>
+
+  <div class="endcta rise d4">
+    <span class="lead">That's the whole idea.</span>
+    <a class="btn" href="/register">Get started</a>
+  </div>
+
+  <div class="doors rise d4">
+    <a href="/how-it-works">How it works</a><a href="/aliases">Names</a><a href="/about">About</a><a href="/help">Help</a><a href="/trust">Trust</a><a href="/contact">Contact</a>
+  </div>
 </div>
+
 <script>
-  var S=[
-    {c:'#2dd4bf', n:'1', k:'step one', h:'Get a wallet.', p:'A wallet is a small app that holds your <b>keys</b> — a key is like a password only you have. Use one you own or make a new one in seconds. Your wallet is also your ID, so <b>no email or phone number</b>.'},
-    {c:'#c084fc', n:'2', k:'step two', h:'Pick a name.', p:'Choose a short name like <b>%alex</b> so people can find you — it works like a username, and points to your wallet.'},
-    {c:'#60a5fa', n:'3', k:'step three', h:'Send a message.', p:'Write it and press send. <b>Before it leaves your device</b>, xete locks it with the other person’s key — only their key can open it. That’s end-to-end encryption: no one in the middle can read it.'},
-    {c:'#fbbf24', n:'4', k:'step four', h:'It disappears.', p:'After 24 hours the message is <b>erased</b> — it doesn’t sit on a server forever. A short private record stays on-chain to prove it was sent — but never what it said.'},
-    {c:'#34d399', n:'5', k:'step five', h:'Send money, too.', p:'Send a payment along with a message. The <b>same keys</b> that protect your words protect your money — you stay in control the whole time.'},
-    {c:'#34d399', n:'✓', k:'the short version', h:'That’s it.', short:['Your keys never leave your device.','No email or phone number needed.','No one can read your messages but you and the person you write to.'], end:true}
+  var ICONS={
+    key:'<circle cx="8" cy="8" r="4.4"/><path d="M11.1 11.1 L20 20"/><path d="M16.6 16.6 l2.4 -2.4"/><path d="M18.8 18.8 l2.4 -2.4"/>',
+    tag:'<path d="M4 13 L13 4 H20 V11 L11 20 Z"/><circle cx="16.2" cy="7.8" r="1.3"/>',
+    lock:'<rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5 V7.5 a4 4 0 0 1 8 0 V10.5"/><circle cx="12" cy="15.2" r="1.15"/>',
+    clock:'<circle cx="12" cy="12" r="8"/><path d="M12 7.6 V12 L15.2 13.9"/><path d="M12 4 v1.6 M20 12 h-1.6" opacity=".5"/>',
+    coin:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.1"/><path d="M12 4 v2.1 M12 17.9 V20" opacity=".55"/>',
+    check:'<circle cx="12" cy="12" r="8.6"/><path d="M8.2 12.3 l2.6 2.6 l5 -5.9"/>'
+  };
+  var STEPS=[
+    {c:'--teal',   ic:'key',   n:'Step 1', h:'Get a wallet.',     p:'A wallet is a small app that holds your <b>keys</b> — a key is like a password only you have. Use one you own or make one in seconds. Your wallet is also your ID, so <b>no email or phone number</b>.'},
+    {c:'--violet', ic:'tag',   n:'Step 2', h:'Pick a name.',      p:'Choose a short name like <b>%alex</b> so people can find you — it works like a username, and points to your wallet.'},
+    {c:'--blue',   ic:'lock',  n:'Step 3', h:'Send a message.',   p:'Write it and press send. <b>Before it leaves your device</b>, xete locks it with the other person’s key — only their key can open it. That’s end-to-end encryption: no one in the middle can read it.'},
+    {c:'--amber',  ic:'clock', n:'Step 4', h:'It disappears.',    p:'After 24 hours the message is <b>erased</b> — it doesn’t sit on a server forever. A short private record stays on-chain to prove it was sent — but never what it said.'},
+    {c:'--green',  ic:'coin',  n:'Step 5', h:'Send money, too.',  p:'Send a payment along with a message. The <b>same keys</b> that protect your words protect your money — you stay in control the whole time.'},
+    {c:'--green',  ic:'check', n:'In short', h:'That’s it.', short:['Your keys never leave your device.','No email or phone number needed.','No one can read your messages but you and the person you write to.']}
   ];
-  var bw=document.getElementById('bw'), dotsBox=document.getElementById('dots'), back=document.getElementById('back'),
-      next=document.getElementById('next'), nav=document.getElementById('nav'), endcta=document.getElementById('endcta'), cur=0;
-  S.forEach(function(s,i){ var d=document.createElement('div'); d.className='step'+(i===0?' on':'');
-    var inner='<div class="kick">'+s.k+'</div><div class="disc" style="--c:'+s.c+'"><span>'+s.n+'</span></div><h1>'+s.h+'</h1>';
-    if(s.short){ inner+='<ul class="short">'+s.short.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>'; } else { inner+='<p>'+s.p+'</p>'; }
-    d.innerHTML=inner; d.style.setProperty('--c',s.c); bw.appendChild(d);
-    var dot=document.createElement('i'); dot.addEventListener('click',(function(k){return function(){ go(k); };})(i)); dotsBox.appendChild(dot);
+  var rail=document.getElementById('rail'), dotsBox=document.getElementById('dots'),
+      arL=document.getElementById('arL'), arR=document.getElementById('arR');
+  STEPS.forEach(function(s,i){
+    var c=document.createElement('div'); c.className='card'+(i===0?' on':''); c.style.setProperty('--c','var('+s.c+')');
+    var inner='<div class="ic"><svg viewBox="0 0 24 24">'+ICONS[s.ic]+'</svg></div><div class="num">'+s.n+'</div><h2>'+s.h+'</h2>';
+    if(s.short){ inner+='<ul class="short">'+s.short.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>'; }
+    else { inner+='<p>'+s.p+'</p>'; }
+    c.innerHTML=inner; rail.appendChild(c);
+    c.addEventListener('click', function(){ scrollToCard(i); });   // click a peeking tile -> bring it to centre
+    var d=document.createElement('i'); if(i===0) d.className='on';
+    d.addEventListener('click', function(){ scrollToCard(i); }); dotsBox.appendChild(d);
   });
-  var steps=[].slice.call(bw.children), dots=[].slice.call(dotsBox.children);
-  function go(i){ cur=i; steps.forEach(function(s,x){ s.classList.toggle('on',x===i); });
-    dots.forEach(function(d,x){ d.classList.toggle('on',x===i); d.style.setProperty('--c',S[i].c); });
-    var last=i===S.length-1; back.hidden=i<=0; next.style.display=last?'none':'inline-block'; nav.style.display=last?'none':'flex'; endcta.classList.toggle('on',last); }
-  next.onclick=function(){ if(cur<S.length-1) go(cur+1); }; back.onclick=function(){ if(cur>0) go(cur-1); };
-  var x0=null; document.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
-  document.addEventListener('touchend',function(e){ if(x0==null)return; var dx=e.changedTouches[0].clientX-x0;
-    if(dx<-45&&cur<S.length-1) go(cur+1); else if(dx>45&&cur>0) go(cur-1); x0=null; },{passive:true});
-  document.addEventListener('keydown',function(e){ if(e.key==='ArrowRight'&&cur<S.length-1)go(cur+1); if(e.key==='ArrowLeft'&&cur>0)go(cur-1); });
-  go(0);
+  var cards=[].slice.call(rail.children), dots=[].slice.call(dotsBox.children);
+  function step(){ return cards.length>1 ? (cards[1].offsetLeft - cards[0].offsetLeft) : cards[0].offsetWidth; }
+  function active(){ return Math.round(rail.scrollLeft / step()); }
+  function setActive(i){ i=Math.max(0,Math.min(cards.length-1,i));
+    cards.forEach(function(c,x){ c.classList.toggle('on',x===i); });
+    dots.forEach(function(d,x){ d.classList.toggle('on',x===i); });
+    if(arL) arL.disabled=i<=0; if(arR) arR.disabled=i>=cards.length-1; }
+  function scrollToCard(i){ rail.scrollTo({left:i*step(), behavior:'smooth'}); }
+  var raf=null;
+  rail.addEventListener('scroll', function(){ if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(function(){ setActive(active()); }); });
+  if(arL) arL.addEventListener('click', function(){ scrollToCard(active()-1); });
+  if(arR) arR.addEventListener('click', function(){ scrollToCard(active()+1); });
+  document.addEventListener('keydown', function(e){ if(e.key==='ArrowRight') scrollToCard(active()+1); if(e.key==='ArrowLeft') scrollToCard(active()-1); });
+  setActive(0);
 </script>
+<script>fetch('/auth/session',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){if(d&&d.authenticated){var g=document.querySelector('a[href="/register"].go,a[href="/register"].btn');if(g){g.textContent='Open your inbox';g.setAttribute('href','/inbox');}}}).catch(function(){});</script>
 </body>
 </html>

@@ -1,20 +1,20 @@
 {
   "generated_note": "sha256 of each LIVE page; manual check + GitHub verifier compare against these",
   "pages": {
-    "/": "6bd2cebe612494c7581b94fa1d95edaf22c2c839abf6aa80855bb80160f66397",
-    "/home": "776bfcbf654466bdaee990f9ac48434c44f9cd0fc1cc9683d5d6fcc45037af93",
-    "/people": "41dcc48fd7520bc1f1d3b49be64f755bd8dbd0de01e0aaa12bb732b4e78fb81b",
-    "/how-it-works": "ccc1ffd68c3a292a9559d8336ddaf4eada3e0a88015db9aaf7a867e7d11405c6",
-    "/aliases": "67d08033c510e834f141099dbcfac30f84ed8709bfba4949c9073a39487fe305",
-    "/about": "14f641ef966f61b677521830678d4e0abaa26e17cca426897f100fb59f8b813a",
-    "/help": "dd6a2d0c8f325bf0e05f004c373f6d5ff7df729d3c1990fe804adebe2af9c554",
-    "/get-started": "d40972e72f46169b22eabeae5f1fa3ece18eb4a7c1e41684fbef655c8259679b",
-    "/developers": "4de576736ee097640b8113cb994a52c05caf5241173c1e50cdb044afe6518ea3",
-    "/for-agents": "0154bb7a5588221aed532e48fbb14622326528af4ddb3ee2963c67dbae089c32",
-    "/enterprise": "6e2ced5c843491bf23592fb8d04281d28ea0428c27939ad7ea2b4026f3558168",
-    "/trust": "b503a0d58982955faea6730d71ffb837f767e3ed170ea00e0c0495cbd9f9e64d",
-    "/contact": "ae4e317ac086a395e2a9bbade66a5986bafc331e1430782621ac0a0ae1fc9792",
+    "/": "89e73b1e7134b25cf0f8ef665ab4cda7f40a39b1cb9cd6ff41a7dc5c81e456d7",
+    "/home": "e25965a82683729108c9e6c24a3a8df517f8d30eb1bce33c7ad739e86caa23e5",
+    "/people": "cb7e6a42349e38a6dfc95e6a89f8fab6967a4e55a4dda9a207467e79755aa31a",
+    "/how-it-works": "c29b9a1fcd330857491eb7cda616710f655ee62bcab1aa5fa05226de1653a479",
+    "/aliases": "7baeb378ee72c762268de2527828aa3addb77c553a45a3a5b8ef98400ddeb1bc",
+    "/about": "924481c830212edc06c4c5ebf81d3194f4813c6a266abf7601051018494b9ec0",
+    "/help": "80b13fe68de2605452d2986bbb4843fc19ef63ebdbcbe79f99db49f961de0bdd",
+    "/get-started": "9b296d0c5e1e2d80f4dcd476cfd36a78ea8d19c23c0e6c9f51e8adde4add9e66",
+    "/developers": "312b7f0573dd144971e34510275007ef6c75a5a7afc23cb9c942b5cf884b8669",
+    "/for-agents": "35c0f99cb809756e4fcd89cf4bc8bcd422f53dae2904520b35b48ccda4e40f2a",
+    "/enterprise": "d92a9252d409a102e73bd1c273c2ca33d8133dc2d4388085d0c9af802a935c9a",
+    "/trust": "c2f509fb2f372962af44bed397bfdee02e43a784822b62d84a854de6be6e84d1",
+    "/contact": "11217d48bcbdb8a4685b2733bec09c2dde546dd2ecdcdf1e0de2eff2ba2956ed",
     "/login": "9b296d0c5e1e2d80f4dcd476cfd36a78ea8d19c23c0e6c9f51e8adde4add9e66",
-    "/tour": "f850b347de6be875237827f32db224c45c138956eed559d5ecb3c8821bc883f8"
+    "/tour": "c92594df62cc404a347fb2167e61c4d29963924d2f689c11fd8ac2bf805947be"
   }
 }

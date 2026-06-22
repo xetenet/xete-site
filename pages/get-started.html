@@ -3,11 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Get started — xete</title>
-<meta name="description" content="Get started with xete in about a minute: connect or create a wallet, claim a short name, and send a test message to the echo bot to watch it work end to end.">
+<title>Log in — xete</title>
+<meta name="description" content="Log in to xete with your wallet — no password, no email. Or link the installed app to a session you've already opened.">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#06070b">
 <style>
   :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399;
-    --teal:#2dd4bf; --violet:#c084fc; --green:#34d399; }
+    --teal:#2dd4bf; --violet:#c084fc; --amber:#fbbf24; --link:#8aa0ff; }
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
   body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
     background:
@@ -18,80 +20,328 @@
     background:
       radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
       radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
-      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent); background-repeat:repeat; }
   @keyframes drift{ to{ transform:translateY(-26px); } }
-  .wrap{ position:relative; z-index:1; max-width:540px; margin:0 auto; padding:0 22px 64px; }
+  .wrap{ position:relative; z-index:1; max-width:460px; margin:0 auto; padding:0 22px 60px; }
   .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
-  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; } .sp{ flex:1; }
-  .bar a{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; }
-  .bar a:hover{ border-color:#8aa0ff; color:#fff; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; color:var(--ink); text-decoration:none; } .sp{ flex:1; }
+  .bar a.nav{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; } .bar a.nav:hover{ border-color:#8aa0ff; color:#fff; }
   .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
   @keyframes rise{ to{ opacity:1; transform:none; } }
-  .d1{ animation-delay:.05s } .d2{ animation-delay:.18s } .d3{ animation-delay:.32s } .d4{ animation-delay:.46s } .d5{ animation-delay:.62s }
-  .hero{ text-align:center; padding:30px 0 6px; }
-  h1{ font-size:32px; line-height:1.15; letter-spacing:-.4px; margin-bottom:12px; }
-  .intro{ font-size:17px; color:#c7cdda; }
-  .clock{ display:inline-block; margin-top:14px; font-size:12.5px; color:var(--green); border:1px solid rgba(52,211,153,.3); background:rgba(52,211,153,.07); padding:6px 13px; border-radius:20px; }
-
-  /* interactive step rail — numbered glowing discs on a track; tap to reveal */
-  .steps{ display:flex; justify-content:center; align-items:flex-start; gap:0; margin:36px 0 18px; position:relative; }
-  .track{ position:absolute; top:25px; left:18%; right:18%; height:2px; background:linear-gradient(90deg,var(--teal),var(--violet),var(--green)); opacity:.35; }
-  .stp{ display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; width:96px; position:relative; z-index:1; }
-  .disc{ width:50px; height:50px; border-radius:50%; position:relative; display:grid; place-items:center; transition:transform .5s cubic-bezier(.2,.7,.2,1); }
-  .disc::after{ content:""; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fff, var(--pc) 62%, #10141f 100%); box-shadow:0 0 0 0 var(--pc); transition:box-shadow .5s; }
-  .disc span{ position:relative; z-index:1; font-weight:800; color:#06121a; font-size:18px; }
-  .stp.on .disc{ transform:scale(1.16); } .stp.on .disc::after{ box-shadow:0 0 22px 3px var(--pc); }
-  .stp:not(.on) .disc{ opacity:.5; }
-  .stp .pl{ font-size:12px; font-weight:700; color:#aeb6c6; text-align:center; transition:color .4s; } .stp.on .pl{ color:#fff; }
-  .detail{ min-height:104px; background:rgba(17,20,28,.55); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
-  .detail h2{ font-size:18px; margin-bottom:7px; } .detail p{ font-size:15px; color:#c4cbd9; margin:0; }
-  .detail .body{ opacity:0; animation:fade .45s ease forwards; } @keyframes fade{ to{ opacity:1 } }
-  .cta{ text-align:center; margin:38px 0 10px; }
-  .cta a.go{ display:inline-block; background:var(--cta); color:#04210f; font-weight:700; padding:15px 32px; border-radius:11px; font-size:16px; text-decoration:none; box-shadow:0 0 24px rgba(52,211,153,.25); }
-  .cta a.tour{ display:block; margin-top:14px; color:#8aa0ff; text-decoration:none; font-size:14px; } .cta a.tour:hover{ text-decoration:underline; }
-  .cta .small{ display:block; margin-top:12px; color:var(--muted); font-size:13px; }
-  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:42px; padding-top:22px; border-top:1px solid var(--line); }
+  .d1{animation-delay:.05s}.d2{animation-delay:.16s}.d3{animation-delay:.28s}.d4{animation-delay:.4s}.d5{animation-delay:.52s}
+  .hero{ text-align:center; padding:26px 0 4px; }
+  h1{ font-size:30px; line-height:1.15; letter-spacing:-.4px; margin-bottom:10px; }
+  .intro{ font-size:15.5px; color:#c7cdda; max-width:380px; margin:0 auto; }
+  .card{ background:rgba(17,20,28,.55); border:1px solid var(--line); border-radius:15px; padding:18px 18px 20px; margin-top:16px; }
+  .card.lead{ border-color:rgba(52,211,153,.32); }
+  .card .ct{ display:flex; align-items:center; gap:9px; font-size:13px; font-weight:700; letter-spacing:.3px; margin-bottom:4px; }
+  .card .ct .dot{ width:9px; height:9px; border-radius:50%; background:var(--pc,#34d399); box-shadow:0 0 10px var(--pc,#34d399); }
+  .card .cs{ font-size:13px; color:var(--muted); margin-bottom:14px; line-height:1.5; }
+  .btn{ display:block; width:100%; text-align:center; text-decoration:none; font-weight:700; padding:14px; border-radius:11px; font-size:15px; border:0; cursor:pointer; font-family:inherit; }
+  .btn.go{ background:var(--cta); color:#04210f; box-shadow:0 0 22px rgba(52,211,153,.22); }
+  .btn.ghost{ background:rgba(13,16,23,.6); color:var(--ink); border:1px solid var(--line); }
+  .btn.ghost:hover{ border-color:#8aa0ff; }
+  .btn:active{ transform:translateY(1px); }
+  .words{ display:flex; gap:8px; margin-bottom:11px; }
+  .words input{ flex:1; min-width:0; width:100%; background:rgba(13,16,23,.92); border:1px solid var(--line); border-radius:10px; padding:13px 8px; color:var(--ink); font-size:16px; font-family:ui-monospace,Menlo,Consolas,monospace; text-align:center; }
+  .words input:focus{ outline:none; border-color:#34d399; }
+  .field{ width:100%; background:rgba(13,16,23,.92); border:1px solid var(--line); border-radius:10px; padding:13px; color:var(--ink); font-size:16px; font-family:ui-monospace,Menlo,Consolas,monospace; text-align:center; letter-spacing:1px; margin-bottom:11px; }
+  .field:focus{ outline:none; border-color:#7c9cff; }
+  .err{ min-height:17px; font-size:12.5px; color:#f87171; margin-bottom:8px; }
+  .hintline{ font-size:12px; color:#5d6577; margin-top:11px; line-height:1.5; text-align:center; }
+  .hintline b{ color:#9aa3b4; }
+  .toggle{ text-align:center; margin-top:18px; }
+  .toggle a{ font-size:13px; color:var(--link); text-decoration:none; } .toggle a:hover{ text-decoration:underline; }
+  details.adv{ margin-top:16px; }
+  details.adv summary{ list-style:none; cursor:pointer; text-align:center; font-size:13px; color:#7c869b; padding:8px; }
+  details.adv summary::-webkit-details-marker{ display:none; }
+  details.adv summary:hover{ color:#cbd2e0; }
+  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:30px; padding-top:22px; border-top:1px solid var(--line); }
   .doors a{ font-size:12.5px; color:#cbd2e0; text-decoration:none; padding:8px 13px; border:1px solid var(--line); border-radius:8px; } .doors a:hover{ border-color:#8aa0ff; color:#fff; }
 </style>
 </head>
 <body>
 <div class="stars"></div>
 <div class="wrap">
-  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/inbox">Log in</a><a href="/register">Register</a></div>
+  <div class="bar rise d1"><a class="brand" href="/home">xete</a><span class="sp"></span><a class="nav" href="/register">Register</a></div>
   <div class="hero">
-    <h1 class="rise d2">Get started.</h1>
-    <p class="intro rise d3">Up and running in about a minute. Here's all it takes.</p>
-    <div class="clock rise d3">~1 minute · free during the alpha</div>
+    <h1 class="rise d1">Log in.</h1>
+    <p class="intro rise d2">Your wallet is your login — no password, no email.</p>
   </div>
 
-  <div class="steps rise d4">
-    <div class="track"></div>
-    <div class="stp on" data-i="0" style="--pc:var(--teal)"><div class="disc"><span>1</span></div><div class="pl">Connect<br>a wallet</div></div>
-    <div class="stp" data-i="1" style="--pc:var(--violet)"><div class="disc"><span>2</span></div><div class="pl">Claim<br>your name</div></div>
-    <div class="stp" data-i="2" style="--pc:var(--green)"><div class="disc"><span>3</span></div><div class="pl">Send<br>a hello</div></div>
+  <!-- PASSPHRASE (this device) — shown by JS: enroll when signed in, login when a token exists -->
+  <div class="card lead rise d2" id="card-pass" style="--pc:var(--violet);display:none">
+    <div class="ct"><span class="dot"></span> <span id="pass-title">Passphrase login</span></div>
+    <div class="cs" id="pass-sub"></div>
+    <input class="field" id="pass1" type="password" autocomplete="off" spellcheck="false" placeholder="passphrase" style="letter-spacing:normal;text-align:left">
+    <input class="field" id="pass2" type="password" autocomplete="off" spellcheck="false" placeholder="confirm passphrase" style="letter-spacing:normal;text-align:left;display:none">
+    <div class="err" id="pass-err"></div>
+    <button class="btn go" id="pass-btn" type="button" onclick="passAction()">Unlock</button>
+    <div class="hintline" id="pass-forget" style="display:none"><a href="#" onclick="passForget();return false;" style="color:#7c869b">Forget passphrase on this device</a></div>
   </div>
-  <div class="detail rise d4" id="detail"></div>
 
-  <div class="cta rise d5">
-    <a class="go" href="/register">Connect wallet & start</a>
-    <a class="tour" href="/tour">New here? Take the 60-second tour ›</a>
-    <span class="small">No account, no email — just your wallet.</span>
+  <!-- FACE ID / passkey (this device) — shown by JS when a platform authenticator exists -->
+  <div class="card lead rise d2" id="card-faceid" style="--pc:var(--teal);display:none">
+    <div class="ct"><span class="dot"></span> <span id="faceid-title">Face ID</span></div>
+    <div class="cs" id="faceid-sub"></div>
+    <div class="err" id="faceid-err"></div>
+    <button class="btn go" id="faceid-btn" type="button" onclick="faceidAction(false)">Use Face ID</button>
+    <div class="hintline" id="faceid-note" style="display:none">Worth knowing: anyone who can hold your phone to your face can unlock Face ID — the encryption is sound, this is about <b>coercion</b>. For the highest bar, set a passphrase instead. We won't push you either way — your call.</div>
   </div>
+
+  <!-- WALLET (desktop + mobile Safari) -->
+  <div class="card rise d2" id="card-wallet" style="--pc:var(--cta)">
+    <div class="ct"><span class="dot"></span> Log in with your wallet</div>
+    <div class="cs">Phantom, Solflare, or any Solana wallet. Sign one message — nothing leaves your device.</div>
+    <button class="btn go" id="btn-wallet" type="button" onclick="doWallet()">Connect wallet</button>
+    <div class="hintline" id="wallet-hint"></div>
+  </div>
+
+  <!-- PAIR (installed PWA) -->
+  <div class="card rise d3" id="card-pair" style="--pc:var(--violet)">
+    <div class="ct"><span class="dot"></span> Link the installed app</div>
+    <div class="cs">Using xete added to your home screen? Log in on another device first (or in Safari), open your inbox, tap <b style="color:#c7cdda">Pair my phone app</b>, and type the three words here.</div>
+    <div class="words">
+      <input id="pw0" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="word">
+      <input id="pw1" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="word">
+      <input id="pw2" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="word">
+    </div>
+    <div class="err" id="pair-err"></div>
+    <button class="btn ghost" type="button" onclick="doPair()">Link this app</button>
+  </div>
+
+  <!-- INVITE CODE -->
+  <details class="adv rise d4">
+    <summary>Have an invite code?</summary>
+    <div style="margin-top:10px">
+      <input class="field" id="code" type="text" autocomplete="off" spellcheck="false" maxlength="40" placeholder="invite code">
+      <div class="err" id="code-err"></div>
+      <button class="btn ghost" type="button" onclick="doCode()">Unlock &amp; continue</button>
+    </div>
+  </details>
+
+  <div class="toggle rise d4">New to xete? It's invite-only right now — enter your code above, or <a href="/contact">request one &rsaquo;</a></div>
+
   <div class="doors rise d5">
-    <a href="/how-it-works">How it works</a><a href="/aliases">Names</a><a href="/help">Help</a><a href="/people">For people</a>
+    <a href="/home">Home</a><a href="/how-it-works">How it works</a><a href="/help">Help</a><a href="/developers">Agent API</a>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
+<script src="/js/wallet-auth.js?v=deeplink4"></script>
 <script>
-  var D=[
-    {c:'var(--teal)',   h:'Connect or create a wallet.', p:'Use a wallet you already have, or make a new one in seconds. It’s your ID and it holds your keys — no email, no phone number.'},
-    {c:'var(--violet)', h:'Claim your name.',            p:'Pick a short handle like <b style="color:#fff">%alex</b> so people can find you. Most names are free.'},
-    {c:'var(--green)',  h:'Send a hello.',               p:'Message our echo bot and it replies instantly — so you can watch xete work end to end, encrypted both ways.'}
-  ];
-  var det=document.getElementById('detail'), stps=[].slice.call(document.querySelectorAll('.stp'));
-  function show(i){ stps.forEach(function(s,x){ s.classList.toggle('on', x===i); });
-    det.innerHTML='<div class="body"><h2 style="color:'+D[i].c+'">'+D[i].h+'</h2><p>'+D[i].p+'</p></div>'; }
-  stps.forEach(function(s){ s.addEventListener('click', function(){ show(+this.dataset.i); }); });
-  show(0);
+  // ── Passphrase device-login: seal the server-issued device token under PBKDF2(passphrase)
+  //    AES-GCM in localStorage. Server is blind to the passphrase. ──
+  var XPASS = {
+    KEY:'xete_devlogin',
+    has:function(){ try{ return !!localStorage.getItem(this.KEY); }catch(e){ return false; } },
+    clear:function(){ try{ localStorage.removeItem(this.KEY); }catch(e){} },
+    _b64:function(b){ return btoa(String.fromCharCode.apply(null,new Uint8Array(b))); },
+    _ub:function(s){ return Uint8Array.from(atob(s),function(c){return c.charCodeAt(0);}); },
+    _key:async function(pass,salt){
+      var base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+      return crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:600000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+    },
+    seal:async function(pass,token){
+      var salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+      var key=await this._key(pass,salt);
+      var ct=await crypto.subtle.encrypt({name:'AES-GCM',iv:iv},key,new TextEncoder().encode(token));
+      localStorage.setItem(this.KEY,JSON.stringify({v:1,salt:this._b64(salt),iv:this._b64(iv),ct:this._b64(ct)}));
+    },
+    open:async function(pass){
+      var o=JSON.parse(localStorage.getItem(this.KEY));
+      var key=await this._key(pass,this._ub(o.salt));
+      var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:this._ub(o.iv)},key,this._ub(o.ct));
+      return new TextDecoder().decode(pt);
+    }
+  };
+  var _passMode=null;
+  function _byId(id){ return document.getElementById(id); }
+  function showPassEnroll(){
+    _passMode='enroll';
+    _byId('pass-title').textContent='Set up passphrase login';
+    _byId('pass-sub').textContent='Pick a passphrase. From then on you open the app on this phone with just this passphrase — no wallet, no second device.';
+    _byId('pass2').style.display='block';
+    _byId('pass-btn').textContent='Turn on passphrase login';
+    _byId('card-pass').style.display='block';
+  }
+  function showPassLogin(){
+    _passMode='login';
+    _byId('pass-title').textContent='Log in with your passphrase';
+    _byId('pass-sub').textContent='Enter the passphrase you set on this phone.';
+    _byId('pass2').style.display='none';
+    _byId('pass-btn').textContent='Unlock';
+    _byId('pass-forget').style.display='block';
+    _byId('card-pass').style.display='block';
+    setTimeout(function(){ var f=_byId('pass1'); if(f) f.focus(); },80);
+  }
+  async function passAction(){
+    var err=_byId('pass-err'); err.style.color='#f87171'; err.textContent='';
+    var p1=_byId('pass1').value;
+    if(_passMode==='enroll'){
+      var p2=_byId('pass2').value;
+      if(!p1||p1.length<6){ err.textContent='Use at least 6 characters.'; return; }
+      if(p1!==p2){ err.textContent='Passphrases do not match.'; return; }
+      err.style.color='#9aa3b4'; err.textContent='setting up…';
+      try{
+        var r=await fetch('/auth/device/enroll',{method:'POST',credentials:'include'});
+        var d=await r.json();
+        if(!d||d.status!=='ok'||!d.device_token){ err.style.color='#f87171'; err.textContent=(d&&(d.detail||d.error))||('Could not set up ('+r.status+')'); return; }
+        await XPASS.seal(p1,d.device_token);
+        err.style.color='#34d399'; err.textContent='Done — passphrase login is on. Opening your inbox…';
+        setTimeout(function(){ location.href='/inbox'; },1000);
+      }catch(e){ err.style.color='#f87171'; err.textContent='Setup error: '+e.message; }
+    } else {
+      if(!p1){ err.textContent='Enter your passphrase.'; return; }
+      err.style.color='#9aa3b4'; err.textContent='unlocking…';
+      var token;
+      try{ token=await XPASS.open(p1); }catch(e){ err.style.color='#f87171'; err.textContent='Wrong passphrase.'; return; }
+      try{
+        var r=await fetch('/auth/device/refresh',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({device_token:token})});
+        var d={}; try{ d=await r.json(); }catch(e){}
+        if(r.ok && d.status==='ok'){ err.style.color='#34d399'; err.textContent='Welcome back — opening your inbox…'; location.href='/inbox'; }
+        else if(d.code==='REVOKED'||d.code==='EXPIRED'||d.code==='BAD_TOKEN'){ XPASS.clear(); err.style.color='#f87171'; err.textContent=(d.detail||'Set up passphrase login again.'); setTimeout(function(){ location.reload(); },1800); }
+        else { err.style.color='#f87171'; err.textContent=(d.detail||d.error||('Could not log in ('+r.status+')')); }
+      }catch(e){ err.style.color='#f87171'; err.textContent='Error: '+e.message; }
+    }
+  }
+  function passForget(){ if(XPASS.has() && confirm('Remove passphrase login from this device? You will need to pair again to set it back up.')){ XPASS.clear(); location.reload(); } }
+
+  // ── Face ID / passkey (WebAuthn) ──
+  function _faceidSet(){ try{ return localStorage.getItem('xete_faceid')==='1'; }catch(e){ return false; } }
+  function b64uToBuf(s){ s=String(s).replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4)s+='='; var bin=atob(s),u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return u.buffer; }
+  function bufToB64u(b){ var u=new Uint8Array(b),s=''; for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  async function faceidAvailable(){ try{
+    // "Face ID" is a phone thing. isUserVerifyingPlatformAuthenticatorAvailable() is ALSO true on
+    // desktop (Windows Hello / Mac Touch ID), which wrongly showed a "Set up Face ID" card on desktop.
+    // Gate it to touch/coarse-pointer devices so desktop never offers Face ID.
+    var touch=(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)||navigator.maxTouchPoints>0||('ontouchstart' in window);
+    return touch && !!window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  }catch(e){ return false; } }
+  var _faceMode=null;
+  function showFaceidSetup(){
+    _faceMode='setup';
+    _byId('faceid-title').textContent='Set up Face ID';
+    _byId('faceid-sub').textContent='Open the app on this phone with Face ID — the fast way in, nothing to type.';
+    _byId('faceid-btn').textContent='Turn on Face ID';
+    _byId('card-faceid').style.display='block';
+    _byId('faceid-note').style.display='block';
+  }
+  function showFaceidLogin(){
+    _faceMode='login';
+    _byId('faceid-title').textContent='Log in with Face ID';
+    _byId('faceid-sub').textContent='Look at your phone to sign in.';
+    _byId('faceid-btn').textContent='Use Face ID';
+    _byId('card-faceid').style.display='block';
+    _byId('faceid-note').style.display='none';
+    // on-open: auto-trigger the prompt where the browser allows it (silently falls back to the button)
+    if(_faceidSet()){ setTimeout(function(){ faceidAction(true); }, 450); }
+  }
+  async function faceidAction(auto){
+    var err=_byId('faceid-err'); err.style.color='#f87171'; err.textContent='';
+    if(_faceMode==='setup'){
+      try{
+        var opt=await (await fetch('/auth/passkey/register/begin',{method:'POST',credentials:'include'})).json();
+        if(!opt||!opt.challenge){ err.textContent='Could not start ('+((opt&&(opt.detail||opt.error))||'?')+')'; return; }
+        opt.challenge=b64uToBuf(opt.challenge); opt.user.id=b64uToBuf(opt.user.id);
+        if(opt.excludeCredentials) opt.excludeCredentials=opt.excludeCredentials.map(function(c){return {type:c.type,id:b64uToBuf(c.id)};});
+        var cred=await navigator.credentials.create({publicKey:opt});
+        var body={ response:{ clientDataJSON:bufToB64u(cred.response.clientDataJSON), attestationObject:bufToB64u(cred.response.attestationObject) } };
+        var r2=await fetch('/auth/passkey/register/finish',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+        var d={}; try{ d=await r2.json(); }catch(e){}
+        if(r2.ok&&d.status==='ok'){ try{localStorage.setItem('xete_faceid','1');}catch(e){} err.style.color='#34d399'; err.textContent='Face ID is on. Opening your inbox…'; setTimeout(function(){location.href='/inbox';},1000); }
+        else { err.textContent='Setup failed: '+(d.detail||d.error||r2.status); }
+      }catch(e){ err.textContent=(e&&e.name==='NotAllowedError')?'Canceled.':('Could not set up Face ID: '+((e&&e.message)||e)); }
+    } else {
+      try{
+        var opt=await (await fetch('/auth/passkey/login/begin',{method:'POST',credentials:'include'})).json();
+        if(!opt||!opt.challenge){ if(auto) return; err.textContent='Could not start.'; return; }
+        opt.challenge=b64uToBuf(opt.challenge);
+        if(opt.allowCredentials) opt.allowCredentials=opt.allowCredentials.map(function(c){return {type:c.type,id:b64uToBuf(c.id)};});
+        var a=await navigator.credentials.get({publicKey:opt});
+        var body={ id:a.id, response:{ clientDataJSON:bufToB64u(a.response.clientDataJSON), authenticatorData:bufToB64u(a.response.authenticatorData), signature:bufToB64u(a.response.signature) } };
+        var r2=await fetch('/auth/passkey/login/finish',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+        var d={}; try{ d=await r2.json(); }catch(e){}
+        if(r2.ok&&d.status==='ok'){ err.style.color='#34d399'; err.textContent='Welcome back — opening your inbox…'; location.href='/inbox'; }
+        else { err.textContent='Face ID login failed: '+(d.detail||d.error||r2.status); }
+      }catch(e){ if(auto) return; err.textContent=(e&&e.name==='NotAllowedError')?'Canceled, or no passkey on this phone yet.':('Face ID failed: '+((e&&e.message)||e)); }
+    }
+  }
+
+  // ── Orchestrate: signed in -> offer Face ID + passphrase setup; signed out -> offer them as logins ──
+  (async function initLogin(){
+    var fa=await faceidAvailable();
+    var sess={authenticated:false};
+    try{ sess=await (await fetch('/auth/session',{credentials:'include'})).json(); }catch(e){}
+    if(sess && sess.authenticated){
+      var needFace=fa && !_faceidSet(), needPass=!XPASS.has();
+      if(!needFace && !needPass){ location.href='/inbox'; return; }
+      ['card-wallet','card-pair'].forEach(function(id){ var e=_byId(id); if(e) e.style.display='none'; });
+      var dt=document.querySelector('details.adv'); if(dt) dt.style.display='none';
+      var tg=document.querySelector('.toggle'); if(tg) tg.innerHTML='<a href="/inbox" style="color:#7c869b;text-decoration:none">Skip &mdash; open my inbox &rsaquo;</a>';
+      if(needFace) showFaceidSetup();
+      if(needPass) showPassEnroll();
+    } else {
+      if(fa) showFaceidLogin();
+      if(XPASS.has()) showPassLogin();
+    }
+  })();
+
+  function isStandalone(){ return (window.navigator.standalone===true) || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches); }
+
+  // In the installed PWA the wallet deeplink can't return into the app, so pairing is the
+  // reliable path — lead with it. In Safari/desktop, wallet is primary.
+  (function(){
+    var hint=document.getElementById('wallet-hint');
+    if(isStandalone()){
+      // Move the pair card above the wallet card and soften wallet.
+      var w=document.getElementById('card-wallet'), p=document.getElementById('card-pair');
+      p.parentNode.insertBefore(p, w);
+      p.classList.add('lead');
+      document.getElementById('btn-wallet').className='btn ghost';
+      hint.innerHTML='In the installed app, wallet sign-in opens in Safari. Linking (above) keeps you in the app.';
+    }
+  })();
+
+  function doWallet(){
+    try{ if(window.XETE_AUTH){ XETE_AUTH.connect(); } else { location.href='/inbox'; } }
+    catch(e){ location.href='/inbox'; }
+  }
+
+  // ── Pairing claim (ungated /auth/pair/claim → session cookie lands HERE) ──
+  function _pf(){ return [document.getElementById('pw0'),document.getElementById('pw1'),document.getElementById('pw2')]; }
+  function _spread(t){ var parts=String(t).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean); var f=_pf(); for(var i=0;i<3;i++){ if(f[i]) f[i].value=parts[i]||''; } }
+  _pf().forEach(function(inp,idx){
+    if(!inp) return;
+    inp.addEventListener('paste',function(e){ var t=((e.clipboardData||window.clipboardData)||{}).getData?(e.clipboardData||window.clipboardData).getData('text'):''; if(t&&/[^a-z0-9]/i.test(t.trim())){ e.preventDefault(); _spread(t); var l=_pf()[2]; if(l) l.focus(); } });
+    inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); doPair(); } else if((e.key===' '||e.key==='-') && idx<2 && inp.value.trim()){ e.preventDefault(); var n=_pf()[idx+1]; if(n) n.focus(); } });
+  });
+  async function doPair(){
+    var err=document.getElementById('pair-err'); err.textContent='';
+    var words=_pf().map(function(x){return x?x.value.trim().toLowerCase():'';}).filter(Boolean);
+    if(words.length<3){ err.textContent='Enter all three words.'; return; }
+    err.style.color='#9aa3b4'; err.textContent='linking…';
+    try{
+      var r=await fetch('/auth/pair/claim',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({words:words})});
+      var d={}; try{ d=await r.json(); }catch(e){}
+      if(r.ok && d.status==='ok'){ err.style.color='#34d399'; err.textContent='linked — signing in…'; location.href='/inbox'; }
+      else { err.style.color='#f87171'; err.textContent=(d.detail||d.error||'Invalid or expired code ('+r.status+')'); }
+    }catch(e){ err.style.color='#f87171'; err.textContent='Error: '+e.message; }
+  }
+
+  // ── Invite code (gate unlock → sets cookie, then inbox) ──
+  async function doCode(){
+    var err=document.getElementById('code-err'); err.textContent='';
+    var code=(document.getElementById('code').value||'').trim();
+    if(!code){ err.textContent='Enter your invite code.'; return; }
+    err.style.color='#9aa3b4'; err.textContent='checking…';
+    try{
+      var r=await fetch('/gate/unlock',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code})});
+      var d={}; try{ d=await r.json(); }catch(e){}
+      if(r.ok && d && d.ok){ err.style.color='#34d399'; err.textContent='welcome in'; try{localStorage.setItem('xete_invite_code',code);}catch(e){} location.href='/inbox'; }
+      else { err.style.color='#f87171'; err.textContent='Invalid or already-used code.'; }
+    }catch(e){ err.style.color='#f87171'; err.textContent='Network error — try again.'; }
+  }
 </script>
 </body>
 </html>

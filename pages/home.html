@@ -24,6 +24,7 @@
   .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
   .brand{ font-weight:700; letter-spacing:3px; font-size:15px; color:var(--ink); text-decoration:none; } .sp{ flex:1; }
   .bar a.login{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; } .bar a.login:hover{ border-color:#8aa0ff; color:#fff; }
+  .totour{ display:inline-block; margin:2px 0 4px; font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; } .totour:hover{ border-color:#8aa0ff; color:#fff; }
   .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
   @keyframes rise{ to{ opacity:1; transform:none; } }
   .d1{animation-delay:.04s}.d2{animation-delay:.14s}.d3{animation-delay:.26s}.d4{animation-delay:.36s}.d5{animation-delay:.46s}.d6{animation-delay:.56s}.d7{animation-delay:.66s}
@@ -50,6 +51,7 @@
 <div class="stars"></div>
 <div class="wrap">
   <div class="bar rise d1"><a class="brand" href="/home">xete</a><span class="sp"></span><a class="login" href="/login">Log in</a></div>
+  <a class="totour rise d1" href="/tour">&lsaquo; Return to tour</a>
   <div class="hero">
     <h1 class="rise d1">One sovereign stack.</h1>
     <p class="intro rise d2">Private messaging and payments you own — an identity you can't get banned from, messages no server can read, value no one can freeze.</p>
@@ -59,11 +61,10 @@
 
   <div class="pick rise d3">Or pick a direction</div>
   <div class="grid">
-    <a class="door rise d3" href="/tour" style="--pc:var(--teal)"><span class="disc"></span><span class="tx"><span class="t">Take the tour</span><span class="s">The whole ecosystem, in a 60-second animated map.</span></span><span class="ar">&rsaquo;</span></a>
+    <a class="door rise d3" href="/how-it-works" style="--pc:var(--blue)"><span class="disc"></span><span class="tx"><span class="t">How it works</span><span class="s">The whole idea, in five plain steps.</span></span><span class="ar">&rsaquo;</span></a>
     <a class="door rise d4" href="/people" style="--pc:var(--amber)"><span class="disc"></span><span class="tx"><span class="t">For people</span><span class="s">Private messaging you actually own.</span></span><span class="ar">&rsaquo;</span></a>
-    <a class="door rise d5" href="/how-it-works" style="--pc:var(--blue)"><span class="disc"></span><span class="tx"><span class="t">How it works</span><span class="s">The whole idea, in five plain steps.</span></span><span class="ar">&rsaquo;</span></a>
-    <a class="door rise d6" href="/developers" style="--pc:var(--green)"><span class="disc"></span><span class="tx"><span class="t">For developers</span><span class="s">Build on xete — MCP tools, HTTP API, on-chain settlement.</span></span><span class="ar">&rsaquo;</span></a>
-    <a class="door rise d7" href="/enterprise" style="--pc:var(--violet)"><span class="disc"></span><span class="tx"><span class="t">For enterprise</span><span class="s">Private, auditable comms behind your own VPN.</span></span><span class="ar">&rsaquo;</span></a>
+    <a class="door rise d5" href="/developers" style="--pc:var(--green)"><span class="disc"></span><span class="tx"><span class="t">For developers</span><span class="s">Build on xete — MCP tools, HTTP API, on-chain settlement.</span></span><span class="ar">&rsaquo;</span></a>
+    <a class="door rise d6" href="/enterprise" style="--pc:var(--violet)"><span class="disc"></span><span class="tx"><span class="t">For enterprise</span><span class="s">Private, auditable comms behind your own VPN.</span></span><span class="ar">&rsaquo;</span></a>
   </div>
 
   <div class="doors rise d7">

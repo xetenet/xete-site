@@ -64,7 +64,7 @@
 <body>
 <div class="stars"></div>
 <div class="wrap">
-  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/inbox">Log in</a><a href="/register">Register</a></div>
+  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/login">Log in</a><a href="/register">Register</a></div>
 
   <div class="hero">
     <div class="sys rise d1"><div class="ring"></div><div class="ring b"></div><div class="orb"></div><div class="orb b"></div><div class="core"></div></div>
@@ -87,12 +87,11 @@
 
   <div class="cta rise d5">
     <a class="go" href="/register">Get started</a>
-    <a class="tour" href="/tour">Or take the 60-second tour ›</a>
     <span class="small">A small team building in the open. Free during the alpha.</span>
   </div>
 
   <div class="doors rise d5">
-    <a href="/how-it-works">How it works</a><a href="/aliases">Names</a><a href="/help">Help</a><a href="https://github.com/xetenet/xete-tab">Source</a>
+    <a href="/how-it-works">How it works</a><a href="/aliases">Names</a><a href="/about">About</a><a href="/help">Help</a><a href="/trust">Trust</a><a href="/contact">Contact</a>
   </div>
 </div>
 <script>
@@ -108,5 +107,6 @@
   pills.forEach(function(p){ p.addEventListener('click', function(){ show(+this.dataset.i); }); });
   show(0);
 </script>
+<script>fetch('/auth/session',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){if(d&&d.authenticated){var g=document.querySelector('a[href="/register"].go,a[href="/register"].btn');if(g){g.textContent='Open your inbox';g.setAttribute('href','/inbox');}}}).catch(function(){});</script>
 </body>
 </html>

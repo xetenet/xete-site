@@ -183,6 +183,7 @@
 </style>
 </head>
 <body>
+<div id="xfade" style="position:fixed;inset:0;background:#06070b;opacity:0;pointer-events:none;z-index:60;transition:opacity .34s ease;"></div>
 <div id="scene"></div>
 
 <!-- crawlable / screen-reader text alternative for the WebGL scene (real content, not keyword stuffing) -->
@@ -429,6 +430,8 @@ controls.minDistance=12; controls.maxDistance=300;
 
 /* ---- landing → fly-in → home ---- */
 const HOME_CAM=new THREE.Vector3(40,16,56), LAND_CAM=new THREE.Vector3(140,56,196);   // ~2x farther → ~half apparent size
+const DIVE_TARGET=new THREE.Vector3(7,2.4,9.6);   // dive until the Wallet fills the TOUR's canvas size (NOT the full window) so it links up with the tour's first frame
+const DIVE_LOOK=new THREE.Vector3(0,-1.5,0);      // look slightly below centre so the Wallet sits HIGH, where the tour places it (the tour's map sits above its step panel)
 let phase = location.hash==='#home' ? 'home' : 'landing';   // bare URL lands; #home skips straight in (used by in-site nav)
 let landRemain = 30;   // (vestigial — entry is gated; no auto fly-in)
 let isSignedIn=false, gateOff=false, gateRemembered=false, gateFree=false, gateRevealed=false, freeShown=false;
@@ -438,6 +441,13 @@ const forceGate = /[?&]gate(=|&|$)/.test(location.search);   // ?gate forces the
 function enterSite(){ if(phase!=='landing') return; phase='flying';
   document.body.classList.remove('gateopen'); document.body.classList.remove('landing');   // reset offsets so the fly-in centers on home
   controls.enabled=false; document.getElementById('landing').classList.add('gone'); }
+// Landing entry = a portal INTO the tour: play the existing fly-in, then hand off to /tour
+// (mirrors the mobile landing's "dive into the tour"). The full free-roam map is the REWARD at /explore.
+function diveToTour(){ if(phase!=='landing'){ location.href='/tour'; return; }
+  phase='diving'; document.body.classList.remove('gateopen'); document.body.classList.remove('landing');
+  controls.enabled=false; document.getElementById('landing').classList.add('gone');
+  setTimeout(function(){ var f=document.getElementById('xfade'); if(f) f.style.opacity='1'; }, 1050);   // Wallet has filled -> soft dip to bg
+  setTimeout(function(){ location.href='/tour'; }, 1390); }                                              // hand off under the dip; the tour fades back in on the matching frame
 function bumpTimer(){ if(phase==='landing' && landRemain<5) landRemain=5; }
 // Free-entry UI (no code): a session OR the gate being switched OFF. Never shows the code field.
 function applyFree(){
@@ -449,7 +459,7 @@ function applyFree(){
   if(row) row.innerHTML='<button type="button" id="gate-enter">Enter ›</button>';
   if(hint) hint.textContent='or click the system to enter';
   if(login) login.style.display='none';
-  const b=document.getElementById('gate-enter'); if(b) b.onclick=function(){ enterSite(); };
+  const b=document.getElementById('gate-enter'); if(b) b.onclick=function(){ diveToTour(); };
 }
 // Reveal on click: free Enter for a session / gate-off; otherwise the invite-code field.
 function revealGate(){
@@ -496,14 +506,14 @@ else { document.body.classList.add('entered'); document.getElementById('landing'
       // redeems the code (carried in localStorage for wallet-auth to consume).
       const r=await fetch('/gate/unlock',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
       const d=await r.json().catch(()=>({}));
-      if(r.ok && d && d.ok){ msg.style.color='#34d399'; msg.textContent='welcome in'; try{localStorage.setItem('xete_invite_code',code);}catch(e){} enterSite(); }
+      if(r.ok && d && d.ok){ msg.style.color='#34d399'; msg.textContent='welcome in'; try{localStorage.setItem('xete_invite_code',code);}catch(e){} diveToTour(); }
       else { msg.style.color='#f87171'; msg.textContent='Invalid or already-used code.'; inp.focus(); inp.select(); }
     }catch(_){ msg.style.color='#f87171'; msg.textContent='Network error — try again.'; }
   });
   // "I don't have a code" — let the curious browse the public site (no code, no cookie).
   // The doors (login/register/inbox) still ask for a code, hardened server-side.
   var skip=document.getElementById('gate-skip');
-  if(skip) skip.addEventListener('click', function(e){ e.preventDefault(); enterSite(); });
+  if(skip) skip.addEventListener('click', function(e){ e.preventDefault(); diveToTour(); });
 })();
 
 scene.add(new THREE.AmbientLight(0x40485f, 1.15));
@@ -755,7 +765,7 @@ renderer.domElement.addEventListener('pointerdown',e=>{ bumpTimer(); if(e.button
 renderer.domElement.addEventListener('wheel',bumpTimer,{passive:true});
 renderer.domElement.addEventListener('pointerup',e=>{
   if(Math.hypot(e.clientX-downXY[0],e.clientY-downXY[1])>=5) return;
-  if(phase==='landing'){ if(!gateRevealed) revealGate(); else if(gateFree) enterSite(); return; }   // click reveals the gate; session/gate-off can click the system to enter
+  if(phase==='landing'){ if(!gateRevealed) revealGate(); else if(gateFree) diveToTour(); return; }   // click reveals the gate; session/gate-off can click the system to enter
   if(phase!=='home') return;                       // ignore clicks mid-flight
   // membrane caption: it's pointer-events:none (so drags orbit through it), so detect a real CLICK on
   // it here, in the canvas handler, and send it to /trust like the old direct link did.
@@ -822,6 +832,8 @@ function tick(){
   if(phase==='flying'){
     camera.position.lerp(HOME_CAM,0.035); camera.lookAt(ORIGIN);
     if(camera.position.distanceTo(HOME_CAM)<1.2){ camera.position.copy(HOME_CAM); controls.target.copy(ORIGIN); controls.enabled=true; controls.enableZoom=true; controls.enablePan=true; controls.autoRotate=userRotate; controls.autoRotateSpeed=0.3; phase='home'; document.body.classList.add('entered'); labelRenderer.domElement.style.display='block'; }
+  } else if(phase==='diving'){
+    camera.position.lerp(DIVE_TARGET, 0.085); camera.lookAt(DIVE_LOOK);   // zoom the Wallet to the tour-canvas size, framed where the tour places it
   } else {
     controls.update();
     // landing holds until a valid invite code unlocks it (the gate calls enterSite); no auto fly-in
