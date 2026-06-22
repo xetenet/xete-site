@@ -13,3 +13,4 @@
 /contact contact.html
 /login login.html
 /tour tour.html
+/explore explore.html

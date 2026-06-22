@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explore the map — xete</title>
+<meta name="description" content="The whole xete stack as a living map — identity, apps, the ciphertext-only relay, and on-chain settlement. Explore it, then get started.">
+<link rel="canonical" href="https://xete.net/explore">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#06070b">
+<meta name="author" content="xete">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="xete">
+<meta property="og:title" content="xete — sovereign encrypted messaging & on-chain settlement">
+<meta property="og:description" content="An identity you can't get banned from, messages no server can read, value no one can freeze. Encrypted messaging + non-custodial settlement on Solana, for people and AI agents.">
+<meta property="og:url" content="https://xete.net/explore">
+<meta property="og:image" content="https://xete.net/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="xete — sovereign encrypted messaging & on-chain settlement">
+<meta name="twitter:description" content="An identity you can't get banned from, messages no server can read, value no one can freeze. For people and AI agents.">
+<meta name="twitter:image" content="https://xete.net/og.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"xete","url":"https://xete.net","description":"Sovereign encrypted messaging and non-custodial on-chain settlement for people and AI agents.","sameAs":["https://github.com/xetenet"]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"xete","url":"https://xete.net"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"xete","applicationCategory":"CommunicationApplication","operatingSystem":"Web, Windows, macOS, Linux","description":"End-to-end encrypted messaging (X25519 + AES-256-GCM) and non-custodial on-chain settlement on Solana, for people and AI agents. Identity is a keypair; the relay only ever sees ciphertext.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What is xete?","acceptedAnswer":{"@type":"Answer","text":"xete is a sovereign, Solana-based protocol for end-to-end encrypted messaging and non-custodial settlement, for people and AI agents. Your identity is a keypair you can't get banned from, your messages are encrypted to the recipient so no server can read them, and value moves on-chain where no one can freeze it."}},
+{"@type":"Question","name":"Who can read my messages on xete?","acceptedAnswer":{"@type":"Answer","text":"Only you and the people you choose. Messages are end-to-end encrypted with X25519 + AES-256-GCM; the relay only ever sees ciphertext."}},
+{"@type":"Question","name":"Do I need an account or email to use xete?","acceptedAnswer":{"@type":"Answer","text":"No. Your identity is a Solana keypair — there is no account to ban and no email required. You can spin up as many keypairs (identities) as you need."}},
+{"@type":"Question","name":"Is xete live?","acceptedAnswer":{"@type":"Answer","text":"Yes. The payment detector and the settlement program are live and verifiable on Solana mainnet."}},
+{"@type":"Question","name":"Can AI agents use xete?","acceptedAnswer":{"@type":"Answer","text":"Yes. Agents use xete through xete-mcp (run: uvx xete-mcp), giving them encrypted messaging, names, and on-chain settlement."}}
+]}
+</script>
+<style>
+  :root{
+    --bg:#06070b; --panel:rgba(17,20,28,.82); --line:#262b38; --ink:#e7eaf2; --muted:#9aa3b4;
+    --id:#c084fc; --app:#60a5fa; --svc:#2dd4bf; --live:#34d399; --built:#f472b6; --econ:#fbbf24;
+    --money:#fbbf24; --trust:#34d399; --defense:#fb7185; --use:#6b7689;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; overflow:hidden; background:var(--bg);
+    font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; color:var(--ink); }
+  #scene{ position:fixed; inset:0; transition:transform 1.2s cubic-bezier(.4,0,.2,1); }
+  body.landing #scene{ transform:translateY(-60px); }            /* raise the resting system higher on the landing */
+  body.landing.gateopen #scene{ transform:translateY(56px); }    /* on reveal, slide down to clear the code + login affordances */
+  .label{ font-size:12.5px; font-weight:600; letter-spacing:.1px; color:#eef1f8;
+    text-shadow:0 1px 6px #000,0 0 2px #000; pointer-events:none; white-space:nowrap; transition:opacity .2s; }
+  .label small{ display:block; font-weight:400; font-size:10.5px; color:#aab2c2; margin-top:1px; }
+  .label.dim{ opacity:.12; }
+  .mlabel{ font-size:10.5px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase;
+    color:#7fe9da; text-shadow:0 0 8px #000; pointer-events:none; white-space:nowrap; }
+  .mlabel small{ display:block; font-weight:500; letter-spacing:.3px; text-transform:none; color:#8aa3b0; }
+  .mlabel.mlink{ cursor:pointer; transition:color .15s; }
+  .mlabel.mlink:hover{ color:#a6f5e8; }
+  .mlabel.mlink:hover small{ color:#cdd9df; text-decoration:underline; }
+  /* viz labels must never be text-selectable or browser-draggable, or a drag that starts on a
+     label (esp. the membrane caption near the equator) does native select/drag instead of orbit */
+  .label, .mlabel{ -webkit-user-select:none; user-select:none; -webkit-user-drag:none; }
+
+  #title{ position:fixed; top:22px; left:26px; max-width:350px; z-index:5; }
+  #title h1{ font-size:38px; margin:0 0 6px; letter-spacing:2px; font-weight:700; }
+  #title .doors{ display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; }
+  #title .door{ font-size:12.5px; text-decoration:none; padding:7px 12px; border-radius:9px; border:1px solid var(--line); color:#cbd2e0; background:rgba(20,24,34,.55); transition:.15s; }
+  #title .door:hover{ border-color:#8aa0ff; color:#fff; background:#1b2030; }
+  #title p{ font-size:13px; line-height:1.5; color:var(--muted); margin:0; }
+
+  #panel{ position:fixed; top:22px; right:22px; z-index:5; }
+  .hamb{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; width:42px; height:42px; margin-left:auto;
+    background:var(--panel); border:1px solid var(--line); border-radius:11px; backdrop-filter:blur(9px); box-shadow:0 8px 40px rgba(0,0,0,.55); cursor:pointer; }
+  .hamb span{ display:block; width:18px; height:2px; background:#cbd2e0; border-radius:2px; transition:background .2s; }
+  .hamb:hover span{ background:#fff; }
+  #panel-menu{ position:absolute; top:50px; right:0; width:240px;
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; backdrop-filter:blur(9px); box-shadow:0 8px 40px rgba(0,0,0,.55); }
+  #panel-menu.hidden{ display:none; }
+  #panel h2{ font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin:0 0 10px; font-weight:700; }
+  #panel h2:not(:first-child){ margin-top:16px; }
+  .row{ display:flex; align-items:center; gap:9px; font-size:12px; padding:3px 0; color:#cbd2e0; }
+  .row b{ color:#eef1f8; font-weight:600; }
+  .dot{ width:12px; height:12px; border-radius:4px; box-shadow:0 0 9px currentColor; flex:0 0 auto; }
+  .toggle{ cursor:pointer; user-select:none; display:flex; align-items:center; gap:9px; font-size:12.5px; padding:4px 0; color:#cbd2e0; }
+  .toggle input{ accent-color:#8aa0ff; width:14px; height:14px; cursor:pointer; }
+  .toggle.off{ opacity:.4; }
+  .seg{ width:18px; height:3px; border-radius:2px; box-shadow:0 0 8px currentColor; flex:0 0 auto; }
+  .seg.dash{ background-image:linear-gradient(90deg,currentColor 55%,transparent 0); background-size:6px 3px; box-shadow:none; }
+  .btns{ display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; }
+  .btn{ flex:1; min-width:62px; text-align:center; font-size:11.5px; padding:7px 8px; cursor:pointer;
+    background:#1b1f2b; border:1px solid var(--line); border-radius:9px; color:#cbd2e0; }
+  .btn:hover{ background:#232838; color:#fff; } .btn.on{ border-color:#8aa0ff; color:#fff; }
+  .collap{ cursor:pointer; user-select:none; }
+  .collap .chev{ font-size:9px; color:var(--muted); display:inline-block; transition:transform .15s; }
+  .collap.open .chev{ transform:rotate(90deg); }
+  .hidden{ display:none; }
+  .opts{ position:relative; margin-top:10px; } #panel .opts:first-child{ margin-top:0; }
+  .optbtn{ width:100%; }
+  .optmenu{ position:absolute; right:0; top:calc(100% + 6px); width:222px; padding:8px; display:flex; flex-direction:column; gap:6px;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px; box-shadow:0 12px 34px rgba(0,0,0,.6); backdrop-filter:blur(9px); z-index:7; }
+  .optmenu .btn{ flex:0 0 auto; width:100%; text-align:left; }
+  .optmenu.hidden{ display:none; }   /* beat .optmenu's display:flex so the hidden class actually hides it */
+
+  #info{ position:fixed; left:26px; bottom:24px; width:300px; z-index:6;
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px; backdrop-filter:blur(9px); box-shadow:0 8px 40px rgba(0,0,0,.55); display:none; }
+  #info.pulse{ animation:infoPulse .42s ease; }
+  @keyframes infoPulse{ 0%{ transform:scale(1); box-shadow:0 8px 40px rgba(0,0,0,.55); }
+    45%{ transform:scale(1.035); box-shadow:0 8px 46px rgba(96,165,250,.45); }
+    100%{ transform:scale(1); box-shadow:0 8px 40px rgba(0,0,0,.55); } }
+  #info .chip{ display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+    padding:3px 9px; border-radius:999px; margin-bottom:8px; }
+  #info .role{ font-size:11px; font-style:italic; color:#7fe9da; margin:0 0 6px; }
+  #info h3{ margin:0 0 2px; font-size:17px; }
+  #info .desc{ font-size:12.5px; color:var(--muted); margin:0 0 10px; line-height:1.5; }
+  #info .note{ font-size:11.5px; color:#a8bbd8; background:#161c29; border-left:2px solid #3a4a6a; padding:6px 9px; border-radius:6px; margin:2px 0 10px; line-height:1.45; }
+  #info .hintline{ font-size:11px; color:#9ec5fb; font-weight:600; margin:0 0 9px; }
+  #info .onchain{ display:inline-block; font-size:11px; color:#9ec5fb; text-decoration:none; border:1px solid #2c3650; background:#141a27; padding:5px 10px; border-radius:7px; margin:0 0 10px; }
+  #info .onchain:hover{ border-color:#3d5ea0; color:#cfe0ff; }
+  #info .onchain .ad{ color:#6b7689; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:10px; }
+  #info .rel{ font-size:12.5px; color:#e7eaf2; margin:8px 0 0; line-height:1.4; }
+  #info .rel .verb{ color:var(--muted); font-weight:400; }
+  #info .rel b{ font-weight:600; }
+  #info .gl{ font-size:11px; color:#8b93a4; margin:1px 0 0; line-height:1.42; }
+  #info-body{ max-height:62vh; overflow:auto; }
+  #info .grp{ font-size:10px; text-transform:uppercase; letter-spacing:.8px; color:#6b7689; margin:11px 0 3px; font-weight:700; }
+  #info .x{ position:absolute; top:11px; right:14px; cursor:pointer; color:var(--muted); font-size:16px; }
+  #info .x:hover{ color:#fff; }
+  #hint{ position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:5; font-size:11.5px; color:#5a6273; pointer-events:none; }
+
+  /* persistent nav — populates on entry */
+  .nav{ position:fixed; top:0; left:0; right:0; z-index:8; display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+    padding:11px 22px; background:rgba(6,7,11,.82); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .nav .brand{ font-weight:700; letter-spacing:2px; font-size:17px; margin-right:14px; color:var(--ink); text-decoration:none; }
+  .nav a.item{ font-size:13px; padding:7px 11px; border-radius:8px; color:#cbd2e0; text-decoration:none; }
+  .nav a.item:hover{ background:#1b2030; color:#fff; } .nav a.item.on{ color:#c084fc; }
+  .nav .spacer{ flex:1; }
+  .nav a.reg{ background:#34d399; color:#04210f; font-weight:700; padding:7px 14px; border-radius:8px; font-size:13px; text-decoration:none; }
+  .nav a.login{ border:1px solid var(--line); padding:7px 12px; border-radius:8px; font-size:13px; color:#e9ecf5; text-decoration:none; animation:loginglow 3.6s ease-in-out infinite; }
+  .nav a.login:hover{ color:#fff; }
+  @keyframes loginglow{ 0%,100%{ border-color:rgba(255,255,255,.55); box-shadow:0 0 9px rgba(255,255,255,.28); }
+    50%{ border-color:rgba(150,128,255,.85); box-shadow:0 0 16px rgba(150,128,255,.55); } }
+
+  /* landing — wordmark + a click-revealed invite gate, over the distant system */
+  #landing{ position:fixed; inset:0; z-index:7; pointer-events:none; transition:opacity 1.1s ease; }
+  #landing .word{ position:absolute; top:20%; left:50%; transform:translate(-50%,-50%); font-size:86px; font-weight:800; letter-spacing:9px; text-shadow:0 0 44px rgba(124,156,255,.4); }
+  /* subtle "click to enter" cue — shown on the clean landing, hidden once revealed */
+  #landing .enter{ position:absolute; top:30%; left:50%; transform:translateX(-50%); font-size:12px; letter-spacing:3px; text-transform:uppercase; color:#7c869b; white-space:nowrap; opacity:0; transition:opacity 1.4s ease; }
+  #landing.hint .enter{ opacity:.75; animation:enterpulse 2.6s ease-in-out infinite; }
+  #landing.revealed .enter{ opacity:0; animation:none; }
+  @keyframes enterpulse{ 0%,100%{opacity:.4} 50%{opacity:.9} }
+  #landing.gone{ opacity:0; }
+  /* invite-code gate — sits between the title and the system; hidden until click */
+  #landing #gate{ position:absolute; top:30%; left:50%; transform:translateX(-50%); width:min(360px,86vw); text-align:center; pointer-events:none; opacity:0; transition:opacity .8s ease; }
+  #landing.revealed #gate{ opacity:1; pointer-events:auto; }
+  #gate .gate-label{ font-size:12px; letter-spacing:3px; text-transform:uppercase; color:#9aa3b4; margin-bottom:12px; }
+  #gate .gate-row{ display:flex; gap:8px; justify-content:center; }
+  #gate input{ flex:1; min-width:0; background:rgba(13,16,23,.92); border:1px solid #2c3650; border-radius:9px; padding:11px 13px; color:#e7eaf2; font-size:15px; font-family:ui-monospace,Menlo,Consolas,monospace; letter-spacing:1px; }
+  #gate input:focus{ outline:none; border-color:#7c9cff; box-shadow:0 0 0 2px rgba(124,156,255,.2); }
+  #gate button{ flex:0 0 auto; background:#34d399; color:#04210f; font-weight:700; border:0; border-radius:9px; padding:11px 18px; font-size:14px; cursor:pointer; }
+  #gate button:hover{ filter:brightness(1.08); }
+  #gate #gate-msg{ min-height:18px; font-size:12.5px; margin-top:10px; color:#f87171; letter-spacing:.3px; }
+  #gate .gate-hint{ font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#5a6273; margin-top:14px; }
+  #gate .gate-login{ margin-top:12px; font-size:11px; letter-spacing:.5px; }
+  #gate .gate-login a{ color:#5a6273; text-decoration:none; }
+  #gate .gate-login a:hover{ color:#8aa0ff; text-decoration:underline; }
+  #gate .gate-nocode{ margin-top:16px; font-size:12.5px; }
+  #gate .gate-nocode a{ color:#8aa0ff; text-decoration:none; cursor:pointer; }
+  #gate .gate-nocode a:hover{ text-decoration:underline; }
+  #gate .gate-request{ margin-top:8px; font-size:11px; }
+  #gate .gate-request a{ color:#5a6273; text-decoration:none; }
+  #gate .gate-request a:hover{ color:#8aa0ff; }
+
+  /* home UI hidden until entered, then fades in */
+  .nav,#title,#panel,#hint{ opacity:0; transition:opacity 1s ease .25s; }
+  .nav,#title,#panel{ pointer-events:none; }
+  body.entered .nav, body.entered #title, body.entered #panel, body.entered #hint{ opacity:1; }
+  body.entered .nav, body.entered #panel{ pointer-events:auto; }
+  #title{ top:60px; } #panel{ top:60px; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<!-- crawlable / screen-reader text alternative for the WebGL scene (real content, not keyword stuffing) -->
+<main aria-label="xete overview" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:normal;">
+  <h1>xete — sovereign encrypted messaging and on-chain settlement</h1>
+  <p>xete is a sovereign, Solana-based protocol for end-to-end encrypted messaging and non-custodial settlement, for people and AI agents. Your identity is a keypair you can't get banned from. Your messages are encrypted to the recipient, so no server — including ours — can read them. Value moves on-chain, where no one can freeze or seize it.</p>
+  <h2>How it fits together</h2>
+  <ul>
+    <li>Identity — your Solana keypair; no account, no email, nothing to ban.</li>
+    <li>Apps — House Elf (sovereign desktop app), Webmail (browser inbox), and xete-mcp (tools for AI agents).</li>
+    <li>Services — a messaging relay that only ever sees ciphertext.</li>
+    <li>On-chain — a payment detector and a non-custodial settlement program, both live on Solana mainnet.</li>
+    <li>Agent guard — protection for autonomous agents on the network.</li>
+  </ul>
+  <h2>Who it's for</h2>
+  <p><a href="/people">For people</a> — private messaging you actually own. <a href="/developers">For developers</a> — build on xete with <code>uvx xete-mcp</code>, MCP tools, an HTTP API, X25519 + AES-256-GCM encryption, and on-chain settlement. <a href="/for-agents">For agents</a> — your agent's own identity and name, with the primitives to message, settle, and trade on-chain. <a href="/enterprise">For enterprise (finance and fintech)</a> — private, auditable comms behind your existing VPN.</p>
+  <p><a href="/register">Register</a> · <a href="/login">Log in to your inbox</a> · <a href="/contact">Contact</a></p>
+</main>
+<noscript><div style="max-width:680px;margin:80px auto;padding:0 24px;color:#e7eaf2;font-family:system-ui,sans-serif;line-height:1.6;">
+  <h1>xete</h1>
+  <p>Sovereign, end-to-end encrypted messaging and non-custodial on-chain settlement on Solana — for people and AI agents. An identity you can't get banned from, messages no server can read, value no one can freeze.</p>
+  <p><a href="/people" style="color:#8aa0ff">For people</a> · <a href="/developers" style="color:#8aa0ff">For developers</a> · <a href="/for-agents" style="color:#8aa0ff">For agents</a> · <a href="/enterprise" style="color:#8aa0ff">For enterprise</a> · <a href="/contact" style="color:#8aa0ff">Contact</a></p>
+</div></noscript>
+
+<div class="nav">
+  <a class="brand" href="/home">xete</a>
+  <a class="item" href="/home">Home</a>
+  <a class="item" href="/people">For people</a>
+  <a class="item" href="/developers">For developers</a>
+  <a class="item" href="/for-agents">For agents</a>
+  <a class="item" href="/enterprise">For enterprise</a>
+  <span class="spacer"></span>
+  <a class="login" href="/login">Login → inbox</a>
+  <a class="reg" href="/register">Register</a>
+</div>
+
+<div id="landing"><div class="word">xete</div>
+  <div class="enter">click to enter</div>
+  <form id="gate" autocomplete="off">
+    <div class="gate-label">enter your invite code</div>
+    <div class="gate-row">
+      <input id="gate-code" type="text" placeholder="invite code" autocomplete="off" spellcheck="false" maxlength="40">
+      <button type="submit">Enter</button>
+    </div>
+    <div id="gate-msg"></div>
+    <div class="gate-login"><a href="/inbox">or log in</a></div>
+    <div class="gate-nocode"><a id="gate-skip" href="#">I don't have a code — explore the site ›</a></div>
+    <div class="gate-request"><a href="/contact">Coming from outside our circles? Request a code →</a></div>
+    <div class="gate-hint"></div>
+  </form>
+</div>
+
+<div id="title">
+  <p>One sovereign stack — an identity you can't get banned from, messages no server can read, value no one can freeze. <b>Drag to explore · click a body · click it again to open it.</b></p>
+</div>
+
+<div id="panel">
+  <button class="hamb" id="panel-toggle" aria-label="View options" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div id="panel-menu" class="hidden">
+  <div class="opts">
+    <div class="btn optbtn" id="map-toggle">The map</div>
+    <div class="optmenu hidden" id="map-menu">
+      <div class="row"><span class="dot" style="color:var(--id)"></span> <b>Identity</b> — your keypair</div>
+      <div class="row"><span class="dot" style="color:var(--app)"></span> <b>Apps</b> — what you use it through</div>
+      <div class="row"><span class="dot" style="color:var(--svc)"></span> <b>Services</b> — the relay &amp; co.</div>
+      <div class="row"><span class="dot" style="color:#f87171"></span> <b>Agent guard</b> — protects agents on the network</div>
+      <div class="row"><span class="dot" style="color:var(--live)"></span> On-chain — LIVE on mainnet</div>
+      <div class="row"><span class="dot" style="color:var(--built)"></span> On-chain — built</div>
+    </div>
+  </div>
+
+  <div class="opts">
+    <div class="btn optbtn" id="flows-toggle">Flows</div>
+    <div class="optmenu hidden" id="flows-menu">
+      <label class="toggle" data-type="identity"><input type="checkbox" checked><span class="seg" style="color:var(--id)"></span> identity</label>
+      <label class="toggle" data-type="use"><input type="checkbox" checked><span class="seg" style="color:var(--use)"></span> uses / depends</label>
+      <label class="toggle" data-type="trust"><input type="checkbox" checked><span class="seg" style="color:var(--trust)"></span> trust greenlight</label>
+      <label class="toggle" data-type="defense"><input type="checkbox" checked><span class="seg" style="color:var(--defense)"></span> guard / defense</label>
+      <label class="toggle" data-type="control"><input type="checkbox" checked><span class="seg dash" style="color:#dbe4f3"></span> control · you configure</label>
+    </div>
+  </div>
+
+  <div class="opts">
+    <div class="btn optbtn" id="opt-toggle">View options</div>
+    <div class="optmenu hidden" id="optmenu">
+      <div class="btn on" id="b-rotate">Drift</div>
+      <div class="btn on" id="b-membrane">Boundary</div>
+      <div class="btn on" id="b-labels">Labels</div>
+      <div class="btn" id="b-focus">Focus: Ring</div>
+      <div class="btn" id="b-reset">Reset view</div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div id="info"><span class="x" id="info-x">✕</span><div id="info-body"></div></div>
+<div id="hint">your keypair is your identity · the relay only ever sees ciphertext · on-chain, nothing can be frozen or seized</div>
+
+<script>/* backstop: a phone that slips past the wrangler/Caddy split → the text home (no WebGL) */
+if(window.matchMedia && matchMedia('(max-width:640px) and (pointer:coarse)').matches) location.replace('/home');</script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const C = { id:'#c084fc', app:'#60a5fa', svc:'#2dd4bf', live:'#34d399', built:'#f472b6', econ:'#fbbf24', guard:'#f87171' };
+const MEMBRANE_R = 18.5;
+
+// nodes positioned in 3D by spherical coords (r, theta=azimuth°, phi=polar from +Y°)
+const NODES = [
+  // nucleus — identity (inside nuclear envelope)
+  { id:'wallet', label:'Wallet',  sub:'Solana keypair · un-bannable', role:'Your keypair', note:'You are never limited to one. Spin up as many keypairs as you need - each is its own identity, and xete never ties them together. Use a fresh one per context to keep them separate.', cl:'identity', color:C.id, r:0,  th:0,   ph:0,   size:2.4, core:true },
+  { id:'alias',  label:'%alias',  sub:'human handle',                 role:'Human handle',     cl:'identity', color:C.id, r:3.4, th:30,  ph:48,  size:1.3 },
+  { id:'sol',    label:'.sol name',sub:'free match in grace',         role:'External .sol name', cl:'identity', color:C.id, r:3.4, th:210, ph:132, size:1.1 },
+  // apps — internal tools (cytoplasm)
+  { id:'mcp',  label:'xete-mcp',  sub:'tools for AI agents',     role:'Agent tooling',   cl:'apps', color:C.app, r:10, th:10,  ph:92,  size:1.9 },
+  { id:'he',   label:'House Elf', sub:'inbox · vault · transactions',   role:'Sovereign desktop app', note:'Three surfaces in one sovereign app: Inbox - encrypted messaging. Vault - on-device encrypted storage for notes and files; export your way - as wallet-sealed ciphertext (portable over any channel) or as plaintext. Transactions - create and sign on-chain actions.', cl:'apps', color:C.app, r:11, th:95,  ph:42,  size:1.5 },
+  // House Elf features — bloom only when House Elf is selected (parked + hidden otherwise)
+  { id:'he_inbox', label:'Inbox',        sub:'encrypted messaging',        role:'House Elf feature', cl:'apps', color:'#9ec5fb', parent:'he', feature:true, via:'relay',  r:11, th:90,  ph:40, size:0.7 },
+  { id:'he_vault', label:'Vault',        sub:'on-device encrypted storage', role:'House Elf feature', cl:'apps', color:'#9ec5fb', parent:'he', feature:true, r:12, th:96,  ph:45, size:0.7 },
+  { id:'he_txn',   label:'Transactions', sub:'create & sign on-chain',     role:'House Elf feature', cl:'apps', color:'#9ec5fb', parent:'he', feature:true, via:'wallet', r:11, th:101, ph:40, size:0.7 },
+  { id:'web',  label:'Webmail',   sub:'browser inbox',           role:'Browser client', cl:'apps', color:C.app, r:10, th:165, ph:138, size:1.3 },
+  { id:'site', label:'Website',   sub:'users · devs · enterprise', role:'Onboarding', cl:'apps', color:C.app, r:11, th:255, ph:72, size:1.3 },
+  // organelles — services
+  { id:'relay',   label:'Messaging Relay', sub:'only ever sees ciphertext',     role:'Encrypted relay', cl:'services', color:C.svc, r:MEMBRANE_R, th:30,  ph:68, size:1.7 },
+  { id:'permit',  label:'Permit Server',   sub:'name claims', role:'Service',     cl:'services', color:C.svc, r:12, th:200, ph:122, size:1.4 },
+  { id:'gdA',      label:'Agent Guard', sub:'protects an agent on the network', role:'Guards an agent on the network', cl:'guard', color:C.guard, r:16,   th:330, ph:96,  size:1.6 },
+  { id:'gdB',  label:'[REDACTED]',  sub:'protective component', role:'Method not disclosed', cl:'guard', color:C.guard, r:12.5, th:60, ph:142, size:1.1 },
+  { id:'gdC', label:'[REDACTED]',  sub:'protective component', role:'Method not disclosed', cl:'guard', color:C.guard, r:14.5, th:290, ph:38,  size:1.3 },
+  // extracellular ledger — on-chain
+  { id:'settle', label:'Settlement · the tab', sub:'LIVE · private negotiation → on-chain settlement', role:'On-chain program', cl:'chain', color:C.live,  r:24, th:350, ph:118, size:1.5, status:'live', addr:'GPCsJ6kvrQ61wDG8bpP8315ge7AHfmsUHdxTD7LQ6CoJ' },
+  { id:'pay',    label:'Payment Detector',     sub:'LIVE',                      role:'On-chain program', cl:'chain', color:C.live,  r:24, th:40,  ph:52,  size:1.4, status:'live', addr:'GLdM82RspCLDFmAUqty2Ef8GBGursZVgMD9cqeNHDq2U' },
+  { id:'reg',    label:'Alias Registry',       sub:'built · name ownership',    role:'On-chain program', cl:'chain', color:C.built, r:24, th:210, ph:138, size:1.3, status:'built', addr:'AXTREGuYbpgcWFbZy124jcWDN2nd7mtmrCDsUojktZrd' },
+  { id:'swap',   label:'Token Swap',           sub:'built · token↔token',       role:'On-chain program', cl:'chain', color:C.built, r:25, th:300, ph:66,  size:1.3, status:'built', addr:'AXTSWAPVuUPivum39Fh2N6AS6SsktpABDpBLePknyvUD' },  // ---- features (bloom on 2nd click of their parent) ----
+  // xete-mcp tools — each re-roots to the real connection it uses
+  { id:'mcp_msg', label:'Messaging',  sub:'send & read, E2E',       role:'xete-mcp tool', cl:'apps', color:'#9ec5fb', parent:'mcp', feature:true, via:'relay',  r:10, th:10, ph:92, size:0.7 },
+  { id:'mcp_set', label:'Settlement', sub:'agent→agent value',      role:'xete-mcp tool', cl:'apps', color:'#9ec5fb', parent:'mcp', feature:true, via:'settle', r:10, th:10, ph:92, size:0.7 },
+  { id:'mcp_nam', label:'Names',      sub:'claim & resolve %alias', role:'xete-mcp tool', cl:'apps', color:'#9ec5fb', parent:'mcp', feature:true, via:'permit', r:10, th:10, ph:92, size:0.7 },
+  { id:'mcp_trd', label:'Trade',      sub:'token ↔ token',          role:'xete-mcp tool', cl:'apps', color:'#9ec5fb', parent:'mcp', feature:true, via:'swap',   r:10, th:10, ph:92, size:0.7 },
+  // permit server functions
+  { id:'pm_cosign', label:'Co-sign claims', sub:'authorize name writes', role:'Permit function', cl:'services', color:'#8fe6d8', parent:'permit', feature:true, via:'reg',   r:12, th:200, ph:122, size:0.7 },
+  // website doors — all onboard via mcp
+  { id:'st_users', label:'Users',      sub:'the warm front door', role:'Website door', cl:'apps', color:'#9ec5fb', parent:'site', feature:true, via:'mcp', r:11, th:255, ph:72, size:0.7 },
+  { id:'st_devs',  label:'Devs',       sub:'build on xete',       role:'Website door', cl:'apps', color:'#9ec5fb', parent:'site', feature:true, via:'mcp', r:11, th:255, ph:72, size:0.7 },
+  { id:'st_ent',   label:'Enterprise', sub:'private deployments', role:'Website door', cl:'apps', color:'#9ec5fb', parent:'site', feature:true, via:'mcp', r:11, th:255, ph:72, size:0.7 },
+  // settlement instructions (internal — no outgoing line)
+  { id:'se_dep', label:'Deposit', sub:'fund the tab',         role:'Settlement instruction', cl:'chain', color:'#a7f3d0', parent:'settle', feature:true, r:24, th:350, ph:118, size:0.7 },
+  { id:'se_clm', label:'Claim',   sub:'beneficiary collects',  role:'Settlement instruction', cl:'chain', color:'#a7f3d0', parent:'settle', feature:true, r:24, th:350, ph:118, size:0.7 },
+  { id:'se_rec', label:'Reclaim', sub:'sender takes it back',  role:'Settlement instruction', cl:'chain', color:'#a7f3d0', parent:'settle', feature:true, r:24, th:350, ph:118, size:0.7 },
+  // registry instructions (internal)
+  { id:'rg_clm', label:'Claim',    sub:'first-claim-wins', role:'Registry instruction', cl:'chain', color:'#fbcfe8', parent:'reg', feature:true, r:24, th:210, ph:138, size:0.7 },
+  { id:'rg_xfr', label:'Transfer', sub:'owner-signed',     role:'Registry instruction', cl:'chain', color:'#fbcfe8', parent:'reg', feature:true, r:24, th:210, ph:138, size:0.7 },
+  { id:'rg_rel', label:'Release',  sub:'give up a name',   role:'Registry instruction', cl:'chain', color:'#fbcfe8', parent:'reg', feature:true, r:24, th:210, ph:138, size:0.7 },
+  // swap instructions (internal)
+  { id:'sw_off', label:'Make offer', sub:'list a token pair', role:'Swap instruction', cl:'chain', color:'#fbcfe8', parent:'swap', feature:true, r:25, th:300, ph:66, size:0.7 },
+  { id:'sw_fil', label:'Fill',       sub:'take an offer',     role:'Swap instruction', cl:'chain', color:'#fbcfe8', parent:'swap', feature:true, r:25, th:300, ph:66, size:0.7 },
+  // Agent Guard — blooms redacted features only
+  { id:'bk_r1', label:'[REDACTED]', sub:'████████',  role:'Method not disclosed', cl:'guard', color:'#8b93a4', parent:'gdA', feature:true, r:16, th:330, ph:96, size:0.7 },
+  { id:'bk_r2', label:'[REDACTED]', sub:'█████████', role:'Method not disclosed', cl:'guard', color:'#8b93a4', parent:'gdA', feature:true, r:16, th:330, ph:96, size:0.7 },
+  { id:'bk_r3', label:'[REDACTED]', sub:'███████',   role:'Method not disclosed', cl:'guard', color:'#8b93a4', parent:'gdA', feature:true, r:16, th:330, ph:96, size:0.7 },
+  // (the other guard components stay atomic [REDACTED] nodes)
+];
+
+const EDGES = [
+  ['wallet','alias','claims','identity',"A wallet claims a %alias as its human-readable handle."],
+  ['sol','alias','free match','identity',"An existing .sol name maps to the matching %alias, free during the grace window."],
+  ['alias','wallet','resolves to','identity',"Looking up a %alias returns the wallet and agent behind it."],
+  ['he','wallet','holds & signs','use',"House Elf custodies the keypair for a human and signs with it."],
+  ['mcp','wallet','is its identity','use',"An AI agent's identity IS its keypair - there's no account to ban."],
+  ['he','relay','sends E2E','use',"House Elf sends and reads messages; only ciphertext reaches the relay."],
+  ['web','relay','sends E2E','use',"Webmail sends and reads in the browser; the relay never sees plaintext."],
+  ['mcp','relay','messages','use',"Agents exchange end-to-end encrypted messages through the relay."],
+  ['mcp','settle','negotiate & settle','use',"Two agents agree terms over the encrypted channel, then settle the outcome on-chain - a private, ledgered tab."],
+  ['mcp','permit','claims names','use',"Agents ask the permit server to claim or resolve a %alias."],
+  ['he','permit','claims names','use',"House Elf claims names for its user via the permit server."],
+  ['site','mcp','onboards','use',"The website is the front door that gets new agents onto xete-mcp."],
+  ['mcp','gdA','asks to sign','use',"The agent routes signing through its guard - it can't sign on its own."],
+  ['gdA','wallet','holds the keys','defense',"The guard holds the keys and signs; the agent never touches them."],
+  ['gdA','relay','guards the crossing','defense',"The guard stands between the agent and the relay."],
+  ['gdB','gdA','watches','defense',"A protective component watches the guard."],
+  ['gdC','gdA','circuit breaker','defense',"A protective component keeps guards separate and checked."],
+  ['wallet','gdA','you set its rules','control',"You configure what your guard is allowed to sign for."],
+  ['wallet','gdB','you set its alarms','control',"You configure your protection."],
+  ['wallet','gdC','you set its limits','control',"You configure your protection."],
+  ['relay','pay','greenlit by','trust',"Delivery is released only after the Payment Detector confirms payment on-chain."],
+  ['permit','reg','co-signs','trust',"The permit server co-signs each claim written to the on-chain Alias Registry."],
+  ['swap','alias','gated by','trust',"Listing requires holding a %alias - a membership gate."],
+  ['mcp','swap','trades','use',"Agents trade token-for-token on-chain."],  ['he','he_inbox','','part',"Encrypted messaging - read and send, end-to-end."],
+  ['he','he_vault','','part',"On-device encrypted storage; exports as wallet-sealed ciphertext or plaintext."],
+  ['he','he_txn','','part',"Create and sign on-chain transactions."],
+  ['he_inbox','relay','','flink',"Inbox reads and sends over the relay, end-to-end."],
+  ['he_txn','wallet','','flink',"Transactions are signed with your keypair."],
+  // feature stems (parent → feature)
+  ['mcp','mcp_msg','','part',''],['mcp','mcp_set','','part',''],['mcp','mcp_nam','','part',''],['mcp','mcp_trd','','part',''],
+  ['permit','pm_cosign','','part',''],
+  ['site','st_users','','part',''],['site','st_devs','','part',''],['site','st_ent','','part',''],
+  ['settle','se_dep','','part',''],['settle','se_clm','','part',''],['settle','se_rec','','part',''],
+  ['reg','rg_clm','','part',''],['reg','rg_xfr','','part',''],['reg','rg_rel','','part',''],
+  ['swap','sw_off','','part',''],['swap','sw_fil','','part',''],
+  ['gdA','bk_r1','','part',''],['gdA','bk_r2','','part',''],['gdA','bk_r3','','part',''],
+  // feature → real connection (re-rooted links)
+  ['mcp_msg','relay','','flink',''],['mcp_set','settle','','flink',''],['mcp_nam','permit','','flink',''],['mcp_trd','swap','','flink',''],
+  ['pm_cosign','reg','','flink',''],
+  ['st_users','mcp','','flink',''],['st_devs','mcp','','flink',''],['st_ent','mcp','','flink',''],
+];
+
+const ET = {
+  identity:{ color:0xc084fc, flow:false, dash:false, w:0.07 },
+  control: { color:0xdbe4f3, flow:false, dash:true,  w:0.055 },
+  part:    { color:0x9ec5fb, flow:false, dash:false, w:0.04 },
+  flink:   { color:0x9ec5fb, flow:false, dash:false, w:0.055 },
+  use:     { color:0x6b7689, flow:false, dash:false, w:0.05 },
+  money:   { color:0xfbbf24, flow:true,  dash:false, w:0.09, speed:0.45 },
+  trust:   { color:0x34d399, flow:true,  dash:false, w:0.08, speed:0.22 },
+  defense: { color:0xfb7185, flow:false, dash:true,  w:0.06 },
+  econ:    { color:0xf59e0b, flow:false, dash:true,  w:0.06 },
+};
+
+/* ---------------- SCENE ---------------- */
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x06070b, 0.0025);
+const camera = new THREE.PerspectiveCamera(52, innerWidth/innerHeight, 0.1, 3000);
+camera.position.set(40, 16, 56);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+document.getElementById('scene').appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(innerWidth, innerHeight);
+labelRenderer.domElement.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:4';
+document.body.appendChild(labelRenderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping=true; controls.dampingFactor=0.07;
+controls.autoRotate=true; controls.autoRotateSpeed=0.3;
+controls.minDistance=12; controls.maxDistance=300;
+
+/* ---- landing → fly-in → home ---- */
+const HOME_CAM=new THREE.Vector3(40,16,56), LAND_CAM=new THREE.Vector3(140,56,196);   // ~2x farther → ~half apparent size
+const YAXIS=new THREE.Vector3(0,1,0);   // pull-out spin axis (dynamism on the reveal)
+let flyLook=null;   // pull-out look-target: starts ON the mcp node, eases to centre as the map reveals
+let flyN=0;         // fly-out frame counter -> hard completion cap so the reveal can never hang short of interactive
+let phase = location.hash==='#home' ? 'home' : 'landing';   // bare URL lands; #home skips straight in (used by in-site nav)
+let landRemain = 30;   // (vestigial — entry is gated; no auto fly-in)
+let isSignedIn=false, gateOff=false, gateRemembered=false, gateFree=false, gateRevealed=false, freeShown=false;
+try{ gateRemembered = !!localStorage.getItem('xete_invite_code'); }catch(e){}   // code entered, not yet registered -> remember. wallet-auth clears it on register, so a logged-out user re-gates (no logout-survival)
+gateFree = gateRemembered;   // known synchronously (no re-gate flash on reload)
+const forceGate = /[?&]gate(=|&|$)/.test(location.search);   // ?gate forces the not-signed-in code form (preview/test)
+function enterSite(){ if(phase!=='landing') return; phase='flying'; flyN=0;
+  document.body.classList.remove('gateopen'); document.body.classList.remove('landing');   // reset offsets so the fly-in centers on home
+  controls.enabled=false; document.getElementById('landing').classList.add('gone'); }
+function bumpTimer(){ if(phase==='landing' && landRemain<5) landRemain=5; }
+// Free-entry UI (no code): a session OR the gate being switched OFF. Never shows the code field.
+function applyFree(){
+  freeShown=true;
+  const form=document.getElementById('gate');
+  const label=form&&form.querySelector('.gate-label'), row=form&&form.querySelector('.gate-row'),
+        hint=form&&form.querySelector('.gate-hint'), login=form&&form.querySelector('.gate-login');
+  if(label) label.textContent = gateOff ? 'enter the system' : 'welcome back';
+  if(row) row.innerHTML='<button type="button" id="gate-enter">Enter ›</button>';
+  if(hint) hint.textContent='or click the system to enter';
+  if(login) login.style.display='none';
+  const b=document.getElementById('gate-enter'); if(b) b.onclick=function(){ enterSite(); };
+}
+// Reveal on click: free Enter for a session / gate-off; otherwise the invite-code field.
+function revealGate(){
+  if(phase!=='landing' || gateRevealed) return; gateRevealed=true;
+  document.getElementById('landing').classList.add('revealed');
+  document.body.classList.add('gateopen');   // slide the system down to open room
+  if(gateFree && !forceGate){ applyFree(); }
+  else { const inp=document.getElementById('gate-code'); setTimeout(()=>{ if(inp) inp.focus(); }, 250); }
+}
+if(phase==='landing'){ camera.position.copy(LAND_CAM); controls.autoRotateSpeed=1.3;
+  document.body.classList.add('landing');   // raises the resting system position (see #scene CSS)
+  controls.enableZoom=false; controls.enablePan=false;   // rotate-only while gated
+  labelRenderer.domElement.style.display='none';
+  setTimeout(()=>{ if(phase==='landing' && !gateRevealed) document.getElementById('landing').classList.add('hint'); }, 1100);   // show the "click to enter" cue
+  if(/[?&]reveal(=|&|$)/.test(location.search)) setTimeout(()=>revealGate(), 800); }  // preview/capture helper: auto-reveal the gate
+else { document.body.classList.add('entered'); document.getElementById('landing').style.display='none'; }  // #home / skip: hide instantly, no fade flash
+
+// ---- invite gate — live session decides free-vs-code; SEO/AEO stays in the served HTML ----
+(function(){
+  if(phase!=='landing') return;
+  // Live check decides free-vs-code (never auto-enters). A valid SESSION never sees the code
+  // (persists across reloads). invite_gate_required===false = the single OFF-switch -> open for all.
+  if(!forceGate){ fetch('/auth/session',{credentials:'include'}).then(r=>r.json()).then(d=>{
+    isSignedIn=!!(d&&d.authenticated);
+    gateOff=!!(d&&d.invite_gate_required===false);   // relay reports the one flag; absent -> stays gated (safe default)
+    gateFree = gateOff || isSignedIn || gateRemembered;
+    if(gateFree && gateRevealed && !freeShown) applyFree();   // raced a fast click before the check -> upgrade, never show code to a session/open gate/remembered pass
+  }).catch(()=>{}); }
+  // Re-validate a REMEMBERED code: if it's been consumed/expired (validate -> false), clear it
+  // so the gate re-shows. Covers the edge where wallet-auth didn't clear it (e.g. registered on another device).
+  if(gateRemembered && !forceGate){ let sc=''; try{ sc=localStorage.getItem('xete_invite_code')||''; }catch(e){}
+    if(sc) fetch('/auth/invite/validate',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:sc})})
+      .then(r=>r.json()).then(d=>{ if(!(d&&d.valid)){ try{ localStorage.removeItem('xete_invite_code'); }catch(e){} gateRemembered=false; gateFree = gateOff||isSignedIn; } }).catch(()=>{}); }
+  const form=document.getElementById('gate'), inp=document.getElementById('gate-code'), msg=document.getElementById('gate-msg');
+  if(!form) return;
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const code=(inp.value||'').trim();
+    if(!code){ msg.style.color='#f87171'; msg.textContent='Enter your invite code.'; return; }
+    msg.style.color='#9aa3b4'; msg.textContent='checking…';
+    try{
+      // /gate/unlock validates the code AND sets the httpOnly xete_gate cookie, so the
+      // hardened doors (/inbox, /register) stop asking. NON-consuming: registration still
+      // redeems the code (carried in localStorage for wallet-auth to consume).
+      const r=await fetch('/gate/unlock',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+      const d=await r.json().catch(()=>({}));
+      if(r.ok && d && d.ok){ msg.style.color='#34d399'; msg.textContent='welcome in'; try{localStorage.setItem('xete_invite_code',code);}catch(e){} enterSite(); }
+      else { msg.style.color='#f87171'; msg.textContent='Invalid or already-used code.'; inp.focus(); inp.select(); }
+    }catch(_){ msg.style.color='#f87171'; msg.textContent='Network error — try again.'; }
+  });
+  // "I don't have a code" — let the curious browse the public site (no code, no cookie).
+  // The doors (login/register/inbox) still ask for a code, hardened server-side.
+  var skip=document.getElementById('gate-skip');
+  if(skip) skip.addEventListener('click', function(e){ e.preventDefault(); enterSite(); });
+  // EXPLORE (post-tour reward): bookend to the landing's dive-in — start tucked INTO the node,
+  // then ZOOM OUT to reveal the full map. No gate flash on the reward.
+  var _lz=document.getElementById('landing'); if(_lz) _lz.style.display='none';
+  setTimeout(function(){
+    // start ON the node the user FINISHED the tour on (xete-mcp), looking AT it, then pull OUT + widen to the full map
+    var a=(pos&&pos['mcp'])?pos['mcp'].clone():new THREE.Vector3(8,3,11);
+    flyLook=a.clone();                                                      // look AT the mcp node first (not the centre)
+    camera.position.copy(a).add(a.clone().normalize().multiplyScalar(4));   // just outside that node, framed on it
+    enterSite();
+  }, 350);
+})();
+
+scene.add(new THREE.AmbientLight(0x40485f, 1.15));
+const coreLight = new THREE.PointLight(0xc9b6ff, 2.4, 240, 1.3); scene.add(coreLight); // nucleus glows
+const rim = new THREE.DirectionalLight(0x88a0ff, 0.45); rim.position.set(30,40,20); scene.add(rim);
+
+// round sprite for all Points (so they're circles, not squares, when you rotate)
+const DISC_TEX=(function(){ const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d');
+  const g=x.createRadialGradient(32,32,0,32,32,32); g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(.55,'rgba(255,255,255,.95)'); g.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=g; x.beginPath(); x.arc(32,32,32,0,7); x.fill(); return new THREE.CanvasTexture(c); })();
+// starfield
+(function(){ const n=1300,g=new THREE.BufferGeometry(),p=new Float32Array(n*3);
+  for(let i=0;i<n;i++){ const r=200+Math.random()*420,t=Math.random()*6.28,ph=Math.acos(2*Math.random()-1);
+    p[i*3]=r*Math.sin(ph)*Math.cos(t); p[i*3+1]=r*Math.cos(ph); p[i*3+2]=r*Math.sin(ph)*Math.sin(t); }
+  g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0x5d68a0,size:1.1,map:DISC_TEX,transparent:true,opacity:.7,depthWrite:false}))); })();
+
+/* ---------------- MEMBRANE + ENVELOPES ---------------- */
+const shells = new THREE.Group(); scene.add(shells);
+// encryption membrane — the boundary that only ciphertext crosses
+const membrane = new THREE.Mesh(new THREE.SphereGeometry(MEMBRANE_R, 64, 48),
+  new THREE.MeshPhongMaterial({ color:0x2dd4bf, transparent:true, opacity:0.05, shininess:60, side:THREE.DoubleSide, depthWrite:false }));
+shells.add(membrane);
+const membraneWire = new THREE.Mesh(new THREE.SphereGeometry(MEMBRANE_R, 28, 18),
+  new THREE.MeshBasicMaterial({ color:0x2dd4bf, wireframe:true, transparent:true, opacity:0.07, depthWrite:false }));
+shells.add(membraneWire);
+// nuclear envelope (identity)
+const nucEnv = new THREE.Mesh(new THREE.SphereGeometry(5.2, 40, 32),
+  new THREE.MeshBasicMaterial({ color:0xc084fc, transparent:true, opacity:0.07, blending:THREE.AdditiveBlending, depthWrite:false }));
+shells.add(nucEnv);
+// outer boundary (ambient — the extent of the system)
+const medium = new THREE.Mesh(new THREE.SphereGeometry(36, 32, 24),
+  new THREE.MeshBasicMaterial({ color:0x33405a, wireframe:true, transparent:true, opacity:0.03, depthWrite:false }));
+shells.add(medium);
+
+// membrane caption
+const mcap = document.createElement('div'); mcap.className='mlabel mlink';
+mcap.innerHTML='Encrypted boundary<small>only ciphertext crosses · how it\'s proven</small>';
+mcap.style.pointerEvents='none'; mcap.setAttribute('role','link'); mcap.tabIndex=0;   // pointer-events:none so a drag over the caption ORBITS through it; its click is re-routed via the canvas handler below
+mcap.title='Trust & verification — how xete proves this';
+mcap.addEventListener('click',()=>{ location.href='/trust'; });
+mcap.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); location.href='/trust'; } });
+const mcapObj = new CSS2DObject(mcap); mcapObj.position.set(0, MEMBRANE_R+1.5, 0); shells.add(mcapObj);
+
+// cytoplasm motes (alive feel)
+const motes = (function(){ const n=260,g=new THREE.BufferGeometry(),p=new Float32Array(n*3);
+  for(let i=0;i<n;i++){ const r=5+Math.random()*(MEMBRANE_R-6),t=Math.random()*6.28,ph=Math.acos(2*Math.random()-1);
+    p[i*3]=r*Math.sin(ph)*Math.cos(t); p[i*3+1]=r*Math.cos(ph); p[i*3+2]=r*Math.sin(ph)*Math.sin(t); }
+  g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  const m=new THREE.Points(g,new THREE.PointsMaterial({color:0x7f9ad0,size:0.4,map:DISC_TEX,transparent:true,opacity:.35,depthWrite:false}));
+  scene.add(m); return m; })();
+
+/* ---------------- BUILD NODES ---------------- */
+const D2R=Math.PI/180, pos={}, nodeObjs={};
+function sph(r,thDeg,phDeg){ const th=thDeg*D2R, ph=phDeg*D2R;
+  return new THREE.Vector3(r*Math.sin(ph)*Math.cos(th), r*Math.cos(ph), r*Math.sin(ph)*Math.sin(th)); }
+
+NODES.forEach(n=>{
+  const v=sph(n.r,n.th,n.ph); pos[n.id]=v;
+  const col=new THREE.Color(n.color);
+  const mesh=new THREE.Mesh(new THREE.SphereGeometry(n.size,40,40),
+    new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:n.core?1.1:0.55,roughness:0.35,metalness:0.1}));
+  mesh.position.copy(v); mesh.userData.id=n.id; scene.add(mesh);
+  const glow=new THREE.Mesh(new THREE.SphereGeometry(n.size*1.9,24,24),
+    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.12,blending:THREE.AdditiveBlending,depthWrite:false}));
+  glow.position.copy(v); scene.add(glow);
+  const el=document.createElement('div'); el.className='label'; el.innerHTML=`${n.label}<small>${n.sub}</small>`;
+  const lbl=new CSS2DObject(el); lbl.position.set(0,n.size+1.3,0); mesh.add(lbl);
+  nodeObjs[n.id]={mesh,glow,labelEl:el,color:col,data:n,home:v.clone(),cur:v.clone(),tgt:v.clone()};
+});
+
+/* ---------------- DE-OVERLAP (no two visible bodies touch at rest) ---------------- */
+(function relax(){
+  const main=NODES.filter(n=>!n.feature);
+  for(let it=0; it<90; it++){
+    for(let i=0;i<main.length;i++) for(let j=i+1;j<main.length;j++){
+      const a=main[i], b=main[j], A=nodeObjs[a.id], B=nodeObjs[b.id];
+      const need=a.size+b.size+1.5;                 // required centre-to-centre gap
+      const delta=B.home.clone().sub(A.home); const dist=delta.length();
+      if(dist>need || dist<1e-4) continue;
+      const dir=delta.multiplyScalar(1/dist), push=need-dist;
+      if(a.core)      B.home.add(dir.multiplyScalar(push));
+      else if(b.core) A.home.add(dir.multiplyScalar(-push));
+      else { B.home.add(dir.clone().multiplyScalar(push*0.5)); A.home.add(dir.multiplyScalar(-push*0.5)); }
+    }
+  }
+  NODES.forEach(n=>{ const o=nodeObjs[n.id];
+    if(n.feature) o.home.copy(nodeObjs[n.parent].home);   // features re-tuck to their (relaxed) parent
+    pos[n.id].copy(o.home); o.cur.copy(o.home); o.tgt.copy(o.home);
+    o.mesh.position.copy(o.home); o.glow.position.copy(o.home);
+  });
+})();
+
+/* ---------------- BUILD EDGES ---------------- */
+const edgeObjs=[];
+EDGES.forEach(([from,to,label,type])=>{
+  const a=pos[from]; let b=pos[to]; if(a.distanceTo(b)<0.05) b=b.clone().add(new THREE.Vector3(0.12,0.12,0.12)); const mid=a.clone().add(b).multiplyScalar(0.5);
+  const out=mid.clone(); if(out.length()<0.01) out.set(1,0,0);
+  out.normalize().multiplyScalar(a.distanceTo(b)*0.18); mid.add(out);
+  const curve=new THREE.QuadraticBezierCurve3(a.clone(),mid,b.clone());
+  const st=ET[type];
+  const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,40,st.w,8,false),
+    new THREE.MeshBasicMaterial({color:st.color,transparent:true,opacity:st.dash?0.32:0.42}));
+  scene.add(tube);
+  const particles=[];
+  if(st.flow){ for(let i=0;i<3;i++){ const pm=new THREE.Mesh(new THREE.SphereGeometry(st.w*2.6,10,10),
+    new THREE.MeshBasicMaterial({color:st.color,blending:THREE.AdditiveBlending,transparent:true,opacity:0.95,depthWrite:false}));
+    pm.userData.t=i/3; scene.add(pm); particles.push(pm); } }
+  edgeObjs.push({type,tube,from,to,particles,curve,speed:st.speed||0.3,dash:st.dash,origColor:st.color});
+});
+
+/* ---------------- ADJACENCY ---------------- */
+const labelOf={}; NODES.forEach(n=>labelOf[n.id]=n.label);
+const out={},inc={};
+EDGES.forEach(([f,t,l,ty,g])=>{ if(ty==='part'||ty==='flink') return; (out[f]=out[f]||[]).push([t,l,g]);(inc[t]=inc[t]||[]).push([f,l,g]);});
+const featParent={}; NODES.forEach(n=>{ if(n.feature) featParent[n.id]=n.parent; });
+
+/* ---------------- FOCUS / EGO LAYOUT ---------------- */
+const FOCAL=new THREE.Vector3(0,2,0), ORIGIN=new THREE.Vector3(0,0,0);
+const TYPE_ORDER=['identity','control','use','defense','trust','money','econ'];
+let animating=false, shellVis=1, shellTarget=1, focusMode='ring', userRotate=true, expanded=null;
+function edgeBetween(a,b){ return EDGES.find(e=>(e[0]===a&&e[1]===b)||(e[0]===b&&e[1]===a)); }
+function rebuildEdges(){
+  const bow = selected ? 0.0 : 0.16;   // straight spokes when focused
+  edgeObjs.forEach(e=>{
+    const a=nodeObjs[e.from].cur, b=nodeObjs[e.to].cur;
+    if(a.distanceTo(b)<0.05) return;
+    const mid=a.clone().add(b).multiplyScalar(0.5);
+    if(bow>0){ const o=mid.clone(); if(o.length()<0.01) o.set(1,0,0); o.normalize().multiplyScalar(a.distanceTo(b)*bow); mid.add(o); }
+    e.curve=new THREE.QuadraticBezierCurve3(a.clone(),mid,b.clone());
+    e.tube.geometry.dispose();
+    e.tube.geometry=new THREE.TubeGeometry(e.curve,28,ET[e.type].w,8,false);
+  });
+}
+function computeTargets(){
+  NODES.forEach(n=>{ if(n.feature) nodeObjs[n.id].tgt.copy(nodeObjs[n.parent].home); });
+  if(!selected){ Object.values(nodeObjs).forEach(o=>{ if(!o.data.feature) o.tgt.copy(o.home); }); return; }
+  const sel=selected, nb=[];
+  (out[sel]||[]).forEach(([t])=>{ if(!nb.includes(t)) nb.push(t); });
+  (inc[sel]||[]).forEach(([f])=>{ if(!nb.includes(f)) nb.push(f); });
+  nb.sort((a,b)=>TYPE_ORDER.indexOf(edgeBetween(sel,a)[3])-TYPE_ORDER.indexOf(edgeBetween(sel,b)[3]));
+  const M=nb.length||1;
+  if(focusMode==='column'){
+    // camera-facing column: hub to one side, connections stacked vertically
+    const n=camera.position.clone().sub(FOCAL).normalize();
+    const u=new THREE.Vector3(0,1,0).sub(n.clone().multiplyScalar(n.y)).normalize();   // vertical, in plane
+    const r=new THREE.Vector3().crossVectors(u,n).normalize();                         // horizontal, in plane
+    nodeObjs[sel].tgt.copy(FOCAL).add(r.clone().multiplyScalar(-13));
+    const H=Math.min((M-1)*4.6,42), step=M>1?H/(M-1):0, top=H/2;
+    nb.forEach((id,i)=>{
+      nodeObjs[id].tgt.copy(FOCAL).add(r.clone().multiplyScalar(9)).add(u.clone().multiplyScalar(top-i*step));
+    });
+  } else {
+    nodeObjs[sel].tgt.copy(FOCAL);
+    const R=Math.min(11+M*1.5,26);
+    const N=new THREE.Vector3(0.22,1,0.12).normalize();
+    const U=new THREE.Vector3(1,0,0).sub(N.clone().multiplyScalar(N.x)).normalize();
+    const V=new THREE.Vector3().crossVectors(N,U).normalize();
+    nb.forEach((id,i)=>{
+      const ang=(i/M)*Math.PI*2 - Math.PI/2;
+      nodeObjs[id].tgt.copy(FOCAL).add(U.clone().multiplyScalar(Math.cos(ang)*R)).add(V.clone().multiplyScalar(Math.sin(ang)*R));
+    });
+  }
+  if(expanded===sel){
+    const feats=NODES.filter(n=>n.feature && n.parent===sel);
+    if(feats.length){
+      const hub=nodeObjs[sel].tgt.clone(), up=new THREE.Vector3(0,1,0);
+      const N2=new THREE.Vector3(0.22,1,0.12).normalize();
+      const U2=new THREE.Vector3(1,0,0).sub(N2.clone().multiplyScalar(N2.x)).normalize();
+      const V2=new THREE.Vector3().crossVectors(N2,U2).normalize();
+      // via-features sit along the real connection's spoke; no-via (local) features spread evenly in the open gaps, off every spoke
+      const byVia={}; feats.forEach(n=>{ if(n.via&&nodeObjs[n.via]) (byVia[n.via]=byVia[n.via]||[]).push(n.id); });
+      const noVia=feats.filter(n=>!(n.via&&nodeObjs[n.via])); let k=0;
+      feats.forEach(n=>{
+        let dir, perpAmt;
+        if(n.via&&nodeObjs[n.via]){
+          dir=nodeObjs[n.via].tgt.clone().sub(hub).normalize();
+          const grp=byVia[n.via], gn=grp.length, gi=grp.indexOf(n.id);
+          perpAmt = gn>1 ? (gi-(gn-1)/2)*3.2 : 1.3;   // fan features sharing one target so their labels don't stack
+        }
+        else { const a=(k/(noVia.length||1))*Math.PI*2 - Math.PI/2; k++; dir=U2.clone().multiplyScalar(Math.cos(a)).add(V2.clone().multiplyScalar(Math.sin(a))).normalize(); perpAmt=0; }
+        const perp=new THREE.Vector3().crossVectors(dir,up); if(perp.lengthSq()<0.001) perp.set(1,0,0); perp.normalize();
+        nodeObjs[n.id].tgt.copy(hub).add(dir.clone().multiplyScalar(6)).add(perp.clone().multiplyScalar(perpAmt));
+      });
+    }
+  }
+  const keep=new Set([sel,...nb]), clearR=8.5;
+  Object.entries(nodeObjs).forEach(([id,o])=>{ if(keep.has(id)||o.data.feature) return;
+    const d=o.home.clone().sub(FOCAL);
+    if(d.length()<clearR){ if(d.length()<0.01) d.set(0,-1,0.2); o.tgt.copy(FOCAL).add(d.normalize().multiplyScalar(clearR)); } // nudge non-neighbors out of the focus zone so nothing touches the hub
+    else o.tgt.copy(o.home); }); // otherwise stay put (dimmed)
+}
+function updateRotate(){ controls.autoRotate = userRotate && !(selected && focusMode==='column'); }
+function setSelection(id){
+  selected=id; expanded=null;
+  if(id){ showInfo(id); } else { document.getElementById('info').style.display='none'; }
+  computeTargets(); animating=true; shellTarget=id?0:1; updateRotate(); applyVisibility();
+}
+
+/* ---------------- INTERACTION ---------------- */
+const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
+const meshes=Object.values(nodeObjs).map(o=>o.mesh);
+let selected=null;
+const typeOn={identity:true,control:true,use:true,money:true,trust:true,defense:true,econ:true};
+function neighbors(id){ const s=new Set([id]); (out[id]||[]).forEach(([t])=>s.add(t)); (inc[id]||[]).forEach(([f])=>s.add(f)); return s; }
+function applyVisibility(){
+  const sel=selected, near=sel?neighbors(sel):null;
+  Object.entries(nodeObjs).forEach(([id,o])=>{
+    if(o.data.feature){
+      const show = expanded===o.data.parent;
+      o.mesh.visible=show; o.glow.visible=show;
+      o.mesh.material.emissiveIntensity=0.7; o.mesh.material.transparent=false; o.mesh.material.opacity=1; o.glow.material.opacity=0.16;
+      o.labelEl.classList.toggle('dim',!show);
+      return;
+    }
+    const lit=!sel||near.has(id);
+    o.mesh.material.emissiveIntensity=(o.data.core?1.1:0.55)*(lit?1:0.16);
+    o.mesh.material.transparent=!lit; o.mesh.material.opacity=lit?1:0.28;
+    o.glow.material.opacity=lit?0.12:0.015; o.labelEl.classList.toggle('dim',!lit);
+  });
+  edgeObjs.forEach(e=>{
+    if(e.type==='part'){ const show=!!expanded && e.from===expanded; e.tube.visible=show; e.tube.material.opacity=show?0.55:0; return; }
+    if(e.type==='flink'){ const show=!!expanded && expanded===featParent[e.from]; e.tube.visible=show; e.tube.material.opacity=show?0.72:0; return; }
+    const tv=typeOn[e.type], touches=!sel||(e.from===sel||e.to===sel);
+    const greyed = !!expanded && (e.from===expanded||e.to===expanded);   // the expanded node's own spokes fade to grey
+    e.tube.visible= tv&&touches;
+    if(greyed){ e.tube.material.color.set(0x555c6b); e.tube.material.opacity= e.tube.visible?0.16:0; }
+    else { e.tube.material.color.set(e.origColor); e.tube.material.opacity= e.tube.visible ? (e.dash?0.5:0.62) : 0; }
+    e.particles.forEach(p=>p.visible= e.tube.visible && !greyed);
+  });
+}
+function showInfo(id){
+  const n=NODES.find(x=>x.id===id);
+  const areaName={identity:'Identity',apps:'Apps & interfaces',services:'Services',guard:'Defenses · agent guard',chain:n.status==='live'?'On-chain · LIVE':'On-chain · built',econ:'Economics'}[n.cl];
+  const cc=n.color;
+  const o=(out[id]||[]).map(([t,l,g])=>`<div class="rel"><b>${labelOf[t]}</b> <span class="verb">· ${l}</span>${g?`<div class="gl">${g}</div>`:''}</div>`).join('');
+  const i=(inc[id]||[]).map(([f,l,g])=>`<div class="rel"><b>${labelOf[f]}</b> <span class="verb">· ${l}</span>${g?`<div class="gl">${g}</div>`:''}</div>`).join('');
+  const hasFeat=NODES.some(x=>x.feature&&x.parent===id);
+  const hint=hasFeat?(expanded===id?`<p class="hintline">▾ click again to collapse</p>`:`<p class="hintline">▸ click again to open its parts</p>`):(selected===id?`<p class="hintline">◦ this is its full card · click empty space to deselect</p>`:`<p class="hintline">▸ click again for its full card</p>`);
+  document.getElementById('info-body').innerHTML=
+    `<span class="chip" style="background:${cc}22;color:${cc};border:1px solid ${cc}55">${areaName}</span>
+     <div class="role">◦ ${n.role}</div><h3>${n.label}</h3><p class="desc">${n.sub}</p>${n.note?`<p class="note">${n.note}</p>`:''}${n.addr?`<a class="onchain" href="https://solscan.io/account/${n.addr}" target="_blank" rel="noopener">View on-chain (Solscan) · <span class="ad">${n.addr.slice(0,4)}…${n.addr.slice(-4)}</span></a>`:''}${hint}
+     ${o?`<div class="grp">this → others</div>${o}`:''}${i?`<div class="grp">others → this</div>${i}`:''}`;
+  document.getElementById('info').style.display='block';
+}
+function pulseInfo(){ const el=document.getElementById('info'); el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }   // restart the brief glow so the 2nd click gives feedback
+let downXY=[0,0];
+renderer.domElement.addEventListener('pointerdown',e=>{ bumpTimer(); if(e.button===0) downXY=[e.clientX,e.clientY]; });
+renderer.domElement.addEventListener('wheel',bumpTimer,{passive:true});
+renderer.domElement.addEventListener('pointerup',e=>{
+  if(Math.hypot(e.clientX-downXY[0],e.clientY-downXY[1])>=5) return;
+  if(phase==='landing'){ if(!gateRevealed) revealGate(); else if(gateFree) enterSite(); return; }   // click reveals the gate; session/gate-off can click the system to enter
+  if(phase!=='home') return;                       // ignore clicks mid-flight
+  // membrane caption: it's pointer-events:none (so drags orbit through it), so detect a real CLICK on
+  // it here, in the canvas handler, and send it to /trust like the old direct link did.
+  { const mr=mcap.getBoundingClientRect(); if(mr.width && e.clientX>=mr.left && e.clientX<=mr.right && e.clientY>=mr.top && e.clientY<=mr.bottom){ location.href='/trust'; return; } }
+  mouse.x=(e.clientX/innerWidth)*2-1; mouse.y=-(e.clientY/innerHeight)*2+1;
+  ray.setFromCamera(mouse,camera);
+  const hit=ray.intersectObjects(meshes.filter(m=>m.visible))[0];
+  const id=hit?hit.object.userData.id:null;
+  const nd=id?NODES.find(n=>n.id===id):null;
+  if(nd && nd.feature){ showInfo(id); pulseInfo(); return; }   // feature node: show its card, leave the layout put
+  if(id && id===selected){
+    if(NODES.some(n=>n.feature&&n.parent===id)){ expanded=(expanded===id?null:id); showInfo(id); computeTargets(); animating=true; applyVisibility(); }
+    else { showInfo(id); pulseInfo(); }   // no parts: second click re-affirms its info card so every node's 2nd click does something
+    return;
+  }
+  setSelection(id);
+});
+renderer.domElement.addEventListener('pointermove',e=>{
+  if(phase!=='home'){ bumpTimer(); renderer.domElement.style.cursor = phase==='landing'?'pointer':'default'; return; }
+  mouse.x=(e.clientX/innerWidth)*2-1; mouse.y=-(e.clientY/innerHeight)*2+1;
+  ray.setFromCamera(mouse,camera);
+  renderer.domElement.style.cursor=ray.intersectObjects(meshes.filter(m=>m.visible)).length?'pointer':'default';
+});
+document.getElementById('info-x').onclick=()=>setSelection(null);
+document.querySelectorAll('.toggle').forEach(t=>t.addEventListener('change',()=>{
+  typeOn[t.dataset.type]=t.querySelector('input').checked;
+  t.classList.toggle('off',!t.querySelector('input').checked); applyVisibility();
+}));
+const bRot=document.getElementById('b-rotate'),bMem=document.getElementById('b-membrane'),bLab=document.getElementById('b-labels');
+bRot.onclick=()=>{userRotate=!userRotate;updateRotate();bRot.classList.toggle('on',userRotate);};
+bMem.onclick=()=>{shells.visible=!shells.visible;bMem.classList.toggle('on',shells.visible);};
+bLab.onclick=()=>{const v=labelRenderer.domElement.style.display!=='none';labelRenderer.domElement.style.display=v?'none':'block';bLab.classList.toggle('on',!v);};
+document.getElementById('b-reset').onclick=()=>{ setSelection(null); camera.position.set(40,16,56); controls.target.set(0,0,0); };
+const bFoc=document.getElementById('b-focus');
+bFoc.onclick=()=>{ focusMode=focusMode==='ring'?'column':'ring'; bFoc.textContent='Focus: '+(focusMode==='ring'?'Ring':'Column'); bFoc.classList.toggle('on',focusMode==='column'); updateRotate(); if(selected){ computeTargets(); animating=true; } };
+function setupPopout(btnId, menuId){
+  const b=document.getElementById(btnId), m=document.getElementById(menuId);
+  b.addEventListener('click', e=>{ e.stopPropagation();
+    const willOpen = m.classList.contains('hidden');
+    document.querySelectorAll('.optmenu').forEach(x=>x.classList.add('hidden'));   // one open at a time
+    document.querySelectorAll('.optbtn').forEach(x=>x.classList.remove('on'));
+    if(willOpen){ m.classList.remove('hidden'); b.classList.add('on'); }
+  });
+}
+setupPopout('map-toggle','map-menu');
+setupPopout('flows-toggle','flows-menu');
+setupPopout('opt-toggle','optmenu');
+// hamburger: controls hidden by default, expand on click, collapse on click-away
+(function(){ const pt=document.getElementById('panel-toggle'), pm=document.getElementById('panel-menu');
+  if(!pt||!pm) return;
+  pt.addEventListener('click', e=>{ e.stopPropagation(); const hid=pm.classList.toggle('hidden'); pt.setAttribute('aria-expanded', String(!hid)); });
+  document.addEventListener('click', e=>{ if(!pm.classList.contains('hidden') && !document.getElementById('panel').contains(e.target)){ pm.classList.add('hidden'); pt.setAttribute('aria-expanded','false'); } });
+})();
+document.addEventListener('click', e=>{ if(!e.target.closest('.opts')){
+  document.querySelectorAll('.optmenu').forEach(x=>x.classList.add('hidden'));
+  document.querySelectorAll('.optbtn').forEach(x=>x.classList.remove('on')); } });
+addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight); labelRenderer.setSize(innerWidth,innerHeight); });
+
+/* ---------------- ANIMATE ---------------- */
+let clock=0, _fpsN=0, _fpsT=0, _fpsStage=0;   // adaptive quality: measure FPS, drop DPR, then fall to text home if hopeless
+function tick(){
+  requestAnimationFrame(tick); clock+=0.016;
+  if(phase==='flying'){
+    flyN++;
+    var rem=camera.position.distanceTo(HOME_CAM);
+    if(rem>3) camera.position.applyAxisAngle(YAXIS, 0.030*Math.min(1,rem/35));   // spin the MAP only while still far; STOP it near the end so pure lerp converges (the spin used to hold rem just above the 1.2 threshold forever -> the reveal froze short of interactive)
+    camera.position.lerp(HOME_CAM,0.035);                                  // match home's proven approach speed so it reliably arrives
+    if(flyLook){ flyLook.lerp(ORIGIN,0.02); camera.lookAt(flyLook); } else { camera.lookAt(ORIGIN); }   // gaze tracks the mcp node, eases to centre
+    if(camera.position.distanceTo(HOME_CAM)<1.2 || flyN>360){ camera.position.copy(HOME_CAM); controls.target.copy(ORIGIN); controls.enabled=true; controls.enableZoom=true; controls.enablePan=true; userRotate=true; controls.autoRotate=true; controls.autoRotateSpeed=0.9; updateRotate(); phase='home'; flyLook=null; document.body.classList.add('entered'); labelRenderer.domElement.style.display='block'; }   // hard cap (flyN>360 ~6s) guarantees it always reaches interactive; userRotate+updateRotate ensure the map auto-rotates on arrival
+  } else {
+    controls.update();
+    // landing holds until a valid invite code unlocks it (the gate calls enterSite); no auto fly-in
+  }
+  if(animating){
+    let maxd=0;
+    Object.values(nodeObjs).forEach(o=>{ o.cur.lerp(o.tgt,0.045); o.mesh.position.copy(o.cur); o.glow.position.copy(o.cur); maxd=Math.max(maxd,o.cur.distanceTo(o.tgt)); });
+    rebuildEdges();
+    controls.target.lerp(selected?FOCAL:ORIGIN, 0.03);
+    if(maxd<0.06){ Object.values(nodeObjs).forEach(o=>{ o.cur.copy(o.tgt); o.mesh.position.copy(o.cur); o.glow.position.copy(o.cur); }); rebuildEdges(); controls.target.copy(selected?FOCAL:ORIGIN); animating=false; }
+  }
+  shellVis += (shellTarget-shellVis)*0.04;
+  membrane.material.opacity=0.05*shellVis; membraneWire.material.opacity=0.07*shellVis;
+  medium.material.opacity=0.035*shellVis; motes.material.opacity=0.35*shellVis; mcap.style.opacity=shellVis;
+  const pulse=1+Math.sin(clock*0.9)*0.012; membrane.scale.setScalar(pulse); membraneWire.scale.setScalar(pulse);
+  nucEnv.material.opacity=(0.05+Math.sin(clock*1.4)*0.025)*shellVis; coreLight.intensity=2.2+Math.sin(clock*1.4)*0.4;
+  motes.rotation.y+=0.0006; motes.rotation.x+=0.0003;
+  edgeObjs.forEach(e=>{ if(!e.particles.length) return;
+    e.particles.forEach(p=>{ if(!p.visible) return; p.userData.t=(p.userData.t+0.0034*e.speed)%1; p.position.copy(e.curve.getPointAt(p.userData.t)); }); });
+  renderer.render(scene,camera); labelRenderer.render(scene,camera);
+  if(phase==='home' && _fpsStage<2){            // give capable devices (incl. iPads) the full thing; degrade or bail for weak ones
+    if(_fpsT===0) _fpsT=performance.now();
+    if(++_fpsN>=120){ const fps=_fpsN/((performance.now()-_fpsT)/1000);
+      if(_fpsStage===0){ if(fps<42) renderer.setPixelRatio(1); _fpsStage=1; _fpsN=0; _fpsT=0; }   // stage 1: shed pixel ratio
+      else { if(fps<24) location.replace('/home'); _fpsStage=2; } }              // stage 2: still hopeless → text home
+  }
+}
+applyVisibility(); tick();
+</script>
+<!-- EXPLORE: permanent leak-back so the playground never traps; Esc returns to the hub. -->
+<a id="explore-go" href="/register" style="position:fixed;right:18px;bottom:18px;z-index:30;background:#34d399;color:#04210f;font-weight:700;font-family:system-ui,-apple-system,'Segoe UI',Arial,sans-serif;font-size:14px;text-decoration:none;padding:11px 18px;border-radius:11px;box-shadow:0 0 22px rgba(52,211,153,.28);">Get started ›</a>
+<script>
+(function(){
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') location.href='/home'; });
+  // logged-in explorers: the leak-back opens their inbox instead of registering.
+  fetch('/auth/session',{credentials:'include'}).then(function(r){return r.json();}).then(function(d){
+    if(d&&d.authenticated){ var g=document.getElementById('explore-go'); if(g){ g.textContent='Open your inbox ›'; g.href='/inbox'; } }
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>
