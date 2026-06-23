@@ -1,0 +1,7 @@
+/* JetBrains Mono — self-hosted (OFL, see OFL.txt). Replaces the Google Fonts CDN call:
+   sovereign (no third-party request / IP leak), CSP-clean ('self'), and can't break if the
+   report-only CSP ever goes enforcing. Source: @fontsource/jetbrains-mono (latin subset). */
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/jetbrains-mono-400.woff2) format('woff2');}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/jetbrains-mono-500.woff2) format('woff2');}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/jetbrains-mono-600.woff2) format('woff2');}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/jetbrains-mono-700.woff2) format('woff2');}
