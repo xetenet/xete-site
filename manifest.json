@@ -1,21 +1,21 @@
 {
   "generated_note": "sha256 of each LIVE page; manual check + GitHub verifier compare against these",
   "pages": {
-    "/": "89e73b1e7134b25cf0f8ef665ab4cda7f40a39b1cb9cd6ff41a7dc5c81e456d7",
-    "/home": "e25965a82683729108c9e6c24a3a8df517f8d30eb1bce33c7ad739e86caa23e5",
-    "/people": "cb7e6a42349e38a6dfc95e6a89f8fab6967a4e55a4dda9a207467e79755aa31a",
-    "/how-it-works": "c29b9a1fcd330857491eb7cda616710f655ee62bcab1aa5fa05226de1653a479",
-    "/aliases": "7baeb378ee72c762268de2527828aa3addb77c553a45a3a5b8ef98400ddeb1bc",
-    "/about": "924481c830212edc06c4c5ebf81d3194f4813c6a266abf7601051018494b9ec0",
-    "/help": "80b13fe68de2605452d2986bbb4843fc19ef63ebdbcbe79f99db49f961de0bdd",
-    "/get-started": "9b296d0c5e1e2d80f4dcd476cfd36a78ea8d19c23c0e6c9f51e8adde4add9e66",
-    "/developers": "312b7f0573dd144971e34510275007ef6c75a5a7afc23cb9c942b5cf884b8669",
-    "/for-agents": "35c0f99cb809756e4fcd89cf4bc8bcd422f53dae2904520b35b48ccda4e40f2a",
-    "/enterprise": "d92a9252d409a102e73bd1c273c2ca33d8133dc2d4388085d0c9af802a935c9a",
-    "/trust": "c2f509fb2f372962af44bed397bfdee02e43a784822b62d84a854de6be6e84d1",
-    "/contact": "11217d48bcbdb8a4685b2733bec09c2dde546dd2ecdcdf1e0de2eff2ba2956ed",
-    "/login": "9b296d0c5e1e2d80f4dcd476cfd36a78ea8d19c23c0e6c9f51e8adde4add9e66",
-    "/tour": "c92594df62cc404a347fb2167e61c4d29963924d2f689c11fd8ac2bf805947be",
-    "/explore": "5fc84ccd63e2554a5b436e0989821eba0a9304bb6df349f854920a4dc7f0bf68"
+    "/": "fa47dce627fcb6a453fc2d1566f803f1296de5461ba9ec23836d7b5ee671ef6a",
+    "/home": "d10bb86848f38844fb018f76341befa209ab20a8eb1935e19ddf5061aa4bfd30",
+    "/people": "751a0a135a1b84f24c82704955d3fee866ce1b8a885327edb42e12235d337253",
+    "/how-it-works": "69843105deca7205e26fb69d645e6e3873c300c227a439b9e57aac054b720578",
+    "/aliases": "0e230e22e84e51f7ed8f8cfe181b1db333493a0df1f52702b3c45790f1a3a3bb",
+    "/about": "89241ec2dd0068d3ab3194ade3ac349d9938389f4873bdac31baeef1ba05488b",
+    "/help": "da3484afb8c6ca995d0414e2379d585c6e5aedf2e5078efed51868ed939c4d71",
+    "/get-started": "d0ee9fe62fe1ab4776f1ef6702cc7369adb59efe6760ebedad90f4068438f4d7",
+    "/developers": "09074425465b2e60a13e3d3bbae469f836dca3ca08cce5bca980681adea709b7",
+    "/for-agents": "10397ec01f3cd9634447b739b027f8129c548b8ac990d60d6fa280cc533bbac8",
+    "/enterprise": "74d296fa8e5452f27b2526b0e896b0b768aa59535289ebb3907ee471a5001501",
+    "/trust": "a0a1804548bf0ff32a14e84e92397a17be3b15bb25d76253c0cfd5d45dcd6c94",
+    "/contact": "98cf0e05d62e6746ff8862dea9170b21ac4ec6d5fa806b3048558e86ecfdefc6",
+    "/login": "d0ee9fe62fe1ab4776f1ef6702cc7369adb59efe6760ebedad90f4068438f4d7",
+    "/tour": "c6ef69688b4b6ba25d68275a2938c2145c16b2ddee3af6c2eed273208524140f",
+    "/explore": "846485529582c4aed908926a2cfc50c6d0ccca1d3dabc36bd60e73f17c1cf1d3"
   }
 }
