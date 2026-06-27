@@ -108,5 +108,6 @@
   show(0);
 </script>
 <script>fetch('/auth/session',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){if(d&&d.authenticated){var g=document.querySelector('a[href="/register"].go,a[href="/register"].btn');if(g){g.textContent='Open your inbox';g.setAttribute('href','/inbox');}}}).catch(function(){});</script>
+<script src="/js/nav-auth.js" defer></script>
 </body>
 </html>
