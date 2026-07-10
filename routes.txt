@@ -14,3 +14,4 @@
 /login login.html
 /tour tour.html
 /explore explore.html
+/privacy privacy.html
