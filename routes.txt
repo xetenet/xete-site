@@ -18,3 +18,4 @@
 /terms terms.html
 /mobile-app/saga-seeker mobile-app-saga-seeker.html
 /mobile-app/ios mobile-app-ios.html
+/for-sm-review for-sm-review.html

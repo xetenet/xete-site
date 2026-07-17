@@ -65,35 +65,35 @@
     <p>xete is built so that we <strong>can't</strong> read your data. Messages are encrypted on your device to their recipient; our server relays ciphertext it cannot open. On Saga and Seeker, your keys live in your phone's hardware Seed Vault and never leave it. We don't run ads, we don't sell data, and we collect as little as the service can run on. xete is not a service for meeting or contacting strangers — you reach people you already know, and by default only people you've connected with can message you.</p>
   </div>
 
-  <p class="seclabel rise d4">What we can see, and what we can't</p>
+  <p class="seclabel rise d4" id="what-we-see">What we can see, and what we can't</p>
   <div class="sec rise d4">
     <p><strong>We cannot see:</strong> the content of your messages, your private keys, your vault files, or the contents of private contact cards. All of it is encrypted on your device with keys we never hold. (Attachments are a planned feature, not live yet — this same protection will apply once they ship.)</p>
-    <p>This means we also cannot moderate, filter, or scan message content — there is nothing for us to scan. If someone sends or receives something abusive, you can block that sender and report the account (not its content, which we can't read) to us at xetenet@gmail.com. We act on reports at the account level and cooperate with lawful law enforcement requests. We're telling you this plainly rather than implying a protection we can't actually provide.</p>
+    <p>This means we also cannot moderate, filter, or scan message content — there is nothing for us to scan. If someone sends or receives something abusive, you can <strong>block</strong> that sender and <strong>report</strong> it directly from the message, right in the app — both send us the sender identifier so we can act at the account level; reporting also sends a copy of the content itself, since that's the only way we ever see it. We cooperate with lawful law enforcement requests. We're telling you this plainly rather than implying a protection we can't actually provide.</p>
     <p><strong>We do handle:</strong> the minimum needed to relay and protect the service —</p>
     <ul>
-      <li><strong>Ciphertext in transit and at rest.</strong> Message content is deleted from our server within 24 hours of delivery (longer for paid tiers) — enforced automatically, not just a policy on paper. A delivery record (sender and recipient identifiers, timestamps, size) currently persists longer for anti-abuse and reliability; we are working to shorten that too.</li>
+      <li><strong>Ciphertext in transit and at rest.</strong> A message — its ciphertext and the sender/recipient/timestamp record alongside it — is deleted from our server within 24 hours, automatically, as one operation. Nothing about a message is kept longer than that.</li>
       <li><strong>Your public identity.</strong> Your wallet address, your messaging public key, and any %alias you claim are all public by design — they live on Solana or in the on-chain alias registry, the same way a username is public on any platform.</li>
       <li><strong>Anti-abuse signals.</strong> IP addresses are not stored as part of normal registration. They may be temporarily used only while actively responding to abuse or rate-limit violations — never for advertising or profiling, never sold, never shared except as the law compels.</li>
       <li><strong>On-device diagnostics.</strong> The app keeps a local, on-device log of technical events (errors, connection status) to help you troubleshoot — never message content, keys, or passwords. It never leaves your device unless you explicitly export and send it yourself (e.g., attaching it to a support request).</li>
     </ul>
   </div>
 
-  <p class="seclabel rise d4">What happens on-chain</p>
+  <p class="seclabel rise d4" id="onchain">What happens on-chain</p>
   <div class="sec rise d4">
     <p>%alias claims, trades on the Counter, swaps, and settlements are Solana transactions: public, permanent, and outside anyone's ability to edit or delete — including ours. Everything else stays off the chain on purpose. The chain sees only what must settle.</p>
   </div>
 
-  <p class="seclabel rise d4">Your keys, your control</p>
+  <p class="seclabel rise d4" id="privacy-keys">Your keys, your control</p>
   <div class="sec rise d4">
     <p>xete requires a Solana Saga or Seeker phone: your keys are generated and held in the device's hardware Seed Vault secure element and never leave it. We cannot recover your keys, freeze them, or act for you. Deleting the app removes its on-device data; your on-chain records (aliases, trades) remain, as with any blockchain.</p>
   </div>
 
-  <p class="seclabel rise d4">Your rights</p>
+  <p class="seclabel rise d4" id="rights">Your rights</p>
   <div class="sec rise d4">
-    <p>We don't collect your email, run KYC, or link your identity to anything real-world — the only thing tied to your keypair is what you chose to give us, like an alias. You can ask us (xetenet@gmail.com), or use "Delete my server data" in the app's Settings, to delete whatever we hold about your keypair on our server.</p>
+    <p>We don't collect your email, run KYC, or link your identity to anything real-world — the only thing tied to your keypair is what you chose to give us, like an alias. You can ask us (xetenet@gmail.com), or use "Delete my server data" in the app's Settings, to delete whatever we hold about your keypair on our server. Anyone under 13 shouldn't be using xete at all — see <a href="/terms#who-can-use">who can use xete</a>.</p>
   </div>
 
-  <p class="seclabel rise d4">Third parties</p>
+  <p class="seclabel rise d4" id="third-parties">Third parties</p>
   <div class="sec rise d4">
     <p>Price quotes and routing use Jupiter's public API; on-chain reads use Helius. These services see the queries needed to serve you (e.g., token pairs, wallet addresses being looked up) but never your keys or message content.</p>
   </div>
