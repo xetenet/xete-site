@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Terms of use — xete</title>
+<meta name="description" content="xete is sovereign, on-device software. Your keys never touch our server, and on-chain actions you sign are final, public, and outside anyone's ability to edit, reverse, or refund.">
+<link rel="canonical" href="https://xete.net/terms">
+<meta name="theme-color" content="#06070b">
+<style>
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399;
+    --teal:#2dd4bf; --violet:#c084fc; --green:#34d399; --steel:#7c9cff;
+    --mono:ui-monospace,"SF Mono",Consolas,monospace; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
+    background:
+      radial-gradient(circle at 82% 6%, rgba(124,156,255,.12), transparent 46%),
+      radial-gradient(circle at 12% 96%, rgba(45,212,191,.08), transparent 46%),
+      radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 26px 26px, var(--bg); }
+  .stars{ position:fixed; inset:-6%; z-index:0; pointer-events:none; opacity:.55; animation:drift 120s linear infinite;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
+      radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+  @keyframes drift{ to{ transform:translateY(-26px); } }
+  .wrap{ position:relative; z-index:1; max-width:640px; margin:0 auto; padding:0 22px 64px; }
+  .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; } .sp{ flex:1; }
+  .bar a{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; }
+  .bar a:hover{ border-color:var(--steel); color:#fff; }
+  .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .d1{ animation-delay:.05s } .d2{ animation-delay:.18s } .d3{ animation-delay:.32s } .d4{ animation-delay:.46s }
+  .hero{ text-align:center; padding:30px 0 6px; }
+  .eyebrow{ font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--steel); margin-bottom:14px; }
+  h1{ font-size:31px; line-height:1.2; letter-spacing:-.4px; margin-bottom:12px; } h1 em{ font-style:normal; color:var(--steel); }
+  .intro{ font-size:16px; color:#c7cdda; }
+  .meta{ font-size:12.5px; color:var(--muted); margin-top:14px; }
+  .seclabel{ font-size:11px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--steel); margin:38px 0 12px; }
+  .sec{ background:rgba(17,20,28,.55); border:1px solid var(--line); border-radius:12px; padding:18px 20px; }
+  .sec p{ margin:0 0 12px; color:#c4cbd9; font-size:14.5px; line-height:1.65; } .sec p:last-child{ margin-bottom:0; }
+  .sec strong{ color:#fff; }
+  .sec ul{ list-style:none; margin:10px 0 0; padding:0; } .sec li{ position:relative; padding-left:20px; margin-bottom:10px; color:var(--muted); font-size:14px; line-height:1.55; }
+  .sec li:last-child{ margin-bottom:0; } .sec li::before{ content:"—"; position:absolute; left:0; top:0; color:var(--steel); }
+  .sec a{ color:var(--steel); }
+  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:42px; padding-top:22px; border-top:1px solid var(--line); }
+  .doors a{ font-size:12.5px; color:#cbd2e0; text-decoration:none; padding:8px 13px; border:1px solid var(--line); border-radius:8px; }
+  .doors a:hover{ border-color:var(--steel); color:#fff; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/login">Log in</a><a href="/register">Register</a></div>
+
+  <div class="hero">
+    <p class="eyebrow rise d1">Terms of use</p>
+    <h1 class="rise d2">Sovereign software. You hold the keys, you sign the transactions.</h1>
+    <p class="intro rise d3">Your keys never touch our server, and on-chain actions you sign are final, public, and outside anyone's ability to edit, reverse, or refund — including ours.</p>
+    <p class="meta rise d3">Effective: July 2026 · Operated by XETENET LLC, an Oregon limited liability company · Contact: <a href="mailto:xetenet@gmail.com" style="color:var(--steel)">xetenet@gmail.com</a></p>
+  </div>
+
+  <p class="seclabel rise d4">The short version</p>
+  <div class="sec rise d4">
+    <p>By using xete you agree to these terms. xete is sovereign, on-device software: your identity is a keypair you control, your keys live on your hardware (or your device) and never touch our server, and on-chain actions (claiming a %alias, trading on the Counter, swapping) are Solana transactions you sign yourself — final, public, and outside anyone's ability to edit, reverse, or refund, including ours. We provide the software and relay ciphertext; we never hold your funds or keys, and we can't recover, freeze, or reverse anything for you.</p>
+  </div>
+
+  <p class="seclabel rise d4">Who can use xete</p>
+  <div class="sec rise d4">
+    <p>xete is not directed at, and may not be used by, anyone under 13. You're responsible for complying with the laws that apply to you, including any restrictions on cryptocurrency or blockchain use in your jurisdiction.</p>
+  </div>
+
+  <p class="seclabel rise d4">Your account and your keys</p>
+  <div class="sec rise d4">
+    <p>Your identity is a Solana keypair. On Saga and Seeker, it's generated and held in your device's hardware Seed Vault secure element and never leaves it; on other devices, xete falls back to on-device software key storage without the same hardware-backed guarantee. Either way, <strong>you are solely responsible for your keys and your device.</strong> We cannot recover a lost key, reverse a signed transaction, or restore access to a deleted or lost wallet — there is no account-recovery flow, because we never hold anything to recover. Keep your own backups.</p>
+  </div>
+
+  <p class="seclabel rise d4">On-chain actions, fees, and refunds</p>
+  <div class="sec rise d4">
+    <p>Claiming a %alias, posting or accepting a trade on the Counter, swapping, and settling are all Solana transactions you sign and submit yourself, through the AXTREG and AXTSWAP programs. They cost network fees and, where applicable, a program fee — both disclosed in the app before you sign. Once a transaction is confirmed on-chain, it is permanent. <strong>No refunds are given on names or chain fees.</strong> Fee schedules and program addresses may change with notice; a transaction you've already signed is not affected retroactively.</p>
+  </div>
+
+  <p class="seclabel rise d4">Third-party services</p>
+  <div class="sec rise d4">
+    <p>xete uses Jupiter's public API for swap quotes and routing, and Helius for on-chain reads. We don't control these services, don't guarantee their accuracy or uptime, and you use them at your own risk as part of using xete. NFT and token art/metadata may be sourced from the collection's own on-chain or IPFS/Arweave records, which we don't control or verify for accuracy.</p>
+  </div>
+
+  <p class="seclabel rise d4">Acceptable use</p>
+  <div class="sec rise d4">
+    <p>Don't use xete to violate the law, to abuse, harass, or defraud other users, to attempt to compromise the app, the relay, or the on-chain programs, or to interfere with other users' access to the service. We cannot read message content (see the <a href="/privacy">privacy policy</a>), so we moderate at the account level — blocking and reporting — not by scanning content. We may suspend or terminate an account's access to the off-chain relay/messaging service for violating these terms; we cannot and do not revoke or freeze anything already on-chain (your %alias, your wallet, your trade history), since none of it is ours to control.</p>
+  </div>
+
+  <p class="seclabel rise d4">Intellectual property</p>
+  <div class="sec rise d4">
+    <p>The xete name, logo, and app are ours; using the app doesn't give you rights to them beyond what's needed to use the service normally. Anything you create or send through xete (messages, contact cards, listings) stays yours. NFTs and tokens you hold or trade are governed by their own collection's terms and on-chain provenance, not by us.</p>
+  </div>
+
+  <p class="seclabel rise d4">No warranty</p>
+  <div class="sec rise d4">
+    <p>xete is provided <strong>as is</strong>, without warranty of any kind. Software has bugs; networks have outages; blockchains reorg; markets move against you. We don't guarantee the service will be uninterrupted, error-free, or profitable to use, and we don't guarantee any particular price, quote, or trade outcome you see through third-party data sources.</p>
+  </div>
+
+  <p class="seclabel rise d4">Limitation of liability</p>
+  <div class="sec rise d4">
+    <p>To the fullest extent the law allows, XETENET LLC is not liable for indirect, incidental, or consequential damages, or for lost funds, lost keys, or lost profits arising from your use of xete — including from a signed on-chain transaction, a third-party service outage, or a lost or compromised device. Nothing here limits liability where the law doesn't allow it to be limited.</p>
+  </div>
+
+  <p class="seclabel rise d4">Changes</p>
+  <div class="sec rise d4">
+    <p>We'll post changes here. Continued use after a change means acceptance. If a change is material, we'll try to flag it in the app too.</p>
+  </div>
+
+  <p class="seclabel rise d4">Governing law</p>
+  <div class="sec rise d4">
+    <p>These terms are governed by the laws of the State of Oregon, USA, without regard to conflict-of-law rules. If you have a dispute, contact us first at xetenet@gmail.com — we'd rather resolve it directly.</p>
+  </div>
+
+  <p class="seclabel rise d4">Who operates xete</p>
+  <div class="sec rise d4">
+    <p>xete is operated by XETENET LLC, an Oregon limited liability company, at 5441 S Macadam Ave Ste N, Portland OR 97239.</p>
+  </div>
+
+  <div class="doors rise d4">
+    <a href="/how-it-works">How it works</a><a href="/aliases">Names</a><a href="/about">About</a><a href="/help">Help</a><a href="/trust">Trust</a><a href="/privacy">Privacy</a><a href="/contact">Contact</a>
+  </div>
+</div>
+<script src="/js/nav-auth.js" defer></script>
+</body>
+</html>
