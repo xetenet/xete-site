@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>xete for Solana Saga &amp; Seeker — the mobile app</title>
+<meta name="description" content="xete is the xete mobile app for Solana Saga and Solana Seeker — private messaging, direct trading, and a locked file vault, all under one identity that only you control.">
+<link rel="canonical" href="https://xete.net/mobile-app/saga-seeker">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="theme-color" content="#06070b">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="xete">
+<meta property="og:title" content="xete for Solana Saga & Seeker — the mobile app">
+<meta property="og:description" content="Private messaging, direct trading, and a locked vault — one identity, only you control it.">
+<meta property="og:url" content="https://xete.net/mobile-app/saga-seeker">
+<style>
+  :root{ --bg:#06070b; --ink:#e7eaf2; --muted:#9aa3b4; --line:#222838; --cta:#34d399;
+    --teal:#2dd4bf; --violet:#c084fc; --green:#34d399; --steel:#7c9cff;
+    --mono:ui-monospace,"SF Mono",Consolas,monospace; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{ color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
+    background:
+      radial-gradient(circle at 82% 6%, rgba(124,156,255,.12), transparent 46%),
+      radial-gradient(circle at 12% 96%, rgba(45,212,191,.08), transparent 46%),
+      radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 26px 26px, var(--bg); }
+  .stars{ position:fixed; inset:-6%; z-index:0; pointer-events:none; opacity:.55; animation:drift 120s linear infinite;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff7 99%, transparent), radial-gradient(1px 1px at 70% 60%, #cdd6ff8c 99%, transparent),
+      radial-gradient(1px 1px at 42% 80%, #fff6 99%, transparent), radial-gradient(1px 1px at 86% 22%, #ffe9b48c 99%, transparent),
+      radial-gradient(1px 1px at 55% 14%, #fff5 99%, transparent), radial-gradient(1px 1px at 33% 52%, #fff5 99%, transparent); background-repeat:repeat; }
+  @keyframes drift{ to{ transform:translateY(-26px); } }
+  .wrap{ position:relative; z-index:1; max-width:640px; margin:0 auto; padding:0 22px 64px; }
+  .bar{ display:flex; align-items:center; gap:10px; padding:max(14px,env(safe-area-inset-top)) 0 6px; }
+  .brand{ font-weight:700; letter-spacing:3px; font-size:15px; } .sp{ flex:1; }
+  .bar a{ font-size:12.5px; text-decoration:none; color:#cbd2e0; padding:6px 11px; border:1px solid var(--line); border-radius:8px; }
+  .bar a:hover{ border-color:var(--steel); color:#fff; }
+  .rise{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .d1{ animation-delay:.05s } .d2{ animation-delay:.18s } .d3{ animation-delay:.32s } .d4{ animation-delay:.46s }
+  .hero{ text-align:center; padding:30px 0 6px; }
+  .eyebrow{ font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--steel); margin-bottom:14px; }
+  h1{ font-size:29px; line-height:1.25; letter-spacing:-.4px; margin-bottom:12px; } h1 em{ font-style:normal; color:var(--steel); }
+  .intro{ font-size:16px; color:#c7cdda; }
+  .meta{ font-size:12.5px; color:var(--muted); margin-top:14px; }
+  .seclabel{ font-size:11px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--steel); margin:38px 0 12px; }
+  .sec{ background:rgba(17,20,28,.55); border:1px solid var(--line); border-radius:12px; padding:18px 20px; }
+  .sec p{ margin:0 0 12px; color:#c4cbd9; font-size:15px; line-height:1.65; } .sec p:last-child{ margin-bottom:0; }
+  .sec strong{ color:#fff; }
+  .sec ul{ margin:10px 0 0; padding-left:0; list-style:none; }
+  .sec ul li{ position:relative; padding-left:20px; margin-bottom:12px; color:#c4cbd9; font-size:15px; line-height:1.55; }
+  .sec ul li:last-child{ margin-bottom:0; }
+  .sec ul li::before{ content:"—"; position:absolute; left:0; top:0; color:var(--steel); }
+  .sec a{ color:var(--steel); }
+  .pill{ display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--green); border:1px solid rgba(52,211,153,.4); border-radius:6px; padding:1px 7px; margin-left:6px; vertical-align:middle; }
+  .pill.cost{ color:#fbbf24; border-color:rgba(251,191,36,.4); }
+  .doors{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:42px; padding-top:22px; border-top:1px solid var(--line); }
+  .doors a{ font-size:12.5px; color:#cbd2e0; text-decoration:none; padding:8px 13px; border:1px solid var(--line); border-radius:8px; }
+  .doors a:hover{ border-color:var(--steel); color:#fff; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <div class="bar rise d1"><a class="brand" href="/home" style="text-decoration:none;color:inherit">xete</a><span class="sp"></span><a href="/help">Help</a><a href="/contact">Contact</a></div>
+
+  <div class="hero">
+    <p class="eyebrow rise d1">The xete mobile app</p>
+    <h1 class="rise d2">One card. Your identity, your messages, your trades, your vault.</h1>
+    <p class="intro rise d3">xete is a phone app for Solana Saga and Solana Seeker. It turns your phone into a private inbox, a place to trade directly with other people, and a locked box for your files — all under one identity that only you hold the key to.</p>
+  </div>
+
+  <p class="seclabel rise d4">What the app does</p>
+  <div class="sec rise d4">
+    <ul>
+      <li><strong>Messages</strong> — send notes that only the other person can read. Nobody in between, including us, can open them.</li>
+      <li><strong>Names</strong> — claim a short name, like <strong>%yourname</strong>, so people can reach you without typing a long wallet address.</li>
+      <li><strong>Trade</strong> — swap coins instantly, or trade an NFT/token directly with another person, no company holding anyone's money in between.</li>
+      <li><strong>Vault</strong> — a locked, private place on your phone to keep files.</li>
+    </ul>
+  </div>
+
+  <p class="seclabel rise d4">Built for Saga &amp; Seeker</p>
+  <div class="sec rise d4">
+    <p>Solana Saga and Solana Seeker have a special locked chip built in called <strong>Seed Vault</strong>. Your secret key — the thing that proves your wallet and your identity are really yours — is generated inside that chip and never leaves it. That's what lets xete promise nobody, not even the people who built xete, can read your messages, move your money, or pretend to be you.</p>
+    <p>Developers and testers working without one of these phones on hand can use Solana Mobile's own <strong>Seed Vault Simulator</strong> to try the app on a regular Android device or emulator: <a href="https://docs.solanamobile.com/developers/seed-vault">docs.solanamobile.com/developers/seed-vault</a>.</p>
+  </div>
+
+  <p class="seclabel rise d4">How it feels to use</p>
+  <div class="sec rise d4">
+    <p>There's no row of buttons at the bottom of the screen. Your whole identity lives on one card, and you move the card to get where you're going:</p>
+    <ul>
+      <li>Swipe the card <strong>down</strong> for your <strong>Wallet</strong>.</li>
+      <li>Swipe the card <strong>left</strong> for your <strong>Messages</strong>.</li>
+      <li>Swipe the card <strong>right</strong> to show your <strong>QR code</strong>, so someone can scan it to add you.</li>
+      <li>Swipe the card <strong>up</strong> and it flips around to <strong>Contacts</strong>, <strong>Explorer</strong>, and <strong>Settings</strong>.</li>
+      <li>Press and hold the fingerprint icon on the card for your <strong>Vault</strong>.</li>
+    </ul>
+  </div>
+
+  <p class="seclabel rise d4">Say hello to %echo</p>
+  <div class="sec rise d4">
+    <p>The first thing most people do is open Messages and say hi to <strong>%echo</strong> — a friendly guide that lives right inside the app. It answers immediately and shows you around the rest of xete. Free, no wallet balance required. <span class="pill">Free</span></p>
+  </div>
+
+  <p class="seclabel rise d4">What things cost</p>
+  <div class="sec rise d4">
+    <p>Messaging, browsing, and talking to %echo cost nothing. Two things use a small amount of real SOL, because they write permanently onto Solana's public ledger: <span class="pill cost">Small cost</span></p>
+    <ul>
+      <li>Claiming a <strong>%name</strong> for yourself (usually well under a dollar).</li>
+      <li>Trading or swapping — a real transaction, the same as on any exchange.</li>
+    </ul>
+  </div>
+
+  <p class="seclabel rise d4">Trade, two ways</p>
+  <div class="sec rise d4">
+    <p>Open your Wallet and look for <strong>Trade</strong>:</p>
+    <ul>
+      <li><strong>Instant</strong> — swap one coin for another right away, at the current market price.</li>
+      <li><strong>OTC</strong> (over the counter) — buy or sell an NFT or token directly with another person, contract-enforced, with no company holding the assets in between.</li>
+    </ul>
+  </div>
+
+  <p class="seclabel rise d4">Questions?</p>
+  <div class="sec rise d4">
+    <p>Email <a href="mailto:xetenet@gmail.com">xetenet@gmail.com</a> — a real person reads it and writes back.</p>
+  </div>
+
+  <div class="doors rise d4">
+    <a href="/home">Home</a><a href="/mobile-app/ios">iPhone app</a><a href="/how-it-works">How it works</a><a href="/help">Help</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a>
+  </div>
+</div>
+</body>
+</html>

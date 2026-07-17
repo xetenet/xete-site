@@ -16,4 +16,5 @@
 /explore explore.html
 /privacy privacy.html
 /terms terms.html
-/testing testing.html
+/mobile-app/saga-seeker mobile-app-saga-seeker.html
+/mobile-app/ios mobile-app-ios.html
