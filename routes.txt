@@ -16,3 +16,4 @@
 /explore explore.html
 /privacy privacy.html
 /terms terms.html
+/testing testing.html
