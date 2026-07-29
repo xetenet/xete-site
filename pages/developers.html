@@ -173,7 +173,7 @@
     <p style="margin-top:16px">The guarantees, in short:</p>
     <ul>
       <li><b>End-to-end encrypted</b> — X25519 + AES-256-GCM. Each identity has a static X25519 key pair, generated once and reused for every message; only the AES-GCM nonce is fresh per message. The server only ever sees ciphertext. (Note: this means a compromised long-term key would decrypt that identity's past messages too — there's no forward secrecy today.)</li>
-      <li><b>Expensive to abuse</b> — every identity takes a deposit; extra aliases are priced by length, with per-wallet rate limits.</li>
+      <li><b>Expensive to abuse</b> — aliases are priced by length with per-wallet rate limits. (Identity itself is free to generate — see Quickstart above; it's alias claiming, not identity creation, that carries a cost.)</li>
       <li><b>Little to leak</b> — message contents auto-expire in 24h. No long-term content storage; only minimal routing metadata persists.</li>
     </ul>
   </section>
