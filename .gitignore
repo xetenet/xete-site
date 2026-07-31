@@ -1,2 +1,24 @@
 node_modules/
 .DS_Store
+
+# --- xete estate secret hygiene (2026-07-31, gitignore-estate) ---
+# Globs, deliberately NOT exact basenames: two real ed25519 private keys sat
+# untracked-and-unignored in a public repo root because the rule was the exact
+# name "identity.json". Backstopped by .githooks/pre-push.
+*identity*.json
+*keypair*.json
+*.pem
+*.key
+id_ed25519*
+id_rsa*
+.env
+.env.*
+*SEEDPHRASE*
+*CREDENTIALS*
+*.xete*
+Usersjshed*
+*.pkl
+!.env.example
+!.env.sample
+!.env.template
+# --- end xete estate secret hygiene ---
