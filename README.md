@@ -16,16 +16,17 @@ Three layers, each covering something the others can't:
 
 2. **Per-visitor browser tripwire (CSP).** Every page is served with a Content-Security-Policy whose
    `report-uri` points at `/integrity/report`. CSP is a control on *where* code may come from: if
-   something on the page tries to pull in code from a source the policy doesn't allow — an injected
+   something on the page pulls in code from a source the policy doesn't list — an injected
    `<script src="...">`, a payload added by a MITM or a regional injection — **your browser itself**
-   blocks it and reports it to us, and that report can't be stripped by the page's own code, because
-   the browser does the reporting, not our JavaScript.
+   tells us, and that report can't be stripped by the page's own code, because the browser does the
+   reporting, not our JavaScript.
 
-   **What this layer does not do:** CSP does not look at the *contents* of a resource it is allowed
-   to fetch. If a source already on the allow-list served a poisoned file, the browser sees a
-   permitted origin and stays silent — no violation, no report. So a CSP `report-uri` cannot catch a
-   poisoned CDN, which is exactly why the sign-in pages no longer load anything from one. Closing
-   that gap is layer 3's job.
+   **What this layer does not do.** It is currently served in *report-only* mode, so it is an alarm,
+   not a lock: it tells us an injection happened, it doesn't stop it. And CSP never looks at the
+   *contents* of a resource it is willing to fetch — if a source already on the allow-list serves a
+   poisoned file, the browser sees a permitted origin and stays silent: no violation, no report. So
+   a CSP `report-uri` cannot catch a poisoned CDN. That is why the sign-in pages no longer load
+   anything from one, and closing that gap is layer 3's job.
 
 3. **Pinned, self-hosted third-party code (SRI).** The one third-party library the sign-in pages
    need (tweetnacl, on `pages/login.html` and `pages/get-started.html`) is vendored into this repo
@@ -36,8 +37,8 @@ Three layers, each covering something the others can't:
    those two pages than anywhere else on the site: they run PBKDF2 and AES-GCM over a passphrase, so
    swapped-in crypto code would be reading secrets.
 
-Together: layer 1 watches the whole site globally; layer 2 catches code loaded from a source we
-never allowed; layer 3 catches tampering with the code we did allow.
+Together: layer 1 watches the whole site globally; layer 2 alarms on code pulled from a source we
+never listed; layer 3 blocks tampering with the code we did list.
 
 ## Verify it yourself
 
@@ -64,11 +65,13 @@ sha256sum pages/people.html
 - SRI fails closed but quietly: a mismatch blocks the script and logs a console error, it does not
   POST to `/integrity/report`. Layers 1 and 2 are the ones that raise an alarm; layer 3 is the one
   that stops the code running. Don't read "no alarm" as "nothing was blocked."
-- Layer 2 is only ever as strong as the policy actually sent by the server, which lives in the web
-  server config, not in this repo — so it can't be audited from here. In particular these pages
-  carry inline `<script>` blocks, so the policy has to permit inline script somehow: with
-  per-script nonces or hashes (which still block *injected* inline code) or with `'unsafe-inline'`
-  (which does not). Check the live response headers before relying on layer 2 for inline injection.
+- Layer 2 is only ever as strong as the policy the server actually sends, and that policy lives in
+  the web server config, not in this repo — you can't audit it from a clone, you have to read the
+  response headers. As deployed today it is sent as `Content-Security-Policy-Report-Only`, and its
+  `script-src` includes `'unsafe-inline'` (these pages carry inline `<script>` blocks, which a
+  nonce- or hash-based policy would cover more tightly). Net effect: layer 2 reports code pulled
+  from a source we never listed, after the fact — it does not block, and it does not see injected
+  *inline* code at all.
 - A full compromise of our origin server could, in theory, mute one visitor's in-page reporter — but
   the browser-native CSP report is hard to strip, and any auditor (or our own future verify extension)
   re-running the hash check above always catches it.
@@ -88,6 +91,10 @@ script and the pages together. If the library is ever upgraded, recompute the ha
 ```sh
 echo "sha384-$(openssl dgst -sha384 -binary js/nacl-1.0.3.min.js | openssl base64 -A)"
 ```
+
+Once it is deployed, `https://cdn.jsdelivr.net` should come out of the `script-src` allow-list in
+the server's CSP header — nothing on the site loads from it any more, and while it stays listed an
+injected jsDelivr script is a *permitted* source and raises no report at all.
 
 The vendored copy is tweetnacl 1.0.3 taken from the npm tarball
 (`sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==`,
