@@ -59,7 +59,8 @@ sha256sum pages/people.html
   copy. Layer 2 covers the part of that a browser can see: code pulled in from a source the policy
   doesn't allow. It does not cover a change to the page's own served bytes, because CSP never
   compares those to anything.
-- Layer 1 hashes the HTML routes listed in `routes.txt` and nothing else. Static assets (`fonts/`,
+- Layer 1 hashes exactly the routes listed in `routes.txt` and nothing else: every HTML page, plus
+  `/.well-known/security.txt`, which the web server serves directly rather than from `pages/`. Static assets (`fonts/`,
   `js/`) are **not** monitored by the Action. `js/nacl-1.0.3.min.js` is covered instead by its SRI
   hash, which every visitor's browser re-checks on every page load.
 - SRI fails closed but quietly: a mismatch blocks the script and logs a console error, it does not

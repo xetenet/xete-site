@@ -16,6 +16,7 @@
     "/contact": "98cf0e05d62e6746ff8862dea9170b21ac4ec6d5fa806b3048558e86ecfdefc6",
     "/login": "d0ee9fe62fe1ab4776f1ef6702cc7369adb59efe6760ebedad90f4068438f4d7",
     "/tour": "c6ef69688b4b6ba25d68275a2938c2145c16b2ddee3af6c2eed273208524140f",
-    "/explore": "846485529582c4aed908926a2cfc50c6d0ccca1d3dabc36bd60e73f17c1cf1d3"
+    "/explore": "846485529582c4aed908926a2cfc50c6d0ccca1d3dabc36bd60e73f17c1cf1d3",
+    "/.well-known/security.txt": "0079ae0afb06e00f8f07fbbcd1c94bdc1cb319fcc7d7dc45e524a89e8f29e549"
   }
 }
