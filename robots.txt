@@ -1,0 +1,17 @@
+# xete — all crawlers welcome, including AI answer engines
+User-agent: *
+Allow: /
+
+# AI / answer-engine crawlers explicitly welcomed (AEO)
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://xete.net/sitemap.xml
+# Machine-readable summary for LLMs:
+# https://xete.net/llms.txt

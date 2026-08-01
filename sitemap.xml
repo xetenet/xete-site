@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Production routes (the Desktop xete-*.html prototypes map to these at deploy). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://xete.net/</loc><lastmod>2026-06-14</lastmod><priority>1.0</priority></url>
+  <url><loc>https://xete.net/people</loc><lastmod>2026-06-14</lastmod><priority>0.9</priority></url>
+  <url><loc>https://xete.net/developers</loc><lastmod>2026-06-14</lastmod><priority>0.9</priority></url>
+  <url><loc>https://xete.net/enterprise</loc><lastmod>2026-06-14</lastmod><priority>0.9</priority></url>
+  <url><loc>https://xete.net/how-it-works</loc><lastmod>2026-06-14</lastmod><priority>0.7</priority></url>
+  <url><loc>https://xete.net/aliases</loc><lastmod>2026-06-14</lastmod><priority>0.7</priority></url>
+  <url><loc>https://xete.net/about</loc><lastmod>2026-06-14</lastmod><priority>0.7</priority></url>
+  <url><loc>https://xete.net/help</loc><lastmod>2026-06-14</lastmod><priority>0.7</priority></url>
+  <url><loc>https://xete.net/get-started</loc><lastmod>2026-06-14</lastmod><priority>0.8</priority></url>
+  <url><loc>https://xete.net/trust</loc><lastmod>2026-06-14</lastmod><priority>0.7</priority></url>
+  <url><loc>https://xete.net/contact</loc><lastmod>2026-06-14</lastmod><priority>0.6</priority></url>
+  <url><loc>https://xete.net/register</loc><lastmod>2026-06-14</lastmod><priority>0.8</priority></url>
+</urlset>
