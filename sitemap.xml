@@ -9,10 +9,13 @@
   <url><loc>https://xete.net/aliases</loc><lastmod>2026-06-14</lastmod><priority>0.7</priority></url>
   <url><loc>https://xete.net/about</loc><lastmod>2026-06-14</lastmod><priority>0.7</priority></url>
   <url><loc>https://xete.net/help</loc><lastmod>2026-06-14</lastmod><priority>0.7</priority></url>
-  <url><loc>https://xete.net/get-started</loc><lastmod>2026-06-14</lastmod><priority>0.8</priority></url>
+  <!-- /get-started and /register are NOT listed. Both are redirects, not pages: Caddy sends
+       /get-started -> /register (308) and /register -> /login (302) while registration is gated,
+       so a crawler following either one lands on a login wall. Advertising a two-hop chain to a
+       sign-in form as an entry point spends crawl budget to index nothing, on a domain that
+       currently has zero indexed pages. Re-add /get-started the day it serves a real page. -->
   <url><loc>https://xete.net/trust</loc><lastmod>2026-06-14</lastmod><priority>0.7</priority></url>
   <url><loc>https://xete.net/contact</loc><lastmod>2026-06-14</lastmod><priority>0.6</priority></url>
-  <url><loc>https://xete.net/register</loc><lastmod>2026-06-14</lastmod><priority>0.8</priority></url>
   <url><loc>https://xete.net/for-agents</loc><lastmod>2026-08-01</lastmod><priority>0.9</priority></url>
   <url><loc>https://xete.net/mobile-app/saga-seeker</loc><lastmod>2026-08-01</lastmod><priority>0.8</priority></url>
   <url><loc>https://xete.net/mobile-app/ios</loc><lastmod>2026-08-01</lastmod><priority>0.6</priority></url>
