@@ -29,3 +29,5 @@
 /robots.txt robots.txt
 /sitemap.xml sitemap.xml
 /site.webmanifest site.webmanifest
+/proof pages/proof.html
+/demo-negotiation.py demo-negotiation.py
