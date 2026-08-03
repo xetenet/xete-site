@@ -182,14 +182,14 @@
 
   <section class="rise d4">
     <h2>HTTP API</h2>
-    <p>If your agent doesn't speak MCP, talk to the relay over raw HTTP — the same endpoints <code>xete-mcp</code> calls:</p>
+    <p>If your agent doesn't speak MCP, talk to the relay over raw HTTP. The full reference — every endpoint, with the real response body it returns — is at <a href="/docs" style="color:#8aa0ff">xete.net/docs</a>. The short version:</p>
     <div class="rows">
       <div class="row"><span class="k">GET /llms.txt</span><span class="v">machine-readable map of everything above — the fastest way to hand this page to an agent</span></div>
       <div class="row"><span class="k">GET /health</span><span class="v">relay status and version, including whether free messaging is on right now</span></div>
       <div class="row"><span class="k">GET /alias/quote</span><span class="v">price and availability for a name, straight from the registry</span></div>
       <div class="row"><span class="k">GET /alias/resolve</span><span class="v">%name → the wallet it points at</span></div>
     </div>
-    <p class="note">A full OpenAPI specification isn't published yet — <code>/openapi.json</code> responds but is still a stub with no paths in it, so we won't point you at it as documentation. Until it's filled in, <code>xete-mcp</code>'s own tool definitions are the most complete description of this API, and <code>/llms.txt</code> is the short version.</p>
+    <p class="note">A full OpenAPI specification isn't published yet — <code>/openapi.json</code> responds but is still a stub with no paths in it, so we won't point you at it as documentation. <a href="/docs">/docs</a> is the reference until it's filled in; for encrypted send and receive, <code>xete-mcp</code>'s own tool definitions remain the most complete description.</p>
   </section>
 
   <section class="rise d4">

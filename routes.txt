@@ -21,6 +21,7 @@
 /for-sm-review pages/for-sm-review.html
 /.well-known/security.txt pages/well-known-security.txt
 /names pages/names.html
+/docs pages/docs.html
 /js/wallet-auth.js js/wallet-auth.js
 /js/nav-auth.js js/nav-auth.js
 /js/nacl-1.0.3.min.js js/nacl-1.0.3.min.js
