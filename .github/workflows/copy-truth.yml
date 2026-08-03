@@ -1,0 +1,54 @@
+name: copy-matches-reality
+
+# The site ASSERTS things that are true only while a server flag says so. The flag lives in
+# the relay; the sentence lives in HTML; nothing connects them. That is the same shape as the
+# 2026-07-30 names_wallet drift that broke %alias claiming for 3d21h — two copies of one fact,
+# each behaving exactly as written, disagreeing silently because no code path compared them.
+#
+# This job compares them. It is deliberately a SEPARATE workflow from verify-site-integrity so
+# that "the live site was tampered with" and "our copy outran the product" are never confused
+# for one another in the run list.
+
+on:
+  schedule:
+    - cron: '17 * * * *'    # hourly, offset off the integrity monitor's :00/:15/:30/:45
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  free-messaging-claim:
+    runs-on: ubuntu-latest
+    steps:
+      - name: The site says messaging is free. Does the server still agree?
+        run: |
+          set -u
+          FLAG=$(curl -sL --max-time 20 https://xete.net/health \
+                 | python3 -c 'import sys,json; print(json.load(sys.stdin).get("free_alpha"))')
+          echo "relay /health free_alpha = $FLAG"
+
+          CLAIMS=0
+          for route in /llms.txt /developers /mobile-app/saga-seeker; do
+            n=$(curl -sL --compressed --max-time 20 "https://xete.net$route" \
+                | grep -ociE 'free messaging|messaging[^.]{0,20}free|cost nothing' || true)
+            echo "  $route asserts free messaging in $n place(s)"
+            CLAIMS=$((CLAIMS + n))
+          done
+          echo "total public assertions: $CLAIMS"
+
+          if [ "$FLAG" = "True" ] || [ "$FLAG" = "true" ]; then
+            echo "OK - the flag is on, so the copy is true."
+            exit 0
+          fi
+
+          if [ "$CLAIMS" = "0" ]; then
+            echo "OK - the flag is off and no page claims free messaging."
+            exit 0
+          fi
+
+          echo "::error::COPY OUTRAN THE PRODUCT. free_alpha=$FLAG but $CLAIMS public sentence(s) still say messaging is free."
+          echo "Fix the pages, or turn the flag back on. Do not silence this check."
+          exit 1
