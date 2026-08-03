@@ -1,0 +1,274 @@
+<title>% — the xete name board</title>
+<style>
+  :root{
+    --bg:#0a0b0d; --ink:#e8eaed; --dim:#8b919c; --faint:#3a3f47;
+    --line:#1b1e23; --card:#101216;
+    --yours:#34d399; --taken:#6b7280; --held:#c4a06a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:400 16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;padding:0 20px 120px}
+  .wrap{max-width:760px;margin:0 auto}
+
+  header{padding:96px 0 0;text-align:center}
+  .mark{font:300 128px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);letter-spacing:-.04em}
+  h1{font-size:26px;font-weight:500;letter-spacing:-.02em;margin:28px 0 10px}
+  .sub{color:var(--dim);max-width:44ch;margin:0 auto;font-size:15px}
+
+  /* the checker */
+  .check{margin:64px 0 0}
+  .field{display:flex;align-items:center;gap:2px;border:1px solid var(--line);
+    background:var(--card);border-radius:12px;padding:16px 20px;transition:border-color .18s}
+  .field:focus-within{border-color:#2c333c}
+  .pct{font:300 30px/1 ui-monospace,monospace;color:var(--faint);user-select:none}
+  input{flex:1;background:none;border:0;outline:0;color:var(--ink);
+    font:300 30px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;min-width:0;padding:0 2px}
+  input::placeholder{color:var(--faint)}
+
+  .verdict{min-height:82px;padding:20px 4px 0}
+  .vline{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .status{font-size:19px;font-weight:500;letter-spacing:-.01em}
+  .s-yours{color:var(--yours)} .s-taken{color:var(--taken)} .s-held{color:var(--held)}
+  .note{color:var(--dim);font-size:14px}
+  .owner{font:400 12px/1.5 ui-monospace,monospace;color:var(--faint);
+    word-break:break-all;margin-top:6px}
+  .claim{display:inline-block;margin-top:14px;padding:11px 22px;border-radius:9px;
+    background:var(--ink);color:var(--bg);text-decoration:none;font-size:14px;font-weight:500}
+  .claim:hover{opacity:.88}
+
+  /* the board */
+  section{margin-top:104px}
+  h2{font-size:13px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--dim);margin:0 0 6px}
+  .lede{color:var(--dim);font-size:15px;margin:0 0 28px;max-width:52ch}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .cell{background:var(--card);padding:15px 16px;display:flex;justify-content:space-between;
+    align-items:baseline;gap:10px;min-height:56px}
+  .nm{font:400 15px/1 ui-monospace,monospace;color:var(--ink)}
+  .st{font-size:11px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+  .pending{color:var(--faint)}
+
+  .fine{margin-top:56px;color:var(--dim);font-size:14px;border-top:1px solid var(--line);padding-top:28px}
+  .fine b{color:var(--ink);font-weight:500}
+  .fine p{margin:0 0 12px;max-width:58ch}
+  footer{margin-top:72px;text-align:center;color:var(--faint);font-size:13px}
+  footer a{color:var(--dim)}
+
+  @media (max-width:560px){
+    .mark{font-size:92px} header{padding-top:64px}
+    input,.pct{font-size:24px} .grid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr))}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .rise{animation:rise .5s cubic-bezier(.2,.7,.3,1) both}
+    @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="rise">
+    <div class="mark">%</div>
+    <h1>Most of these are still free.</h1>
+    <p class="sub">Every xete name lives on-chain. Once claimed it can't be taken back —
+      not by us, not by anyone. This board reads the chain live.</p>
+  </header>
+
+  <div class="check rise">
+    <div class="field">
+      <span class="pct">%</span>
+      <input id="q" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+             autofocus maxlength="32" placeholder="yourname" aria-label="Check a xete name">
+    </div>
+    <div class="verdict" id="verdict"></div>
+  </div>
+
+  <section>
+    <h2>The board</h2>
+    <p class="lede">A sample of the register, read live. Almost everything is available —
+      the single most temporary fact on this page.</p>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <div class="fine">
+    <p><b>What a name costs.</b> Six letters or more: free — you cover only the small one-time
+      network rent and gas that records it on-chain, usually well under a dollar. That's the
+      network's fee, not ours.</p>
+    <p><b>Short names carry a one-time price</b> that rises when several people want short names at
+      once and settles back down when they don't. You always see the exact number before you
+      confirm.</p>
+    <p><b>Held</b> means the protocol is holding that name — every name of three letters or fewer,
+      every short number, and a list of names that would be misleading in the wrong hands. They
+      aren't for sale today.</p>
+    <p><b>It's yours.</b> A name is a permanent thing you own, like anything else in your wallet.
+      It isn't rented and it doesn't expire. Up to three names per wallet, first come first served.
+      Your name points to your wallet — it's a public handle, not a hidden one.</p>
+  </div>
+
+  <footer>
+    <a href="/aliases">How names work</a> · <a href="/how-it-works">How xete works</a>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ── Names the protocol holds. Rule-based where the rule is total, list-based otherwise.
+  // Keeping this client-side means a held name costs ZERO requests to report honestly.
+  var NAMED_HELD = ("abraham abuse adam adept adidas admin agent agents ai airbnb airbus aldrin alex alice amazon amd amex anatoly anchor anthropic aphrodite api apollo apple aramco ares artemis assistant athena atlas atlassian audi backpack bankofamerica base bears binance bitbucket bitfinex bitstamp blackrock bmw bob boeing bofa bonfida bonk bot bots bp breakpoint bridge broker burgerking bybit bytedance canva carol channel character chase chevron chickfila chipotle citi clone cohere coinbase contact converse core costco cvs dan dao dave david decrypt deepmind defi defiland degenape degods demeter devnet dexlab dialect dionysus discover disney docs drift dunkin eclipse eclipsefnd eden emma encrypt eve everstake exodus exxon facebook farm fartcoin feed ferrari fida fidelity figma firedancer ford foundation frank frictionless ftx gazprom ge gemini genesis genesysgo george gigaverse github gitlab glow gm god goldman google governance grace grass grok hades hank hash helen helius hello help helper hephaestus hera hermes honda hubble hubspot huggingface huobi hyperdrive hyundai ian ibm inbox inflection info intel iris jack james jane jenny jira jito john jose jpmorgan juan julia jup jupiter kamino karen kate kernel kevin key keypair kfc kia kraken kroger kyle lads lamborghini laura legal lifinity lily linda linkedin lockheed lp lucid luke lululemon lyft mad mage magiceden main mainnet makers mango marginfi marinade mark mars mary mastercard matt mcdonalds mercedes mercury mert meta meta-ai metaplex michael microsoft mike mint mistral moodeng morganstanley mrgnfi multi multisig nakamoto neptune net netflix nft nick nike noah northrop notion nova nvidia okay okx olivia openai openbook oracle orca orion outbox parrot paul paypal perplexity peter phantom phoenix pinterest pluto polestar pool popcat porsche port poseidon privacy privkey prop prophet proposal psyoptions pubkey publix pubsub puma pyth qualcomm queue quicknode rachel raj ray raydium raytheon realms reddit reebok relay replicate rick rivian rob robinhood root router ryan saber salesforce sam samsung sanctum sara sarah satoshi saturn schwab seahorse serum shadow sharky shell shopify sig signature slack smb snapchat sol solana solend solflare sony soon sphere spool spotify squads square squarespace stake staratlas starbucks steve strata streamflow stripe sudo sue support susan swap system target tensor tensorian tesla testnet tiktok tim tipdex titan together toly tom tos totalenergies toyota treasury triton twitter uber underarmour unstake uranus vanguard vans vault venus victor visa vitalik vivian volkswagen vote vw walgreens walmart wellsfargo wendys whole-foods wif will william wix wizard wordpress world wormhole x xai xena y00ts yara yield youtube zack zendesk zeta zeus zoe").split(" ");
+  var HELD = Object.create(null);
+  for (var i=0;i<NAMED_HELD.length;i++) HELD[NAMED_HELD[i]] = 1;
+
+  function isHeld(n){
+    if (HELD[n]) return true;
+    if (/^[a-z]{1,3}$/.test(n)) return true;   // every 1-3 letter name
+    if (/^[0-9]{1,4}$/.test(n)) return true;   // every 1-4 digit name
+    return false;
+  }
+  function isValid(n){ return /^[a-z0-9-]{1,32}$/.test(n); }
+
+  // ── Cache. A refresh must not re-hit the relay; this page is meant to be shared.
+  var mem = Object.create(null);
+  function cacheGet(k){
+    if (mem[k]) return mem[k];
+    try{ var v = sessionStorage.getItem("nb:"+k); if(v) return (mem[k]=JSON.parse(v)); }catch(e){}
+    return null;
+  }
+  function cacheSet(k,v){
+    mem[k]=v; try{ sessionStorage.setItem("nb:"+k, JSON.stringify(v)); }catch(e){}
+  }
+
+  function resolve(name){
+    var c = cacheGet(name); if (c) return Promise.resolve(c);
+    return fetch("/alias/resolve?name="+encodeURIComponent(name))
+      .then(function(r){ return r.json(); })
+      .then(function(d){ var v={owner: d && d.alias_owner ? String(d.alias_owner) : null}; cacheSet(name,v); return v; });
+  }
+  function quote(name){
+    return fetch("/alias/quote?name="+encodeURIComponent(name))
+      .then(function(r){ return r.json(); });
+  }
+  function sol(lamports){
+    var n = Number(lamports)/1e9;
+    if (!isFinite(n)) return null;
+    return n === 0 ? "0" : (n < 1 ? n.toFixed(3).replace(/0+$/,"").replace(/\.$/,"") : String(n));
+  }
+
+  // ── The checker. One request per intent, never per keystroke.
+  var q = document.getElementById("q"), verdict = document.getElementById("verdict"), timer, seq = 0;
+
+  function el(tag, cls, text){
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;   // textContent everywhere: server data is never markup
+    return e;
+  }
+  function show(nodes){
+    verdict.textContent = "";
+    var box = el("div","rise");
+    nodes.forEach(function(n){ box.appendChild(n); });
+    verdict.appendChild(box);
+  }
+  function line(){
+    var d = el("div","vline");
+    for (var i=0;i<arguments.length;i++) if (arguments[i]) d.appendChild(arguments[i]);
+    return d;
+  }
+
+  function render(name){
+    var mine = ++seq;
+    if (!name){ verdict.textContent=""; return; }
+    if (!isValid(name)){
+      show([line(el("span","status s-held","not a name"),
+                 el("span","note","Letters a–z, numbers, and hyphens."))]);
+      return;
+    }
+    show([line(el("span","status pending","checking the chain…"))]);
+
+    // Chain first, ALWAYS. A name can be both held by the protocol and already claimed
+    // (%john is), so answering from the held-list first would state something false.
+    resolve(name).then(function(r){
+      if (mine !== seq) return;                       // a newer query won
+      if (r.owner){
+        var nodes = [line(el("span","status s-taken","taken"),
+                          el("span","note","Claimed on-chain. It can't be reclaimed."))];
+        nodes.push(el("div","owner", r.owner));
+        show(nodes);
+        return;
+      }
+      if (isHeld(name)){
+        show([line(el("span","status s-held","held"),
+                   el("span","note","The protocol is holding this one. Not for sale today."))]);
+        return;
+      }
+      // Available. Price comes from the permit server — never from this page.
+      show([line(el("span","status s-yours","yours"), el("span","note","Reading the price…"))]);
+      quote(name).then(function(qt){
+        if (mine !== seq) return;
+        var lam = qt && qt.total_lamports, s = sol(lam), note;
+        if (s === "0") note = "Free — you cover only the one-time network rent to record it.";
+        else if (s) note = s + " SOL one-time, plus network rent. You'll see this again before you confirm.";
+        else note = "Available.";
+        var a = el("a","claim","Claim %"+name);
+        a.href = "/register";
+        show([line(el("span","status s-yours","yours"), el("span","note",note)), a]);
+      }).catch(function(){
+        if (mine !== seq) return;
+        var a = el("a","claim","Claim %"+name); a.href = "/register";
+        show([line(el("span","status s-yours","yours")), a]);
+      });
+    }).catch(function(){
+      if (mine !== seq) return;
+      show([line(el("span","status pending","couldn't reach the chain"),
+                 el("span","note","Try again in a moment."))]);
+    });
+  }
+
+  q.addEventListener("input", function(){
+    clearTimeout(timer);
+    var v = q.value.trim().toLowerCase().replace(/^%+/,"");
+    timer = setTimeout(function(){ render(v); }, 420);
+  });
+
+  // ── The board. Throttled hard: this page is designed to be shared, and a shared page
+  // that fans out one request per tile per visitor is a load generator, not a landing page.
+  var BOARD = ("zero void dusk iron salt onyx sage kite opal flux jade wolf lynx crow dune " +
+               "ghost raven quill ember slate brass north aegis ronin cipher silent whisper " +
+               "courier envoy parley bazaar ledger escrow settle midnight lockbox sovereign " +
+               "echo john alex apple satoshi").split(" ");
+
+  var grid = document.getElementById("grid"), cells = {};
+  BOARD.forEach(function(n){
+    var c = el("div","cell");
+    c.appendChild(el("span","nm","%"+n));
+    var s = el("span","st pending","·");
+    c.appendChild(s); cells[n]=s; grid.appendChild(c);
+  });
+
+  function paint(n, state, label){
+    var s = cells[n]; if(!s) return;
+    s.className = "st " + state; s.textContent = label;
+  }
+
+  var toFetch = BOARD.slice();
+
+  var idx = 0, LANES = 2;
+  function pump(){
+    if (idx >= toFetch.length) return;
+    var n = toFetch[idx++];
+    resolve(n).then(function(r){
+      // Chain first here too — held is only the answer when nobody owns it.
+      if (r.owner)      paint(n,"s-taken","taken");
+      else if (isHeld(n)) paint(n,"s-held","held");
+      else              paint(n,"s-yours","yours");
+    }).catch(function(){
+      paint(n,"pending","—");
+    }).then(function(){
+      setTimeout(pump, 140);      // deliberate pacing, not a race
+    });
+  }
+  for (var L=0; L<LANES; L++) setTimeout(pump, L*180);
+})();
+</script>

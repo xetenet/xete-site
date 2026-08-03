@@ -20,3 +20,4 @@
 /mobile-app/ios mobile-app-ios.html
 /for-sm-review for-sm-review.html
 /.well-known/security.txt well-known-security.txt
+/names names.html
