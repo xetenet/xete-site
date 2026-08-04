@@ -69,7 +69,7 @@
      the bottom of this stylesheet. */
   #stage{position:absolute;top:0;left:0;width:1920px;height:1080px;
     transform-origin:top left;background:var(--line);
-    display:grid;grid-template-rows:96px 1fr 268px;gap:1px}
+    display:grid;grid-template-rows:96px 1fr 232px;gap:1px}
 
   h2{font:500 13px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.09em;
     text-transform:uppercase;color:var(--dim);margin:0}
@@ -106,11 +106,13 @@
   .atext{font-size:15px;font-weight:500;color:var(--alert);min-width:0;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  /* Seconds since the feed last moved. A number that visibly changes is its own
-     evidence and costs one word of space; it is what remains of the feed line
-     that used to sit under the board, kept because a still page with a green
-     badge is exactly the thing this broadcast must be able to disprove. */
-  .since{font:400 12px/1 ui-monospace,monospace;color:var(--faint);white-space:nowrap}
+  /* There WAS a seconds counter here — the last survivor of the feed line, kept on
+     the argument that a number which visibly changes is its own evidence. On its
+     own in an otherwise empty strip it read as a stray "3s ago" attached to
+     nothing, which is worse than no evidence: a reader who cannot tell what a
+     number counts does not trust the number. The badge beside it carries the state
+     in words, the alarm covers every way the feed can fail, and the board moving is
+     the liveness a viewer actually reads. */
 
   /* ── the live indicator ──────────────────────────────────────────
      Driven by `updated_utc` against the SERVING host's clock — the Date header
@@ -289,17 +291,33 @@
   .bub.pending{visibility:hidden}
 
   /* ── board ───────────────────────────────────────────────────── */
-  .mid{background:var(--card);display:flex;flex-direction:column;align-items:center;
-    justify-content:center;gap:10px;padding:12px;min-height:0;overflow:hidden}
+  /* ── the middle cell: board left, booth right ────────────────────
+     The booth used to live in the bottom band, in a 240px-tall slot beside the
+     request rows, where it held eight lines and a line's whole life on screen was
+     about a minute. Standing it up here as a full-height column beside the board
+     gives it roughly three times the area and, more to the point, the shape a
+     running commentary actually wants: a tall narrow column reads like a chat log,
+     which is a thing people are practised at skimming and dipping back into. That
+     is the ask — something to come back to when you have finished looking at
+     everything else — and height is what buys it.
+
+     The board goes hard left rather than centring in the leftover space. Centred,
+     it would drift with the booth's width and there would be no vertical line
+     anywhere on the screen that anything shares. Pinned left, its left edge sits
+     against the white column and the whole middle band has one spine. */
+  .mid{background:var(--card);display:grid;grid-template-columns:auto 1fr;
+    gap:16px;padding:12px;min-height:0;overflow:hidden;align-items:stretch}
+  .boardcol{display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:10px;min-height:0;min-width:0}
   .movebar{display:flex;align-items:baseline;gap:14px;height:26px}
   .msan{font:400 22px/1 ui-monospace,monospace;color:var(--ink)}
   .mwho{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim)}
-  /* 624, up from 520. The number is measured, not chosen: the middle row is 714px
-     tall, and with the caption gone what is left after the .mid padding (24), the
-     move bar (26), the gap (10) and the file letters (22) is 632. 624 takes it
-     with 8px of slack and divides by 8 into whole 78px squares, so no square is a
-     pixel wider than its neighbour. */
-  .boardwrap{display:grid;grid-template-columns:22px 624px;grid-template-rows:624px 22px}
+  /* 680, from 520. Measured, not chosen: the middle row is now 750px tall (the
+     bottom band gave up 52px when the booth left it), and what remains after the
+     .mid padding (24), the move bar (26), the gap (10) and the file letters (22)
+     is 668. 664 takes it with slack and divides by 8 into whole 83px squares, so
+     no square is a pixel wider than its neighbour. */
+  .boardwrap{display:grid;grid-template-columns:22px 664px;grid-template-rows:664px 22px}
   .ranks{display:grid;grid-template-rows:repeat(8,1fr)}
   .files{grid-column:2;display:grid;grid-template-columns:repeat(8,1fr)}
   .ranks span,.files span{font:400 11px/1 ui-monospace,monospace;color:var(--faint);
@@ -327,7 +345,7 @@
      emoji presentation even if one is offered. The glyphs themselves also
      carry U+FE0E per character for the same reason.
      Belt and braces, because the failure was invisible to the usual check. */
-  .sq{display:flex;align-items:center;justify-content:center;font-size:50px;line-height:1;
+  .sq{display:flex;align-items:center;justify-content:center;font-size:53px;line-height:1;
     user-select:none;position:relative;isolation:isolate;
     font-family:"Segoe UI Symbol","Noto Sans Symbols 2","DejaVu Sans","Apple Symbols",
       "Segoe UI Historic",serif;
@@ -375,36 +393,29 @@
   .pmove{position:absolute;left:0;top:0;pointer-events:none;background:none;
     transition-property:none}
   /* ── server strip ────────────────────────────────────────────────
-     The bottom band carries two things side by side: the request body on
-     the left, the commentary booth on the right. The split is not a
-     fraction — it is what the CIPHERTEXT leaves. That row is the longest
-     string on the page and it may never wrap, clip or gain a scrollbar,
-     so the left column is sized to hold it and the booth takes the
-     remainder. fitCipher() re-checks that at runtime on the real font,
-     and steps the row down if a longer message than any seen so far
-     would have overflowed it. It only ever shrinks: a row that grew back
-     would resize itself mid-match, and nothing on this screen may.
+     The bottom band is now ONE thing: the request body and what it means.
+     The booth used to share it and has gone to stand beside the board, which
+     is both a better shape for a running commentary and the reason this band
+     could give up its height. 268 -> 216, and every pixel of that went into
+     the board.
 
-     560, up from 288. The 288 was set when a message could be a paragraph of
-     smack talk, and the row was sized for a ciphertext that might be enormous.
-     The agents now send a move and a short repair tail — measured, 80 characters
-     of ciphertext needing 660px of a 1396px slot — so most of what was reserved
-     was never used. At 288 a line of colour commentary wrapped three deep and
-     the window held five entries; the whole point of merging the booth was to
-     keep a line on screen long enough to read it, and width is most of that.
-     1264 is left for the rows, which is still nearly twice what the longest
-     ciphertext seen has ever asked for, and fitCipher() still guards the case
-     where a longer one turns up. */
-  .server{background:var(--card);padding:16px 40px 12px;display:grid;
-    grid-template-columns:1fr 560px;column-gap:16px;
+     The ciphertext row is the constraint that remains. It is the longest string
+     on the page, it grows with the message that carried it, and it may never
+     wrap, clip or gain a scrollbar. fitCipher() re-checks that at runtime on the
+     real font and steps the row down if a longer message than any seen so far
+     would have overflowed. It only ever shrinks: a row that grew back would
+     resize itself mid-match, and nothing on this screen may. With the full width
+     to itself it has about 1700px for a string that has so far never asked for
+     more than 660. */
+  .server{background:var(--card);padding:14px 40px 10px;display:block;
     min-height:0;position:relative;overflow:hidden}
-  .sleft{display:flex;flex-direction:column;gap:8px;min-height:0}
+  .sleft{display:flex;flex-direction:column;gap:5px;min-height:0;height:100%}
   .shead{display:flex;align-items:baseline;gap:16px}
   .shead .note{color:var(--faint);font-size:13px}
   .srow{display:grid;grid-template-columns:124px 1fr;align-items:baseline;gap:16px}
   .skey{font:400 11px/1.5 ui-monospace,monospace;letter-spacing:.08em;
     text-transform:uppercase;color:var(--dim)}
-  .sval{font:400 15px/1.5 ui-monospace,monospace;color:var(--taken);
+  .sval{font:400 15px/1.35 ui-monospace,monospace;color:var(--taken);
     white-space:pre;overflow-x:auto;overflow-y:hidden}
   .sval.ct{color:#5d6570}
   .sval.addr{color:var(--dim)}
@@ -416,15 +427,19 @@
      every eight plies, which is about a minute at this pace, so it is something a
      viewer notices having changed rather than something flickering at them. Every
      sentence in the set is checkable against the rows directly above it. */
-  .promo{font-size:13px;line-height:1.45;color:var(--dim);margin-top:auto;
+  .promo{font-size:13px;line-height:1.45;color:#b6bcc5;margin-top:auto;
     min-height:19px;letter-spacing:.01em;
     transition:opacity .3s cubic-bezier(.4,0,.2,1)}
   .promo b{color:var(--xe-gold);font-weight:500}
   @media (prefers-reduced-motion:reduce){ .promo{transition:none} }
-  .disc{border-top:1px solid var(--line);padding-top:6px;color:var(--dim);
-    font-size:13px;line-height:1.45;max-width:1150px}
+  .disc{border-top:1px solid var(--line);padding-top:6px;color:#b6bcc5;
+    font-size:13px;line-height:1.45}
   .disc b{color:var(--ink);font-weight:500}
-  .stamp{font:400 11px/1.4 ui-monospace,monospace;color:var(--faint);letter-spacing:.02em}
+  /* The build stamp sat at --faint under two brighter lines, which read as a line
+   that had been switched off rather than one deliberately kept quiet. It is the
+   last line of the band and it carries the provenance of the file — it should be
+   readable by someone who goes looking for it. */
+  .stamp{font:400 11.5px/1.45 ui-monospace,monospace;color:var(--dim);letter-spacing:.02em}
 
   /* ── the commentary booth ────────────────────────────────────────
      ONE window, two voices — which is what a booth is. It was two cards
@@ -455,7 +470,7 @@
      not as a box dropped on top of the strip. The byline is the honest
      attribution and it is role words only: there is no person in either
      chair. */
-  .booth{display:grid;grid-template-rows:1fr;min-height:0}
+  .booth{display:grid;grid-template-rows:1fr;min-height:0;min-width:0}
   .panel{border:1px solid var(--line);border-radius:10px;background:#0c0e11;
     padding:8px 11px 7px;display:flex;flex-direction:column;gap:5px;
     min-height:0;overflow:hidden}
@@ -620,7 +635,7 @@
        here is genuinely only what would be present but unreadable at this scale.
        The seconds counter goes with them: the badge beside it already carries the
        state, and a 12px number in a 44px strip is texture, not type. */
-    .think,.booth,.ranks,.files,.stamp,.wkey,.sub,.since,
+    .think,.booth,.ranks,.files,.stamp,.wkey,.sub,
     #rowNonce,#rowHash{display:none}
 
     .face{--rk:.55}
@@ -656,7 +671,7 @@
     .bub.snt .btxt{width:380px;font-size:23px}
     .bub.rcv .btxt{width:349.6px;font-size:21.16px}   /* the same 0.92 as desktop */
 
-    .mid{padding:6px;gap:4px}
+    .mid{padding:6px;gap:4px;grid-template-columns:1fr}
     .movebar{height:26px;gap:10px}
     .msan{font-size:26px} .mwho{font-size:14px}
     /* 312, up from 284, for the same reason as the desktop board: the middle row
@@ -666,7 +681,7 @@
     .boardwrap{grid-template-columns:312px;grid-template-rows:312px}
     .sq{font-size:33px}
 
-    .server{grid-template-columns:1fr;padding:8px 24px 6px}
+    .server{padding:8px 24px 6px}
     .sleft{gap:4px}
     .shead{gap:12px}
     h2{font-size:15px}
@@ -700,7 +715,6 @@
       <span class="sub" id="sub">connecting to the live feed</span>
     </div>
     <div class="alarm" id="alarm"><span class="adot"></span><span class="atext" id="atext"></span></div>
-    <div class="since" id="since"></div>
     <div class="live" id="livebadge"><span class="ldot"></span><span class="ltext" id="ltext">connecting</span></div>
   </div>
 
@@ -734,8 +748,9 @@
       <div class="inbox" id="inboxW"></div>
     </div>
 
-    <!-- board -->
+    <!-- board, and the booth standing up beside it -->
     <div class="mid">
+     <div class="boardcol">
       <div class="movebar">
         <span class="msan" id="san"></span>
         <span class="mwho" id="whoMoved"></span>
@@ -744,6 +759,18 @@
         <div class="ranks" id="ranks"></div>
         <div class="board" id="board"></div>
         <div class="files" id="files"></div>
+      </div>
+     </div>
+
+      <!-- the booth: one window, two voices, interleaved in ply order -->
+      <div class="booth" id="booth">
+        <div class="panel pbp">
+          <div class="bhead">
+            <span class="tlab">The booth</span>
+            <span class="bwho" id="bwhoCol">play-by-play computed from this game&#8217;s data &#183; colour improvised by a local model</span>
+          </div>
+          <div class="tape" id="tapePbp"></div>
+        </div>
       </div>
       <!-- Nothing under the board. Everything that stood here was a SECOND
            telling of something already on screen: the message body (the sent
@@ -807,19 +834,9 @@
       part of this run: nothing was staked, nothing settled, and both balances are read
       live and reported as they are.
     </div>
-    <div class="stamp">page built 2026-08-04 15:01 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
+    <div class="stamp">page built 2026-08-04 15:14 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
    </div>
 
-    <!-- the booth: one window, two voices, interleaved in ply order -->
-    <div class="booth" id="booth">
-      <div class="panel pbp">
-        <div class="bhead">
-          <span class="tlab">The booth</span>
-          <span class="bwho" id="bwhoCol">play-by-play computed from this game&#8217;s data &#183; colour improvised by a local model</span>
-        </div>
-        <div class="tape" id="tapePbp"></div>
-      </div>
-    </div>
   </div>
 
 </div>
@@ -1380,7 +1397,11 @@
   // Lines do not animate in. At five seconds a ply the tape has to be readable
   // the instant it changes, and a line that fades up is a line you start reading
   // late.
-  var TAPE_MAX = 18;                 // more than can ever fit; the fit is measured
+  // More than can ever fit — the fit is measured, not counted. Raised from 18 when
+  // the booth stood up beside the board: a 740px column holds far more short lines
+  // than the old 240px slot did, and a cap that bit before the measurement would
+  // have thrown away the column's whole advantage.
+  var TAPE_MAX = 48;
   function drawTape(idx){ fillTape($("tapePbp"), idx); }
   function fillTape(box, idx){
     box.textContent = "";
@@ -1773,7 +1794,6 @@
     // and a seconds count that visibly moves — and only a FAILURE gets a sentence,
     // in the alarm slot. Same words, same conditions, one place, and that place is
     // empty whenever there is nothing wrong.
-    txt("since", everLoaded && isFinite(a) ? ago(a) : "");
     feedFail = alert ? line : "";
     paintAlarm();
     // The board's frame goes red for every state that is not a healthy feed.
@@ -2048,7 +2068,7 @@
   window.__feed = function(){
     return {state: FEED_STATE, age: Math.round(age()), seq: D ? D.move_seq : null,
             status: D ? D.status : null, plies: E.length, errs: netErr, err: netMsg,
-            badge: $("ltext").textContent, since: $("since").textContent,
+            badge: $("ltext").textContent,
             alarm: $("atext").textContent, claimFail: claimFail, feedFail: feedFail};
   };
   // for verification only: the geometry the page settled on, so a check can be
