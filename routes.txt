@@ -31,3 +31,4 @@
 /site.webmanifest site.webmanifest
 /proof pages/proof.html
 /demo-negotiation.py demo-negotiation.py
+/chess pages/chess.html
