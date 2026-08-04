@@ -200,7 +200,43 @@
   .who{text-align:center}
   .side{font-size:16px;font-weight:500;letter-spacing:.02em}
   .w .side{color:var(--ink)} .b .side{color:var(--held)}
-  .aid{font:400 11px/1.4 ui-monospace,monospace;color:var(--faint);margin-top:1px}
+  /* ── the odds ────────────────────────────────────────────────────
+     Stockfish's own evaluation of the live position, converted to an expected
+     score. It is derived, not observed, and the label says so: "engine's odds",
+     not "chance of winning". A draw counts as half in this conversion, which is
+     why the two sides always total 100 and why calling it a win probability
+     would be wrong.
+
+     Deliberately NOT in the gold used for value elsewhere on the page. This is
+     the engine's opinion and it changes every ply; the gold on this screen means
+     something on chain or something sealed, and lending it to a heuristic would
+     cheapen it. The bar is the same ink as the side it belongs to — the white
+     player's fills light, the black player's fills in the held-amber that marks
+     black throughout — so which bar is whose needs no reading.
+
+     Only ONE search runs per ply, on the machine whose turn it is, so this
+     number moves on every other ply and holds in between. That is the truth of
+     the arrangement rather than a gap: the readout beside it already says "no
+     search was reported for this move" on the side that did not think. */
+  /* The machine each side is actually running on. Worth the two lines it costs:
+     the whole point of splitting the agents across two computers was that a message
+     has to cross something real to arrive, and until now the page asked a viewer to
+     take that on trust. Named plainly, in the page's quietest register — it is
+     context for the claim above it, not a spec sheet. */
+  .rig{font:400 11px/1.4 ui-sans-serif,system-ui,sans-serif;color:var(--dim);
+    margin-top:2px;letter-spacing:.01em}
+
+  .odds{margin-top:7px;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .onum{font:400 21px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);
+    font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .obar{width:104px;height:3px;border-radius:2px;background:#20242b;overflow:hidden}
+  .ofill{display:block;height:100%;width:0;border-radius:2px;background:var(--ink);
+    transition:width .45s cubic-bezier(.4,0,.2,1)}
+  .b .ofill{background:var(--held)}
+  .olab{font:400 9px/1.3 ui-sans-serif,system-ui,sans-serif;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--faint)}
+  @media (prefers-reduced-motion:reduce){ .ofill{transition:none} }
+  .aid{font:400 11px/1.4 ui-monospace,monospace;color:var(--faint);margin-top:5px}
   .wallet{border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#0c0e11}
   .wrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
   .wlab{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim)}
@@ -731,6 +767,12 @@
       </div>
       <div class="who">
         <div class="side">WHITE</div>
+        <div class="rig" id="rigW"></div>
+        <div class="odds" id="oddsW">
+          <div class="onum" id="onumW">&#8212;</div>
+          <div class="obar"><span class="ofill" id="ofillW"></span></div>
+          <div class="olab">engine&#8217;s odds</div>
+        </div>
         <div class="aid mono" id="aidW"></div>
       </div>
       <div class="wallet">
@@ -791,6 +833,12 @@
       </div>
       <div class="who">
         <div class="side">BLACK</div>
+        <div class="rig" id="rigB"></div>
+        <div class="odds" id="oddsB">
+          <div class="onum" id="onumB">&#8212;</div>
+          <div class="obar"><span class="ofill" id="ofillB"></span></div>
+          <div class="olab">engine&#8217;s odds</div>
+        </div>
         <div class="aid mono" id="aidB"></div>
       </div>
       <div class="wallet">
@@ -834,7 +882,7 @@
       part of this run: nothing was staked, nothing settled, and both balances are read
       live and reported as they are.
     </div>
-    <div class="stamp">page built 2026-08-04 15:14 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
+    <div class="stamp">page built 2026-08-04 15:22 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
    </div>
 
   </div>
@@ -1554,6 +1602,8 @@
     txt("bwhoCol", "play-by-play computed from this game’s data · colour improvised by a local "
                  + (D.model ? str(D.model) + " model" : "model"));
 
+    txt("rigW", str((D.white || {}).host));
+    txt("rigB", str((D.black || {}).host));
     txt("aidW", str((D.white || {}).agent_id));
     txt("aidB", str((D.black || {}).agent_id));
     txt("keyW", str((D.white || {}).pubkey));
@@ -1590,6 +1640,54 @@
     $("alarm").className = "alarm" + (msg ? " on" : "");
     txt("atext", msg);
     $("atext").title = msg;      // the strip clips; the full sentence is still reachable
+  }
+
+  // ── the odds ─────────────────────────────────────────────────────────────
+  // Stockfish reports centipawns from the point of view of the side to move. The
+  // conversion to an expected score is the logistic Lichess fitted against real
+  // game outcomes:  score = 1 / (1 + e^(-0.00368208 * cp)).
+  //
+  // Three things this is NOT, and the label on screen is written so as not to
+  // claim any of them:
+  //   * not a win probability. A draw counts as half here, which is exactly why
+  //     the two numbers total 100. "Chance of winning" would be a different and
+  //     smaller number, and we do not have it.
+  //   * not an empirical rate for THESE two agents. It is one engine's opinion of
+  //     one position, put on a scale fitted to other people's games.
+  //   * not certainty. Clamped to 1–99 so a heuristic never says a thing is
+  //     settled. When a game is actually settled, the strip says so in words.
+  //
+  // Only the side to move runs a search, so this moves on every other ply and
+  // holds in between. Carrying the last known value forward is honest — the
+  // position has not been re-evaluated, and pretending otherwise by interpolating
+  // would be inventing an assessment nothing made.
+  function expectedScore(cp){ return 1 / (1 + Math.exp(-0.00368208 * cp)); }
+  function oddsAt(i){
+    for (var k=i;k>=0;k--){
+      var t = E[k] && E[k].thinking;
+      var c = (t && isArr(t.candidates)) ? t.candidates[0] : null;
+      if (!c || typeof c.eval !== "number" || !isFinite(c.eval)) continue;
+      // to WHITE's point of view, whoever happened to be searching
+      return {cp: E[k].mover === "white" ? c.eval : -c.eval, ply: E[k].ply};
+    }
+    return null;
+  }
+  function drawOdds(i){
+    var o = oddsAt(i);
+    if (!o){
+      txt("onumW", "—"); txt("onumB", "—");
+      $("ofillW").style.width = "0%"; $("ofillB").style.width = "0%";
+      $("oddsW").title = $("oddsB").title = "";
+      return;
+    }
+    var w = Math.min(99, Math.max(1, Math.round(expectedScore(o.cp) * 100)));
+    txt("onumW", w + "%"); txt("onumB", (100 - w) + "%");
+    $("ofillW").style.width = w + "%"; $("ofillB").style.width = (100 - w) + "%";
+    var why = "Stockfish's evaluation of the position after ply " + o.ply + " ("
+            + (o.cp > 0 ? "+" : "") + o.cp + " centipawns for white), converted to an "
+            + "expected score. A draw counts as half, so the two sides total 100. "
+            + "It is the engine's opinion, not a record of games these two have played.";
+    $("oddsW").title = $("oddsB").title = why;
   }
 
   // ── the message-process line ─────────────────────────────────────────────
@@ -1641,6 +1739,7 @@
     drawInbox("black", i);
     evenInboxes();
     drawTape(i);
+    drawOdds(i);
 
     var s = (ev.server_sees && typeof ev.server_sees === "object") ? ev.server_sees : {};
     txt("sTo", str(s.to) || "—");
@@ -1679,6 +1778,7 @@
     txt("sTo", "—"); txt("sNonce", "—");
     txt("sCt", "—"); txt("sHash", "—");
     txt("shnote", "no move has been sent yet in this game");
+    drawOdds(-1);
     promoAt = -1; drawPromo(1);
     var b = (D && D.balances && typeof D.balances === "object") ? D.balances : {};
     txt("balW", sol(b.white)); txt("balB", sol(b.black));
