@@ -526,13 +526,25 @@
      Live, the set of lines grows, so the fit is re-run when a new line lands —
      but only ever DOWNWARD within a game, so the type never grows back and
      nothing on screen changes size while a viewer is reading it. */
-  .tline{font-size:var(--tsz);line-height:1.34;color:var(--ink);overflow-wrap:anywhere}
+  /* Set as a TRANSCRIPT: the name sits in its own column and the sentence hangs
+     under itself, so a run of lines has one left edge for the speech and another
+     for the speakers. Anyone who has read a script or a court transcript can find
+     "who said that" without reading a word of it — which is exactly the skimming
+     this column exists to allow. */
+  .tline{font-size:var(--tsz);line-height:1.34;color:var(--ink);overflow-wrap:anywhere;
+    padding-left:36px;text-indent:-36px}
+  .spk{display:inline-block;width:36px;text-indent:0;
+    font:500 9.5px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--faint);font-style:normal}
   /* The colour man, in one window with the play-by-play. Italic, dimmed and
      stepped in from the margin, so a glance can tell which chair a line came
      from without reading a word of it — and so the aside sits visibly UNDER the
      fact it is answering rather than beside it. */
-  .tline.aside{font-style:italic;color:var(--dim);padding-left:16px;
-    border-left:1px solid var(--line);font-size:calc(var(--tsz) - 1px)}
+  /* Mud. Italic, dimmed and stepped in from the margin — the rule that used to
+     divide the two voices is gone, because the names now do that job and doing it
+     twice made a plain conversation look like a diagram. */
+  .tline.aside{font-style:italic;color:var(--dim);margin-left:14px;
+    font-size:calc(var(--tsz) - 1px)}
   .tline.o3{opacity:.68} .tline.o2{opacity:.5} .tline.o1{opacity:.42}
 
   @media (prefers-reduced-motion:no-preference){
@@ -809,7 +821,7 @@
         <div class="panel pbp">
           <div class="bhead">
             <span class="tlab">The booth</span>
-            <span class="bwho" id="bwhoCol">play-by-play computed from this game&#8217;s data &#183; colour improvised by a local model</span>
+            <span class="bwho" id="bwhoCol">Don &#8212; computed from this game&#8217;s data &#183; Mud &#8212; improvised by a local model</span>
           </div>
           <div class="tape" id="tapePbp"></div>
         </div>
@@ -882,7 +894,7 @@
       part of this run: nothing was staked, nothing settled, and both balances are read
       live and reported as they are.
     </div>
-    <div class="stamp">page built 2026-08-04 15:22 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
+    <div class="stamp">page built 2026-08-04 17:29 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
    </div>
 
   </div>
@@ -1450,6 +1462,28 @@
   // than the old 240px slot did, and a cap that bit before the measurement would
   // have thrown away the column's whole advantage.
   var TAPE_MAX = 48;
+
+  // Two names, because a booth has two people in it and a screen that says so is
+  // easier to follow than one that leaves the reader to infer it from the italics.
+  // Don calls the game, Mud sits next to him — which is the arrangement everyone
+  // watching already knows, and the reason the joke lands without explanation.
+  //
+  // The byline underneath still carries the honest attribution: Don's lines are
+  // computed from this game's data, Mud's are written by a local model. The names
+  // are a register, not a claim that anyone is in the room.
+  var SPEAKER = {pbp: "Don", color: "Mud"};
+
+  // ONE constructor for a line, used by the renderer AND by the fit measurement.
+  // They must build identical DOM or the fit is measuring something the reader
+  // never sees — and with a name column and a hanging indent in play, a probe that
+  // set textContent alone would have measured a line 36px wider than the real one
+  // and sized the window too large.
+  function lineEl(said){
+    var d = el("div", said.speaker === "color" ? "tline aside" : "tline");
+    d.appendChild(el("span", "spk", SPEAKER[said.speaker] || ""));
+    d.appendChild(document.createTextNode(said.text));
+    return d;
+  }
   function drawTape(idx){ fillTape($("tapePbp"), idx); }
   function fillTape(box, idx){
     box.textContent = "";
@@ -1459,9 +1493,7 @@
       for (var j=0;j<ls.length;j++) all.push(ls[j]);
     }
     var last = all.slice(-TAPE_MAX);
-    for (var k=0;k<last.length;k++)
-      box.appendChild(el("div", last[k].speaker === "color" ? "tline aside" : "tline",
-                         last[k].text));
+    for (var k=0;k<last.length;k++) box.appendChild(lineEl(last[k]));
 
     // Same rule as the inboxes: never show half a line. The tape is bottom
     // anchored so it overflows upward, where scrollHeight cannot see it —
@@ -1509,14 +1541,13 @@
     // step smaller AND indented behind a rule, so the narrower measure can be the
     // taller one. Measuring only the play-by-play would let a long aside wrap past
     // the window it was fitted for.
-    var probe = el("div", "tline"), aside = el("div", "tline aside");
-    box.textContent = ""; box.appendChild(probe); box.appendChild(aside);
+    box.textContent = "";
     box.style.setProperty("--tsz", tapeSize + "px");
     function measure(t){
-      var p = (t.speaker === "color") ? aside : probe;
-      p.textContent = t.text;
-      var h = p.getBoundingClientRect().height;
-      p.textContent = "";
+      var d = lineEl(t);
+      box.appendChild(d);
+      var h = d.getBoundingClientRect().height;
+      box.removeChild(d);
       return h;
     }
     // the handful of tallest lines at the current size; the fit is decided on those
@@ -1599,7 +1630,7 @@
     if (isFinite(Number(D.games_played))) bits.push("game " + Number(D.games_played));
     if (ending()) bits.push(ending());
     txt("sub", bits.join(" · "));
-    txt("bwhoCol", "play-by-play computed from this game’s data · colour improvised by a local "
+    txt("bwhoCol", "Don — computed from this game’s data · Mud — improvised by a local "
                  + (D.model ? str(D.model) + " model" : "model"));
 
     txt("rigW", str((D.white || {}).host));
@@ -1661,14 +1692,36 @@
   // holds in between. Carrying the last known value forward is honest — the
   // position has not been re-evaluated, and pretending otherwise by interpolating
   // would be inventing an assessment nothing made.
-  function expectedScore(cp){ return 1 / (1 + Math.exp(-0.00368208 * cp)); }
+  // The slope. Lichess fits 0.00368208 against millions of HUMAN games, and on
+  // that curve a whole extra pawn is 59-41 — deliberately flat, because a human
+  // holding a pawn still loses it often enough. It made this readout nearly inert:
+  // measured over a real game here, 23 plies produced six distinct values inside a
+  // five-point band.
+  //
+  // This is not that population. It is one engine at a fixed skill level playing
+  // another instance of itself, where an advantage converts far more reliably
+  // because neither side hands it back. So the curve is steeper — and because that
+  // constant is CHOSEN for legibility rather than fitted to outcomes, the readout
+  // no longer claims to be an expected score. It is the engine's evaluation on a
+  // 0-100 scale, the tooltip states the function and the raw centipawns, and the
+  // raw number is on screen anyway in the candidate list.
+  var ODDS_K = 0.0065;
+  function oddsScale(cp){ return 1 / (1 + Math.exp(-ODDS_K * cp)); }
   function oddsAt(i){
     for (var k=i;k>=0;k--){
-      var t = E[k] && E[k].thinking;
+      var ev = E[k];
+      if (!ev) continue;
+      // The broadcaster's own read of the position after this move, present on
+      // EVERY ply and already from white's point of view. Preferred because the
+      // alternative below only exists on the plies this machine searched, which is
+      // every other one — the number was being held for two plies at a time and
+      // that was most of why it looked frozen.
+      if (typeof ev.eval_cp === "number" && isFinite(ev.eval_cp))
+        return {cp: ev.eval_cp, ply: ev.ply, src: "position"};
+      var t = ev.thinking;
       var c = (t && isArr(t.candidates)) ? t.candidates[0] : null;
       if (!c || typeof c.eval !== "number" || !isFinite(c.eval)) continue;
-      // to WHITE's point of view, whoever happened to be searching
-      return {cp: E[k].mover === "white" ? c.eval : -c.eval, ply: E[k].ply};
+      return {cp: ev.mover === "white" ? c.eval : -c.eval, ply: ev.ply, src: "search"};
     }
     return null;
   }
@@ -1680,13 +1733,17 @@
       $("oddsW").title = $("oddsB").title = "";
       return;
     }
-    var w = Math.min(99, Math.max(1, Math.round(expectedScore(o.cp) * 100)));
+    var w = Math.min(99, Math.max(1, Math.round(oddsScale(o.cp) * 100)));
     txt("onumW", w + "%"); txt("onumB", (100 - w) + "%");
     $("ofillW").style.width = w + "%"; $("ofillB").style.width = (100 - w) + "%";
-    var why = "Stockfish's evaluation of the position after ply " + o.ply + " ("
-            + (o.cp > 0 ? "+" : "") + o.cp + " centipawns for white), converted to an "
-            + "expected score. A draw counts as half, so the two sides total 100. "
-            + "It is the engine's opinion, not a record of games these two have played.";
+    var why = "Stockfish scores the position after ply " + o.ply + " at "
+            + (o.cp > 0 ? "+" : "") + o.cp + " centipawns for white"
+            + (o.src === "search" ? ", from the search that chose that move" : "")
+            + ". Mapped to 0-100 by 1/(1+e^(-0.0065·cp)), so the two sides total 100."
+            + " The slope is chosen to be legible for two engines of equal strength,"
+            + " not fitted to game outcomes — this is the engine's opinion of the"
+            + " position, not a measured probability, and not a record of games"
+            + " these two have played.";
     $("oddsW").title = $("oddsB").title = why;
   }
 
