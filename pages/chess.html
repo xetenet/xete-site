@@ -894,7 +894,7 @@
       part of this run: nothing was staked, nothing settled, and both balances are read
       live and reported as they are.
     </div>
-    <div class="stamp">page built 2026-08-04 17:29 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
+    <div class="stamp">page built 2026-08-04 18:26 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
    </div>
 
   </div>
@@ -936,6 +936,20 @@
   var MOVE_MS        = 525;
   var CAP_FADE_MS    = Math.round(MOVE_MS / 2);   // the taken piece goes over the
                                                   // first half of the travel
+
+  // ── the lead ─────────────────────────────────────────────────────────────
+  // The two squares light BEFORE the piece starts travelling, so the eye is told
+  // where to look and arrives in time to watch the move rather than catching the
+  // end of it. The highlight is the cue; the movement is the event.
+  //
+  // ON THE NUMBER, because it was asked for at 20ms and is shipped at 170: 20ms is
+  // roughly one frame at 60Hz, which the eye reads as simultaneous — it would be
+  // the effect in the code and not on the screen. Redirecting a gaze needs a
+  // saccade, and a saccade takes on the order of 200ms just to BEGIN. So this is
+  // one constant, deliberately named, and 170 is where the beat is actually
+  // audible without the board feeling like it hesitates. Change this line to
+  // change the feel; 0 restores the old simultaneous behaviour exactly.
+  var LEAD_MS        = 170;
 
   function $(id){ return document.getElementById(id); }
   function txt(id, s){ $(id).textContent = s; }         // textContent everywhere
@@ -1172,9 +1186,14 @@
   // ── the copy in flight ───────────────────────────────────────────────────
   var motionOK = (window.matchMedia
     ? window.matchMedia("(prefers-reduced-motion:no-preference)") : null);
-  var flightTimer = null;
+  var flightTimer = null, leadTimer = null;
   function landAll(){
     clearTimeout(flightTimer); flightTimer = null;
+    // A ply arriving during the lead cancels it. Without this, a move staged but
+    // not yet released would fire its transform after the board had already been
+    // repainted for the NEXT position, and send a piece to a square from a
+    // position that is no longer on screen.
+    clearTimeout(leadTimer); leadTimer = null;
     var ghosts = board.getElementsByClassName("pmove");
     while (ghosts.length) ghosts[0].parentNode.removeChild(ghosts[0]);
     for (var i=0;i<64;i++) squares[i].classList.remove("inflight");
@@ -1212,21 +1231,34 @@
       plan.moves[i].ghost = g;
     }
     void board.offsetWidth;                       // commit the starting frame
-    requestAnimationFrame(function(){
-      var gs = board.getElementsByClassName("pmove");
-      for (var k=0;k<gs.length;k++){
-        if (gs[k].style.zIndex === "4") gs[k].style.opacity = "0";
-      }
-      for (var m=0;m<plan.moves.length;m++){
-        var sq = squares[plan.moves[m].to];
-        plan.moves[m].ghost.style.transform =
-          "translate(" + sq.offsetLeft + "px," + sq.offsetTop + "px)";
-      }
-    });
-    // Revealing the real glyph and destroying the copy are the same instant, so
-    // a promotion swaps its piece exactly as it lands and nothing is ever drawn
-    // twice.
-    flightTimer = setTimeout(landAll, MOVE_MS + 30);
+
+    // STAGED, not started. Everything above is set up and standing still: the
+    // arriving glyph is already hidden by .inflight and the travelling copy is
+    // sitting on the square it has not left yet. So during the lead a viewer sees
+    // the two squares light with the piece still at home — which is the cue — and
+    // nothing has to be moved backwards to achieve it. Painting the position first
+    // and delaying the WHOLE flight would have flashed the piece at its
+    // destination and then snapped it back to the start.
+    function release(){
+      leadTimer = null;
+      requestAnimationFrame(function(){
+        var gs = board.getElementsByClassName("pmove");
+        for (var k=0;k<gs.length;k++){
+          if (gs[k].style.zIndex === "4") gs[k].style.opacity = "0";
+        }
+        for (var m=0;m<plan.moves.length;m++){
+          var sq = squares[plan.moves[m].to];
+          plan.moves[m].ghost.style.transform =
+            "translate(" + sq.offsetLeft + "px," + sq.offsetTop + "px)";
+        }
+      });
+      // Revealing the real glyph and destroying the copy are the same instant, so
+      // a promotion swaps its piece exactly as it lands and nothing is ever drawn
+      // twice.
+      flightTimer = setTimeout(landAll, MOVE_MS + 30);
+    }
+    if (LEAD_MS > 0) leadTimer = setTimeout(release, LEAD_MS);
+    else release();
   }
 
   function drawBoard(idx, animate){
