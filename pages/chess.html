@@ -1,7 +1,19 @@
 <meta charset="utf-8">
 <title>Two agents playing chess over xete, live</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="description" content="A live broadcast: two agents play chess by sending each other end-to-end-encrypted messages through the xete relay. The relay only ever sees ciphertext.">
+<!-- The ground behind the letterbox is black, so the browser's own furniture is
+     told to be black too and the picture stops at the edge of the glass rather
+     than at the edge of a differently-coloured bar. -->
+<meta name="theme-color" content="#000000">
+<!-- Inert for a visitor who arrived from a link, which is everybody: these only
+     do anything if someone has already chosen to keep the page on a home screen.
+     Nothing on this page is DESIGNED for that case and nothing depends on it —
+     the layout below has to work in an ordinary browser tab with the browser's
+     chrome present, and that is the case it is measured against. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="xete chess">
 <style>
   :root{
     --bg:#0a0b0d; --ink:#e8eaed; --dim:#8b919c; --faint:#3a3f47;
@@ -17,13 +29,44 @@
     --sq-l:#262b32; --sq-d:#171a1f;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;overflow:hidden}
-  body{margin:0;background:#000;color:var(--ink);
+  /* overscroll-behavior stops the rubber-band drag that makes a fixed page feel
+     like a document. text-size-adjust stops iOS inflating the type on its own
+     initiative — on a canvas that is already being scaled, an extra silent
+     multiplier applied to SOME elements and not others would pull the layout
+     apart. touch-action:manipulation kills the double-tap zoom; the viewport's
+     user-scalable=no is honoured by other browsers but deliberately ignored by
+     iOS Safari, so this is the part that actually does the work there. */
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none;
+    -webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{margin:0;background:#000;color:var(--ink);touch-action:manipulation;
     font:400 16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
     -webkit-font-smoothing:antialiased}
-  #frame{position:fixed;inset:0;overflow:hidden;background:#000}
+  /* 100vh is the wrong number on iOS Safari: it is the height the viewport would
+     have if the toolbars were gone, which they are not, so the bottom of the
+     picture sits underneath them. The three declarations are a ladder — vh for
+     anything ancient, -webkit-fill-available for the iOS versions that predate
+     dvh, and dvh, which tracks the toolbars as they collapse and expand. The
+     scale factor is recomputed from the box this produces rather than assumed,
+     because the ladder decides the height and only the browser knows which rung
+     it stopped on. */
+  #frame{position:fixed;left:0;top:0;width:100%;height:100vh;
+    height:-webkit-fill-available;height:100dvh;overflow:hidden;background:#000}
+  /* The safe box. In landscape the notch or island takes a bite out of ONE side
+     and swaps sides when the phone is turned the other way; the home indicator
+     runs along the bottom. env() reports both, and inset-ing the picture by them
+     is the whole fix — nothing is clipped by the notch, nothing is drawn under
+     the indicator, and it is correct in both rotations without asking which way
+     up the device is. The fallbacks are 0px, so a browser with no notch and no
+     env() support loses nothing. */
+  #safe{position:absolute;overflow:hidden;
+    top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);
+    bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px)}
 
-  /* The composition is designed once at 1920x1080 and scaled to fit. */
+  /* The composition is designed once at a fixed size and scaled to fit. The size
+     is a variable, not a constant, because a phone held sideways is a different
+     shape from a monitor and a 1920-wide composition scaled into it puts the
+     smallest type below the size at which type is type. See the phone block at
+     the bottom of this stylesheet. */
   #stage{position:absolute;top:0;left:0;width:1920px;height:1080px;
     transform-origin:top left;background:var(--line);
     display:grid;grid-template-rows:96px 1fr 268px;gap:1px}
@@ -72,6 +115,7 @@
     text-transform:uppercase;color:var(--dim)}
   .live.l-live .ldot{background:var(--yours)} .live.l-live .ltext{color:var(--yours)}
   .live.l-off  .ldot{background:var(--alert)} .live.l-off  .ltext{color:var(--alert)}
+  .live.l-late .ldot{background:#CAA24A} .live.l-late .ltext{color:#CAA24A}
 
   /* ── middle row ──────────────────────────────────────────────── */
   .row2{display:grid;grid-template-columns:420px 1fr 420px;gap:1px;
@@ -110,7 +154,10 @@
      flexible child, so every pixel the portrait takes comes off the
      conversation: at 136 eight plies lost their second message, and the
      capacity cliff sits at 124. */
-  .face{align-self:center;display:block;position:relative;flex:none;
+  /* --rk scales the whole capture jolt. It is 1 here and smaller in the phone
+     layout, where the portrait is half the size: the same absolute travel on a
+     56px carving would throw it clean out of its slot. */
+  .face{align-self:center;display:block;position:relative;flex:none;--rk:1;
     width:116px;height:116px;padding:4px;
     border:1px solid var(--line);border-radius:10px;background:#0c0e11}
   /* stacked in one frame, one visible at a time */
@@ -220,8 +267,12 @@
   .files{grid-column:2;display:grid;grid-template-columns:repeat(8,1fr)}
   .ranks span,.files span{font:400 11px/1 ui-monospace,monospace;color:var(--faint);
     display:flex;align-items:center;justify-content:center}
+  /* position:relative so a piece in flight can be placed against the board's own
+     padding box — the same origin the squares' offsetLeft/offsetTop are measured
+     from, which is what makes "land exactly on the destination square" a copy of
+     a number rather than an arithmetic guess. */
   .board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);
-    border:1px solid var(--line)}
+    border:1px solid var(--line);position:relative}
   /* The board's own frame turns alert-red the moment the page stops being able to
      call itself live. The badge says it in words at the top of the screen; this
      says it around the thing a viewer is actually looking at, which is where a
@@ -263,6 +314,29 @@
   .pw::before{content:attr(data-fill);position:absolute;inset:0;z-index:-1;
     display:flex;align-items:center;justify-content:center;color:#f4f6f9}
   .pb{color:#07080a;-webkit-text-stroke:1.1px #9aa2ae}
+
+  /* ── a piece in flight ───────────────────────────────────────────
+     A move used to be a repaint: sixty-four squares rewritten and the piece
+     simply somewhere else. Now the new position is painted immediately — the
+     DOM is correct from the first frame, which matters because the DOM is what
+     the position IS — and the arriving glyph is merely held invisible while a
+     copy of it travels from the square it left.
+
+     .inflight is deliberately not visibility:hidden. The square still holds its
+     own character, so anything reading the board reads the truth mid-flight, and
+     the highlight ring (an ::after on the same element) stays lit, which
+     visibility would have taken with it. Only the ink is turned off, on all
+     three of the ways a piece is drawn: the glyph, the light mass behind a white
+     piece, and the rim stroke on a black one.
+
+     .pmove is the travelling copy. It follows .sq so that its position:absolute
+     wins on source order — it borrows the square's typography and centring and
+     overrides only where it is. It carries no square colour, so it reads as a
+     piece over the board rather than a square sliding across it. */
+  .sq.inflight{color:transparent;-webkit-text-stroke-color:transparent}
+  .sq.inflight::before{color:transparent}
+  .pmove{position:absolute;left:0;top:0;pointer-events:none;background:none;
+    transition-property:none}
   .caption{text-align:center;max-width:880px}
   .cline{font-size:15px;color:var(--ink);line-height:1.4;min-height:21px}
   .cnote{font-size:12px;color:var(--dim);margin-top:5px;letter-spacing:.02em;min-height:17px}
@@ -383,28 +457,196 @@
                      background-color .22s cubic-bezier(.4,0,.2,1)}
     .face img{transition:opacity .18s cubic-bezier(.4,0,.2,1)}
 
-    /* the hit landing: a short horizontal rattle on the side that took the
-       piece, decaying hard and done in a third of a second. Travel stays
-       inside the frame's own padding, so nothing overlaps the panels
-       either side of it. No overshoot at the end — stone stops dead. */
-    .face.cap{animation:rattle .34s cubic-bezier(.36,.07,.19,.97) both}
+    /* the piece travels. The duration is set from JS off one constant so the
+       travel and the captured piece's fade can never drift apart; what lives
+       here is the curve and the fact that motion is permitted at all. Under
+       reduce, transition-property stays `none` and the copy — if one were ever
+       made — would not move. */
+    .pmove{transition-property:transform,opacity;
+           transition-timing-function:cubic-bezier(.2,.7,.3,1)}
+
+    /* ── the hit landing ────────────────────────────────────────────
+       A piece just died. The old version of this was a ±5px horizontal wobble
+       that read as a nudge; a capture is not a nudge.
+
+       It is now ONE hard hit and a fast decay, and it is asymmetric on purpose:
+       the first 6% of the animation carries the whole impact — 17px sideways,
+       7px up, three and a half degrees of roll and a 1.065 punch in scale — and
+       everything after it is the stone coming to rest. Real impacts do not
+       wobble evenly, they hit and then stop arguing.
+
+       Three axes rather than one, because a horizontal-only shake reads as a
+       glitch in the page and a jolt with vertical travel and a little rotation
+       reads as something happening to an object.
+
+       460ms end to end, fully still long before the next ply at a five-second
+       pace, and the whole thing is inside this block: under reduce there is no
+       motion at all and the reaction is carried entirely by the photograph,
+       which still swaps. --rk scales it for the phone layout's smaller carving.
+       Travel plus the scale punch stays well inside the column, so nothing can
+       overlap the panels either side. */
+    .face.cap{animation:rattle .46s cubic-bezier(.22,.9,.28,1) both}
     @keyframes rattle{
-      0%{transform:translateX(0)}
-      10%{transform:translateX(-5px)}
-      24%{transform:translateX(4px)}
-      38%{transform:translateX(-3px)}
-      52%{transform:translateX(2px)}
-      68%{transform:translateX(-1.25px)}
-      84%{transform:translateX(.5px)}
-      100%{transform:translateX(0)}
+      0%  {transform:translate3d(0,0,0) rotate(0deg) scale(1)}
+      6%  {transform:translate3d(calc(-17px * var(--rk)),calc(-7px * var(--rk)),0)
+                     rotate(calc(-3.4deg * var(--rk))) scale(calc(1 + .065 * var(--rk)))}
+      17% {transform:translate3d(calc(11px * var(--rk)),calc(4.5px * var(--rk)),0)
+                     rotate(calc(2.2deg * var(--rk))) scale(calc(1 + .028 * var(--rk)))}
+      29% {transform:translate3d(calc(-7px * var(--rk)),calc(-2.6px * var(--rk)),0)
+                     rotate(calc(-1.3deg * var(--rk))) scale(calc(1 + .011 * var(--rk)))}
+      43% {transform:translate3d(calc(4.2px * var(--rk)),calc(1.4px * var(--rk)),0)
+                     rotate(calc(.75deg * var(--rk))) scale(calc(1 + .004 * var(--rk)))}
+      59% {transform:translate3d(calc(-2.2px * var(--rk)),calc(-.6px * var(--rk)),0)
+                     rotate(calc(-.38deg * var(--rk))) scale(1)}
+      75% {transform:translate3d(calc(1px * var(--rk)),0,0)
+                     rotate(calc(.16deg * var(--rk))) scale(1)}
+      89% {transform:translate3d(calc(-.4px * var(--rk)),0,0) rotate(0deg) scale(1)}
+      100%{transform:translate3d(0,0,0) rotate(0deg) scale(1)}
     }
     /* the live dot breathes only while the page is entitled to say LIVE */
     .live.l-live .ldot{animation:pulse 2.4s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
   }
+
+  /* ── the rotate line ─────────────────────────────────────────────
+     Hidden until the device is held the short way. It is the page's ground,
+     the mark, and one sentence — no red, no warning triangle, no "unsupported".
+     Turning the phone is the whole remedy and the sentence is the whole page. */
+  #rotate{display:none;position:fixed;left:0;top:0;width:100%;height:100vh;
+    height:-webkit-fill-available;height:100dvh;background:#000;
+    align-items:center;justify-content:center;flex-direction:column;gap:18px;
+    padding:calc(24px + env(safe-area-inset-top,0px))
+            calc(28px + env(safe-area-inset-right,0px))
+            calc(24px + env(safe-area-inset-bottom,0px))
+            calc(28px + env(safe-area-inset-left,0px));
+    text-align:center}
+  #rotate .rmark{font:300 44px/1 ui-monospace,monospace;color:var(--ink)}
+  #rotate .rline{margin:0;max-width:22em;font-size:16px;line-height:1.55;color:var(--dim)}
+  @media (orientation:portrait){
+    #frame{display:none}
+    #rotate{display:flex}
+  }
+
+  /* ── the full-screen control ─────────────────────────────────────
+     Drawn by script and ONLY where the browser will actually honour it, so
+     there is never a control on screen that does nothing when pressed. iPhone
+     Safari restricts the Fullscreen API to video, so on a phone this button
+     does not exist rather than existing and failing. It sits inside the safe
+     box, so it cannot end up under the notch or the indicator. */
+  #fsbtn{position:absolute;top:8px;right:8px;z-index:2;
+    font:500 10px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    letter-spacing:.09em;text-transform:uppercase;color:var(--dim);
+    background:rgba(0,0,0,.55);border:1px solid var(--line);border-radius:6px;
+    padding:9px 12px;cursor:pointer;-webkit-appearance:none;appearance:none}
+  /* The letterbox is where this control lives. When the canvas happens to fit the
+     screen so closely that there is no band left, there is nowhere to put it that
+     is not on top of the broadcast — so it is not put anywhere. fit() sets .tight
+     from the measured band, so this is decided by the actual geometry rather than
+     by a guess about which devices have one. */
+  #safe.tight #fsbtn{display:none}
+
+  /* ── phone, held sideways ────────────────────────────────────────
+     The honest problem, stated as a number: an iPhone in landscape offers about
+     844x390 CSS px, the browser's own toolbar takes a slice of the height, and
+     the notch and the home indicator take more. What is left is roughly 800x320.
+     A 1920x1080 composition scaled into 800x320 lands at about 0.30 — the 11px
+     thinking readout would render at THREE effective pixels. That is not small
+     type, it is a texture, and calling it a mobile layout would be a lie of the
+     same family as a LIVE badge over a frozen board.
+
+     So the composition itself changes shape. The canvas becomes 1340x560 —
+     close to the proportions of the space a phone actually offers, so almost
+     none of it is thrown away as letterbox — and the panels with the worst
+     value-per-pixel are not drawn at all. What is kept is the argument: the
+     board, who is playing, the messages, what the relay carried, and whether
+     the page is entitled to call itself live. What goes is the search readout,
+     both commentary windows, the co-ordinate labels, the FEN and the build
+     stamp — everything that would have been present but unreadable.
+
+     The type is then set in the NEW canvas's terms, which is why the numbers
+     below look large: at the ~0.58 scale this canvas lands at, 22px design is
+     about 13 real pixels. */
+  @media (orientation:landscape) and (max-height:600px){
+    #stage{width:1340px;height:560px;grid-template-rows:44px 1fr 158px}
+
+    /* Not drawn at all, rather than drawn too small to read. Two of these are
+       worth saying out loud, because they are not "less important", they are
+       DUPLICATES: .cline under the board is the message body, which the sent
+       bubble already shows in full a few inches to the left, and .cnote is the
+       sent-equals-decrypted check for one ply, which the verdict in the title
+       strip already states for the whole game and states more strongly. On a
+       desktop they are a useful second reading of the same fact. On a phone they
+       were costing the board fifty pixels to repeat something. */
+    .think,.booth,.ranks,.files,.fenline,.stamp,.wkey,.sub,.cline,.cnote,
+    #rowNonce,#rowHash{display:none}
+
+    .face{--rk:.55}
+
+    /* Two reasons, pointing the same way. iPhone Safari restricts the Fullscreen
+       API to video, so on the device this layout exists for the button would
+       never be drawn anyway. And there is no letterbox here to put it in — this
+       canvas is cut to the shape of the screen, so a corner control lands
+       squarely on the live badge. Not drawn. */
+    #fsbtn{display:none}
+
+    .strip{padding:0 24px;gap:18px}
+    .mark{font-size:24px}
+    .ttl{font-size:20px}
+    .plycount{font-size:17px} .plycount b{font-size:21px}
+    .vtext{font-size:17px}
+    .vdot,.ldot{width:11px;height:11px}
+    .ltext{font-size:16px}
+
+    .row2{grid-template-columns:1fr 340px 1fr}
+    .col{padding:10px 14px;gap:8px}
+    .face{width:56px;height:56px;padding:3px;border-radius:8px}
+    .face img{left:3px;top:3px;width:50px;height:50px;border-radius:5px}
+    .side{font-size:20px}
+    .aid{font-size:13px}
+    .wallet{padding:7px 10px;border-radius:8px}
+    .wlab{font-size:13px} .wamt{font-size:20px}
+    .wnote{font-size:13px;margin-top:2px}
+
+    .inbox{gap:6px}
+    .bub.snt{padding:7px 11px}
+    .bub.rcv{padding:6px 10px}
+    .blab{font-size:14px;margin-bottom:2px}
+    .bub.snt .btxt{width:380px;font-size:23px}
+    .bub.rcv .btxt{width:349.6px;font-size:21.16px}   /* the same 0.92 as desktop */
+
+    .mid{padding:6px;gap:4px}
+    .movebar{height:26px;gap:10px}
+    .msan{font-size:26px} .mwho{font-size:14px}
+    .boardwrap{grid-template-columns:284px;grid-template-rows:284px}
+    .sq{font-size:30px}
+    .caption{max-width:100%}
+    .feedline{font-size:16px;line-height:1.45;margin-top:3px;min-height:23px}
+    .feedline.alert{font-size:17px;line-height:1.45}
+
+    .server{grid-template-columns:1fr;padding:8px 24px 6px}
+    .sleft{gap:4px}
+    .shead{gap:12px}
+    h2{font-size:15px}
+    .shead .note{font-size:15px}
+    /* 190px, not 150: "Encrypted content" plus its tracking is 156px wide, so a
+       150px column silently wrapped the LABEL and cost the strip a whole line. */
+    .srow{grid-template-columns:190px 1fr;gap:12px}
+    .skey{font-size:15px;line-height:1.4}
+    .sval{font-size:19px;line-height:1.4}
+    .disc{font-size:16px;line-height:1.4;max-width:100%;padding-top:5px}
+  }
 </style>
 
+<!-- The rotate line. Not an error and not styled like one: a widescreen picture
+     cannot be shown down the short side of a phone, the reader has done nothing
+     wrong, and the page says which way to turn it and nothing else. -->
+<div id="rotate">
+  <span class="rmark">%</span>
+  <p class="rline">This is a widescreen broadcast. Turn your device sideways to watch it.</p>
+</div>
+
 <div id="frame">
+<div id="safe">
 <div id="stage">
 
   <!-- title strip -->
@@ -501,10 +743,10 @@
       <h2>What the server sees</h2>
       <span class="note" id="shnote"></span>
     </div>
-    <div class="srow"><span class="skey">Recipient</span><span class="sval addr" id="sTo"></span></div>
-    <div class="srow"><span class="skey">Nonce</span><span class="sval" id="sNonce"></span></div>
-    <div class="srow"><span class="skey">Encrypted content</span><span class="sval ct" id="sCt"></span></div>
-    <div class="srow"><span class="skey">Content hash</span><span class="sval" id="sHash"></span></div>
+    <div class="srow" id="rowTo"><span class="skey">Recipient</span><span class="sval addr" id="sTo"></span></div>
+    <div class="srow" id="rowNonce"><span class="skey">Nonce</span><span class="sval" id="sNonce"></span></div>
+    <div class="srow" id="rowCt"><span class="skey">Encrypted content</span><span class="sval ct" id="sCt"></span></div>
+    <div class="srow" id="rowHash"><span class="skey">Content hash</span><span class="sval" id="sHash"></span></div>
     <!-- The rows above ARE the evidence: recipient, nonce, ciphertext, hash, live,
          changing every ply. Prose that re-listed them would only be a worse copy of
          what the reader can already see, so this says the one thing the rows cannot
@@ -514,7 +756,7 @@
       part of this run: nothing was staked, nothing settled, and both balances are read
       live and reported as they are.
     </div>
-    <div class="stamp">page built 2026-08-04 04:16 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
+    <div class="stamp">page built 2026-08-04 05:52 UTC · no match data is embedded in this file · it polls /chess-live.json every 2 seconds while visible and renders whatever the feed last wrote</div>
    </div>
 
     <!-- the booth: two windows, always drawn -->
@@ -538,6 +780,7 @@
 
 </div>
 </div>
+</div>
 
 <script>
 (function(){
@@ -552,9 +795,26 @@
   var FETCH_TIMEOUT  = 8000;
   // 20 seconds is 4x the feed's 5s pace. Past it the page has no basis for
   // calling itself live, so it stops calling itself live.
-  var STALE_MS       = 20000;
+  var STALE_MS       = 20000;   // late  -> quiet amber
+  var DEAD_MS        = 75000;   // stalled -> loud red
+  var GAP_MS         = 45000;   // tolerated pause between games
   var STAGGER        = 700;     // sent, then a beat, then received
   var MAX_EVENTS     = 400;     // bound the work a pathological payload can cause
+
+  // ── how long a piece takes to cross the board ────────────────────────────
+  // ONE number, and everything about the move animation is derived from it: the
+  // travel, the captured piece's fade, and the moment the real glyph is revealed
+  // and the copy destroyed. Two constants written in two places is how a fade
+  // ends up finishing after the piece it belongs to has already landed.
+  //
+  // 350ms on an ease-out curve. Most of the distance is spent in the first
+  // third, so what the eye actually gets time to read is the ARRIVAL — the piece
+  // decelerating into its square. Longer and it floats rather than lands, and it
+  // must in any case be finished well inside the 700ms message stagger and
+  // nowhere near the five-second pace of a ply.
+  var MOVE_MS        = 350;
+  var CAP_FADE_MS    = Math.round(MOVE_MS / 2);   // the taken piece goes over the
+                                                  // first half of the travel
 
   function $(id){ return document.getElementById(id); }
   function txt(id, s){ $(id).textContent = s; }         // textContent everywhere
@@ -582,6 +842,7 @@
   var D = null;          // the last document that parsed
   var E = [];            // its events, this game only
   var lastSeq = null, lastGames = null, lastPly = -1;
+  var lastResult = null, lastStatus = null;   // a game can end with no new ply
   var srvNow = 0, srvUpd = 0, monoAt = 0;   // see age()
   var everLoaded = false, netErr = 0, netMsg = "";
   var pollTimer = null, arriveTimer = null;
@@ -709,7 +970,132 @@
     return out.slice(0,64);
   }
 
-  function drawBoard(idx){
+  // ── what actually moved ──────────────────────────────────────────────────
+  // Read off the SAME diff that lights the highlight ring — the previous ply's
+  // FEN against this one — because there must not be two answers on this page to
+  // the question "which squares changed". A square is a FROM if it held a piece
+  // and now holds nothing, and a TO if it now holds a piece it did not hold
+  // before. Everything else follows from pairing those two lists:
+  //
+  //   ordinary move   one FROM, one TO, same piece            -> travel
+  //   capture         same, and the TO already held a piece   -> that piece fades
+  //   castling        TWO of each, and both pairs match by piece
+  //                   -> king and rook both travel, because animating only the
+  //                      king leaves the rook teleporting and reads as a bug
+  //   en passant      TWO FROMs, ONE TO. The FROM that matches the arriving
+  //                   piece is the mover; the OTHER one is the taken pawn,
+  //                   standing on a square the mover never touches. Fading
+  //                   "whatever was at the destination" does nothing here and
+  //                   the pawn vanishes off a square nobody visited.
+  //   promotion       the glyph that arrives is not the glyph that left, so no
+  //                   pair matches by piece. The leftovers are paired anyway and
+  //                   the copy travels as the PAWN; revealing the real square on
+  //                   arrival is what performs the swap.
+  //
+  // Anything this does not recognise returns null and the position is simply
+  // painted. A confused animation is worse than none.
+  function planMove(prev, cur){
+    var froms = [], tos = [], i;
+    for (i=0;i<64;i++){
+      if (prev[i] === cur[i]) continue;
+      if (prev[i] && !cur[i]) froms.push(i);
+      else if (cur[i]) tos.push(i);          // arrived on an empty or taken square
+    }
+    if (!tos.length || !froms.length || tos.length > 2 || froms.length > 2) return null;
+    var moves = [], takenAt = [], usedF = {}, t, f, k;
+    for (k=0;k<tos.length;k++){              // pass one: the piece is the same piece
+      t = tos[k];
+      for (i=0;i<froms.length;i++){
+        f = froms[i];
+        if (!usedF[f] && prev[f] === cur[t]){
+          usedF[f] = 1;
+          moves.push({from:f, to:t, piece:prev[f]});
+          break;
+        }
+      }
+    }
+    for (k=0;k<tos.length;k++){              // pass two: a pawn that became a queen
+      t = tos[k];
+      var done = false;
+      for (i=0;i<moves.length;i++) if (moves[i].to === t) done = true;
+      if (done) continue;
+      for (i=0;i<froms.length;i++){
+        f = froms[i];
+        if (!usedF[f]){ usedF[f] = 1; moves.push({from:f, to:t, piece:prev[f]}); break; }
+      }
+    }
+    if (moves.length !== tos.length) return null;
+    for (k=0;k<tos.length;k++){              // a piece standing on the destination
+      if (prev[tos[k]]) takenAt.push({at:tos[k], piece:prev[tos[k]]});
+    }
+    for (i=0;i<froms.length;i++){            // a piece that left and arrived nowhere
+      if (!usedF[froms[i]]) takenAt.push({at:froms[i], piece:prev[froms[i]]});
+    }
+    return {moves:moves, taken:takenAt};
+  }
+
+  // ── the copy in flight ───────────────────────────────────────────────────
+  var motionOK = (window.matchMedia
+    ? window.matchMedia("(prefers-reduced-motion:no-preference)") : null);
+  var flightTimer = null;
+  function landAll(){
+    clearTimeout(flightTimer); flightTimer = null;
+    var ghosts = board.getElementsByClassName("pmove");
+    while (ghosts.length) ghosts[0].parentNode.removeChild(ghosts[0]);
+    for (var i=0;i<64;i++) squares[i].classList.remove("inflight");
+  }
+  function ghost(at, piece){
+    var sq = squares[at];
+    var g = document.createElement("div");
+    var white = piece === piece.toUpperCase();
+    g.className = "sq pmove " + (white ? "pw" : "pb");
+    if (white) g.setAttribute("data-fill", GLYPH_B[piece.toLowerCase()]);
+    g.textContent = glyph(piece);                 // textContent, as everywhere
+    g.style.width  = sq.offsetWidth + "px";
+    g.style.height = sq.offsetHeight + "px";
+    // offsetLeft/offsetTop are measured from the board's padding box, and so is
+    // an absolutely positioned child at left:0/top:0. The two are the same origin,
+    // so a piece put at a square's offset sits exactly on that square and lands
+    // exactly on the centre of the one it is sent to.
+    g.style.transform = "translate(" + sq.offsetLeft + "px," + sq.offsetTop + "px)";
+    board.appendChild(g);
+    return g;
+  }
+  function flyMove(plan){
+    landAll();
+    var i, g;
+    for (i=0;i<plan.taken.length;i++){
+      g = ghost(plan.taken[i].at, plan.taken[i].piece);
+      g.style.zIndex = "4";
+      g.style.transitionDuration = CAP_FADE_MS + "ms";
+    }
+    for (i=0;i<plan.moves.length;i++){
+      squares[plan.moves[i].to].classList.add("inflight");
+      g = ghost(plan.moves[i].from, plan.moves[i].piece);
+      g.style.zIndex = "6";
+      g.style.transitionDuration = MOVE_MS + "ms";
+      plan.moves[i].ghost = g;
+    }
+    void board.offsetWidth;                       // commit the starting frame
+    requestAnimationFrame(function(){
+      var gs = board.getElementsByClassName("pmove");
+      for (var k=0;k<gs.length;k++){
+        if (gs[k].style.zIndex === "4") gs[k].style.opacity = "0";
+      }
+      for (var m=0;m<plan.moves.length;m++){
+        var sq = squares[plan.moves[m].to];
+        plan.moves[m].ghost.style.transform =
+          "translate(" + sq.offsetLeft + "px," + sq.offsetTop + "px)";
+      }
+    });
+    // Revealing the real glyph and destroying the copy are the same instant, so
+    // a promotion swaps its piece exactly as it lands and nothing is ever drawn
+    // twice.
+    flightTimer = setTimeout(landAll, MOVE_MS + 30);
+  }
+
+  function drawBoard(idx, animate){
+    landAll();                                    // whatever was mid-flight is over
     var cur = placement(E[idx].fen);
     // Highlight is derived: diff against the previous ply's FEN. Ply 1 has no
     // predecessor in the data, so it gets no highlight rather than an invented one.
@@ -724,12 +1110,20 @@
       if (prev && prev[i] !== c) base += " hi";
       sq.className = base;
     }
+    // The position is now painted and correct. Only after that, and only for a
+    // single-ply advance — never for a reconnect, a jump, or a page arriving in
+    // the middle of a game — is anything set moving.
+    if (!animate || !prev) return;
+    if (motionOK && !motionOK.matches) return;
+    var plan = planMove(prev, cur);
+    if (plan) flyMove(plan);
   }
 
   // No data, no position. The page does not put the opening array on the board
   // to have something to show — an invented position under a live badge is the
   // same lie as a frozen one, wearing a different hat.
   function clearBoard(){
+    landAll();
     for (var i=0;i<64;i++){
       squares[i].textContent = "";
       squares[i].removeAttribute("data-fill");
@@ -814,8 +1208,19 @@
     }
     phase.textContent = str(t.phase) + (t.opening ? " · " + t.opening : "");
     $("tl" + suffix).textContent = "Thinking · ply " + ply;
-    stats.textContent = "weighing " + t.legal_moves + " moves · " + t.nodes
-                      + " positions · " + t.seconds + "s · depth " + t.depth;
+    // The feed can carry `thinking: {}` — an object that exists and reports
+    // nothing, which is what the producer writes when it recorded no search. The
+    // old line concatenated the fields unconditionally and printed "weighing
+    // undefined moves · undefined positions · undefineds · depth undefined"
+    // across the broadcast. A missing field is not drawn at all, and a search
+    // that reported nothing says so in words. Nothing here invents a number.
+    var bits2 = [];
+    if (t.legal_moves != null) bits2.push("weighing " + t.legal_moves + " moves");
+    if (t.nodes != null)       bits2.push(t.nodes + " positions");
+    if (t.seconds != null)     bits2.push(t.seconds + "s");
+    if (t.depth != null)       bits2.push("depth " + t.depth);
+    stats.textContent = bits2.length ? bits2.join(" · ")
+                                     : "no search was reported for this move";
 
     // On a book move the list is played-first, not best-first, so the evals below
     // can read out of order. That is the data telling the truth about itself: say
@@ -855,17 +1260,34 @@
   // and a reaction that silently skips is a reaction the viewer stops believing.
   // The class is therefore reset and reflowed before it is re-applied, which
   // restarts the animation from zero every time a hit actually lands.
-  function drawFaces(idx){
+  // `again` is set when this is a REDRAW of a ply already on screen — the game
+  // ended without a new move, which is what a resignation is — and it suppresses
+  // the animation restart below so a capture from the previous ply does not
+  // rattle a second time for a reason that has nothing to do with it.
+  function drawFaces(idx, again){
     var ev = E[idx], san = String(ev.san || "");
     var mated = san.slice(-1) === "#" ? (ev.mover === "white" ? "black" : "white") : null;
     var captured = san.indexOf("x") !== -1 ? ev.mover : null;
+    // A game can now end without a mate on the board: an engine can resign, and
+    // a resignation is a defeat in every sense this portrait is about. The loser
+    // is READ OFF the result the feed reports rather than inferred from the
+    // position, and only once the feed says the game is actually over — so the
+    // defeat face cannot appear over a game still in progress. A draw has no
+    // loser and gets no defeat face.
+    if (!mated && D && idx === E.length - 1){
+      var st0 = str(D.status), rs = str(D.result);
+      if ((st0 === "between-games" || st0 === "stopped") && rs && rs !== "*"){
+        if (rs === "1-0") mated = "black";
+        else if (rs === "0-1") mated = "white";
+      }
+    }
     [["white","faceW"],["black","faceB"]].forEach(function(pair){
       var node = $(pair[1]);
       var basecls = "face " + (pair[0] === "white" ? "w" : "b");
       var cls = basecls;
       if (mated === pair[0]) cls += " mate";
       else if (captured === pair[0]) cls += " cap";
-      if (node.getAttribute("class") === cls && cls !== basecls){
+      if (!again && node.getAttribute("class") === cls && cls !== basecls){
         node.setAttribute("class", basecls);
         void node.offsetWidth;                     // force the restart
       }
@@ -933,9 +1355,16 @@
     var texts = [];
     for (var i=0;i<E.length;i++) texts = texts.concat(linesOf(E[i], voice));
     if (texts.length === tapeSeen[voice]) return;      // nothing new to fit
+    // No box to fit into: the page is in portrait, where the frame is not drawn
+    // at all, or this window is one of the panels the phone layout does not
+    // draw. Measuring against zero would step the type down to its floor for a
+    // reason that has nothing to do with the text — and the fit only ever goes
+    // down, so it would never come back. Leave it unrecorded and decide when
+    // there is something to decide against.
+    var room = box.getBoundingClientRect().height;
+    if (room < 20) return;
     tapeSeen[voice] = texts.length;
     if (!texts.length) return;
-    var room = box.getBoundingClientRect().height;
     var probe = el("div", cls);
     box.textContent = ""; box.appendChild(probe);
     box.style.setProperty("--tsz", tapeSize[voice] + "px");
@@ -983,8 +1412,11 @@
       if (c.length > longest.length) longest = c;
     }
     if (longest.length <= ctLongest.length) return;
-    ctLongest = longest;
     var e = $("sCt"), keep = e.textContent;
+    // Same guard as the tape: with the frame undrawn there is no row to measure,
+    // and a fit decided against zero width would be permanent.
+    if (e.getBoundingClientRect().width < 20) return;
+    ctLongest = longest;
     e.textContent = longest;
     for (var size=ctSize; size > 9.5; size -= 0.25){
       var rg = document.createRange(); rg.selectNodeContents(e);
@@ -998,16 +1430,30 @@
   // ── the header, recomputed from whatever the feed last said ──────────────
   var RESULTS = {"*":"in progress", "1-0":"white won (1-0)", "0-1":"black won (0-1)",
                  "1/2-1/2":"drawn (1/2-1/2)"};
+
+  // ── how the game ended, and WHY ──────────────────────────────────────────
+  // The engines can now resign and can agree a draw, so most games will end
+  // without a mate on the board. A resignation is an ordinary, decisive ending
+  // and this page has to read it as one — not as an error, not as a stall, and
+  // never as a bare "white won" with the reason dropped, which invites a reader
+  // to assume a checkmate that did not happen. The reason travels with the
+  // result everywhere the result is shown.
+  function ending(){
+    if (!D) return "";
+    var r = str(D.result);
+    if (!r || r === "*") return "";
+    var s = RESULTS[r] || r;
+    var t = str(D.termination);
+    return t ? s + " — " + t : s;
+  }
+
   function header(){
     if (!D) return;
     var bits = [];
     if (D.base_url) bits.push("live from the relay at " + str(D.base_url));
     if (D.opening_book) bits.push(str(D.opening_book));
     if (isFinite(Number(D.games_played))) bits.push("game " + Number(D.games_played));
-    if (D.result && D.result !== "*"){
-      bits.push((RESULTS[D.result] || str(D.result))
-                + (D.termination ? " — " + str(D.termination) : ""));
-    }
+    if (ending()) bits.push(ending());
     txt("sub", bits.join(" · "));
     txt("bwhoCol", D.model ? "improvised by a local " + str(D.model) + " model"
                            : "improvised by a local model");
@@ -1047,12 +1493,12 @@
   }
 
   // ── render one ply ───────────────────────────────────────────────────────
-  function render(i){
+  function render(i, animate){
     var ev = E[i];
 
     txt("san", str(ev.san));
     txt("whoMoved", str(ev.mover) + " moved");
-    drawBoard(i);
+    drawBoard(i, animate);
     drawFaces(i);
     drawThinking("white", i);
     drawThinking("black", i);
@@ -1160,22 +1606,46 @@
     } else if (st === "stopped"){
       cls = "live l-off"; word = "not running"; alert = true;
       line = "The broadcast is not running. This is the last position it sent, "
-           + ago(a) + ", at " + clockUTC(srvUpd) + ".";
+           + ago(a) + ", at " + clockUTC(srvUpd) + "."
+           + (ending() ? "  The last game: " + ending() + "." : "");
       FEED_STATE = "stopped";
-    } else if (a > STALE_MS){
+    } else if ((st === "between-games" || st === "starting") && a <= GAP_MS){
+      // A normal pause between games is NOT a fault. This test MUST come before the
+      // staleness test: the producer holds the final position for its gap, and with a
+      // gap near STALE_MS the page painted itself red during entirely healthy
+      // operation. That happened, it read as a failure, and the failure was ours.
+      cls = "live l-idle";
+      word = (st === "starting") ? "starting" : "between games";
+      // The ending is stated in the ordinary quiet grey, in the place a reader
+      // is already looking. A resignation ends a game; it is not a fault, and
+      // nothing here escalates for one.
+      line = (st === "starting")
+        ? "feed updated " + ago(a) + " · the broadcast is starting up"
+        : "feed updated " + ago(a) + " · "
+          + (ending() ? ending() + " · the next game begins shortly"
+                      : "the game ended and the next begins shortly");
+      FEED_STATE = st;
+    } else if (a > DEAD_MS){
       cls = "live l-off"; word = "stalled"; alert = true;
       line = "The feed has stalled — no update for " + Math.round(a/1000)
            + "s. What is on screen is the last thing that arrived, at "
            + clockUTC(srvUpd) + ". It is not live.";
       FEED_STATE = "stalled";
+    } else if (a > STALE_MS){
+      // Late, but not dead. Say it quietly. Reserving the loud treatment for a real
+      // outage is the only thing that makes the loud treatment mean anything.
+      cls = "live l-late"; word = "waiting";
+      line = "feed updated " + ago(a) + " · the next move is late";
+      FEED_STATE = "late";
     } else if (st === "starting"){
       cls = "live l-idle"; word = "starting";
       line = "feed updated " + ago(a) + " · the broadcast is starting up";
       FEED_STATE = "starting";
     } else if (st === "between-games"){
       cls = "live l-idle"; word = "between games";
-      line = "feed updated " + ago(a) + " · the game has ended and the next one "
-           + "has not started";
+      line = "feed updated " + ago(a) + " · "
+           + (ending() ? ending() + " · the next game has not started"
+                       : "the game has ended and the next one has not started");
       FEED_STATE = "between-games";
     } else if (st === "playing"){
       cls = "live l-live"; word = "live";
@@ -1200,8 +1670,12 @@
     // The board's frame goes red for every state that is not a healthy feed.
     // "between games" and "starting" are healthy: the feed is moving and the
     // position on the board is the real one it last sent, so they stay black.
+    // "late" is healthy too — a move is simply taking longer than the pace. The red
+    // frame is for a feed that has actually failed, not for one that is thinking.
+    // Escalating on every slow move trains the reader to ignore the red, and then it
+    // is worth nothing on the day it matters.
     var honest = (FEED_STATE === "live" || FEED_STATE === "between-games"
-                  || FEED_STATE === "starting");
+                  || FEED_STATE === "starting" || FEED_STATE === "late");
     $("stage").className = honest ? "" : "notlive";
   }
 
@@ -1263,16 +1737,27 @@
       if (ev[i] && typeof ev[i] === "object" && typeof ev[i].fen === "string") clean.push(ev[i]);
     }
 
-    var games = Number(j.games_played);
-    var seq = Number(j.move_seq);
     // A new game arrives as a changed games_played (and an empty events array).
     // A restarted broadcast arrives as a sequence that went backwards. Both mean
     // the same thing to this page: everything on screen belongs to a game that is
     // over, so clear it rather than letting one game's commentary bleed into the
     // next.
+    //
+    // games_played is OPTIONAL, and the producer serving the live feed today does
+    // not write it. `Number(undefined)` is NaN, and NaN !== NaN, so the old test
+    // declared a NEW GAME on every single poll: the board was re-rendered from
+    // scratch every two seconds, the sent/received stagger replayed on a message
+    // that had landed long ago, and the commentary fit was reset and re-measured
+    // each time. A field the feed does not carry must say NOTHING here, not
+    // "different from last time" — so it is read as null when it is absent and
+    // the sequence going backwards carries the signal on its own.
+    var gp = Number(j.games_played);
+    var games = isFinite(gp) ? gp : null;
+    var seq = Number(j.move_seq);
     var restarted = (lastSeq != null && isFinite(seq) && seq < lastSeq);
-    if (lastGames !== null && (games !== lastGames || restarted)) newGame();
-    lastGames = games;
+    var switched = (games !== null && lastGames !== null && games !== lastGames);
+    if (switched || restarted) newGame();
+    if (games !== null) lastGames = games;
     lastSeq = seq;
 
     D = j;
@@ -1285,7 +1770,12 @@
     if (i2 < 0){
       blank(); lastPly = -1;
     } else if (i2 !== lastPly){
-      render(i2);
+      // Only a SINGLE-ply advance is animated. A reconnect, a poll that skipped
+      // ahead, or a viewer arriving in the middle of a game all land here with a
+      // jump of more than one, and a piece sliding between two positions that
+      // are several moves apart would be a picture of something that never
+      // happened. Those paint instantly.
+      render(i2, lastPly >= 0 && i2 === lastPly + 1);
       holdArrival(i2);
       lastPly = i2;
     } else {
@@ -1294,7 +1784,15 @@
       // tapes are refilled because fitTape() empties the window it measures in,
       // and drawing them again is inert — the tape is a pure function of E.
       drawTape(i2);
+      // A game can end with no further ply — a resignation or an agreed draw —
+      // so the result and the status are watched as well as the move count, and
+      // the portraits are asked again when either changes. `true` suppresses the
+      // animation restart: this is the same ply, and a capture on it has already
+      // had its reaction.
+      if (str(j.result) !== lastResult || str(j.status) !== lastStatus) drawFaces(i2, true);
     }
+    lastResult = str(j.result);
+    lastStatus = str(j.status);
     header();
     paint();
   }
@@ -1309,21 +1807,125 @@
   }
 
   // ── start ────────────────────────────────────────────────────────────────
-  // fit the fixed canvas to whatever screen it lands on
-  var stage = $("stage");
+  // Fit the fixed canvas to whatever screen it lands on.
+  //
+  // Two things here are deliberate and neither is obvious.
+  //
+  // FIRST, the box is MEASURED, not computed from window.innerWidth. #safe is
+  // already inset by the safe-area insets and already sized by the dvh ladder,
+  // so reading its client box asks the browser what it actually decided instead
+  // of re-deriving it here and being wrong on the one device that matters. It is
+  // also immune to pinch-zoom, which visualViewport is not — iOS Safari ignores
+  // user-scalable=no on purpose, so a zoomed reader must not have the picture
+  // resized under them.
+  //
+  // SECOND, the canvas size is read off the element rather than hard-coded,
+  // because the phone breakpoint changes it. offsetWidth/offsetHeight are the
+  // pre-transform layout box, which is exactly the number the scale is against.
+  var stage = $("stage"), safeBox = $("safe");
+  var lastScale = 0, lastCw = 0, lastCh = 0, lastY = 0;
   function fit(){
-    var s = Math.min(window.innerWidth/1920, window.innerHeight/1080);
-    var x = Math.round((window.innerWidth  - 1920*s)/2);
-    var y = Math.round((window.innerHeight - 1080*s)/2);
+    var w = safeBox.clientWidth, h = safeBox.clientHeight;
+    // Portrait hides the frame outright, so there is no box to fit into. Doing
+    // nothing leaves the last good transform in place and the rotation back into
+    // landscape recomputes it; scaling to zero here would be a division by the
+    // absence of a screen.
+    if (w < 8 || h < 8) return;
+    var cw = stage.offsetWidth, ch = stage.offsetHeight;
+    if (cw < 8 || ch < 8) return;
+    var s = Math.min(w/cw, h/ch);
+    var x = Math.round((w - cw*s)/2);
+    var y = Math.round((h - ch*s)/2);
     stage.style.transform = "translate(" + x + "px," + y + "px) scale(" + s + ")";
+    // y IS the letterbox band above the picture. Under 40px there is no room for
+    // a corner control that is not sitting on the broadcast, so the control is
+    // withdrawn rather than allowed to land on the live badge.
+    safeBox.className = (y < 40) ? "tight" : "";
+    lastScale = s; lastCw = cw; lastCh = ch; lastY = y;
   }
-  window.addEventListener("resize", fit);
+
+  // iOS reports the OLD dimensions to the handler that fires on a rotation, and
+  // it moves the goalposts again a beat later when the toolbars settle. One
+  // measurement is therefore not enough: fit now, fit again when it has stopped
+  // lying, and once more after the animation. Three cheap layout reads beat one
+  // stale scale factor that persists until the next time the user happens to
+  // resize something.
+  var refitA = null, refitB = null;
+  function refit(){
+    fit();
+    clearTimeout(refitA); refitA = setTimeout(fit, 150);
+    clearTimeout(refitB); refitB = setTimeout(fit, 500);
+    // The geometry changed, so the two measured fits — the commentary type and
+    // the ciphertext row — are entitled to be re-decided against the new box.
+    // Both only ever step DOWN, so this can tighten a fit but never resize
+    // something upward under a reader mid-sentence.
+    tapeSeen = {pbp:-1, color:-1};
+  }
+  window.addEventListener("resize", refit);
+  window.addEventListener("orientationchange", refit);
+  if (window.visualViewport){
+    // Safari fires these three inconsistently — sometimes resize without
+    // orientationchange, sometimes the reverse, sometimes a scroll as the
+    // toolbar collapses and nothing else. Listening to all of them costs a
+    // layout read; listening to one of them costs a mis-scaled broadcast.
+    window.visualViewport.addEventListener("resize", refit);
+    window.visualViewport.addEventListener("scroll", refit);
+  }
+  // And, underneath all three of those, watch the BOX ITSELF. Every listener
+  // above is a guess about which event accompanies a change in the usable area,
+  // and the safe-area insets can change with no event at all — they are a
+  // property of the device's furniture, not of the window. Observing the element
+  // whose size the scale is computed from removes the guess: whatever moved, and
+  // whether or not it announced itself, the picture is re-fitted to what is
+  // actually there. Caught by measurement: with the insets changed underneath a
+  // settled page, every event-driven path stayed silent and the canvas kept a
+  // scale for a box that no longer existed, overhanging the notch side by 59px.
+  if (window.ResizeObserver){
+    new ResizeObserver(function(){ fit(); }).observe(safeBox);
+  }
   fit();
+
+  // ── the full-screen control ──────────────────────────────────────────────
+  // Only built where the browser will honour it. iPhone Safari restricts the
+  // Fullscreen API to video elements, so there the button is simply absent — a
+  // control that is present and does nothing is worse than no control, because
+  // pressing it teaches the reader that the page is broken. Gated on a coarse
+  // pointer as well, so the desktop composition is untouched.
+  var fsb = null;
+  (function initFullscreen(){
+    var root = document.documentElement;
+    var req = root.requestFullscreen || root.webkitRequestFullscreen;
+    var enabled = (document.fullscreenEnabled === true) ||
+                  (document.webkitFullscreenEnabled === true);
+    if (!req || !enabled) return;
+    if (!(window.matchMedia && window.matchMedia("(pointer:coarse)").matches)) return;
+    fsb = document.createElement("button");
+    fsb.id = "fsbtn";
+    fsb.type = "button";
+    fsb.textContent = "full screen";
+    fsb.addEventListener("click", function(){
+      var on = document.fullscreenElement || document.webkitFullscreenElement;
+      var ex = document.exitFullscreen || document.webkitExitFullscreen;
+      try { on && ex ? ex.call(document) : req.call(root); } catch(e){}
+    });
+    safeBox.appendChild(fsb);
+    function label(){
+      fsb.textContent = (document.fullscreenElement || document.webkitFullscreenElement)
+        ? "exit full screen" : "full screen";
+      refit();
+    }
+    document.addEventListener("fullscreenchange", label);
+    document.addEventListener("webkitfullscreenchange", label);
+  })();
 
   document.addEventListener("visibilitychange", function(){
     // Coming back to the page re-polls at once, so it never spends a moment
     // showing a state it could have refreshed. Going away only slows the poll
     // down; it does not stop it, because the badge has to stay honest either way.
+    // Coming back is also a chance for the geometry to have changed while the
+    // page was not looking — a rotation in another tab, or the toolbars in a
+    // different state — so it re-fits as well as re-polls.
+    if (!document.hidden) refit();
     if (!document.hidden && netErr === 0){ clearTimeout(pollTimer); poll(); }
     else schedule(netErr > 0);
   });
@@ -1338,6 +1940,14 @@
     return {state: FEED_STATE, age: Math.round(age()), seq: D ? D.move_seq : null,
             status: D ? D.status : null, plies: E.length, errs: netErr, err: netMsg,
             badge: $("ltext").textContent, line: $("feedLine").textContent};
+  };
+  // for verification only: the geometry the page settled on, so a check can be
+  // made against the numbers rather than against an impression of a screenshot
+  window.__fit = function(){
+    return {scale: lastScale, canvas: [lastCw, lastCh],
+            box: [safeBox.clientWidth, safeBox.clientHeight], letterboxY: lastY,
+            frame: [$("frame").clientWidth, $("frame").clientHeight],
+            fullscreenButton: !!fsb};
   };
 })();
 </script>
